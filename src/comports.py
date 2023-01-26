@@ -1,35 +1,58 @@
-import serial.tools.list_ports
-import time
+import serial
 
 
-ports = serial.tools.list_ports.comports()
-serialInst = serial.Serial()
+def ini():
+    serial_inst = serial.Serial()
+    serial_inst.baudrate = 9600
+    serial_inst.bytesize = 8
+    serial_inst.parity = 'N'
+    serial_inst.stopbits = 1
+    serial_inst.port = 'COM3'
+    serial_inst.open()
+    return serial_inst
 
-portList = []  # Show all available COM-PORTs
-for port in ports:
-    portList.append(str(port))
-    print(str(port))
 
-serialInst.baudrate = 9600
-serialInst.bytesize = 8
-serialInst.parity = 'N'
-serialInst.stopbits = 1
-serialInst.port = 'COM2'
-res = serialInst.open()
+def show_available_ports():
+    import serial.tools.list_ports
+    ports = serial.tools.list_ports.comports()
+    port_list = []  # Show all available COM-PORTs
+    for port in ports:
+        port_list.append(str(port))
+        print(str(port))
+    return port_list
 
-while True:
-    if serialInst.inWaiting():
-        print('Listening...')
-        time.sleep(2.0)
-        print('Reading data...')
-        packet = serialInst.read()
-        if packet is None:
-            print('No data')
+
+def write_comport(data, serial_inst):
+    serial_inst.write(data)
+
+
+def read_com_port(serial_inst):
+    while True:
+        if serial_inst.inWaiting():
+            packet = serial_inst.read()
+            if packet is None:
+                return "No data"
+            else:
+                return packet.decode('utf-8')
+
+
+def convert_string_to_bytes(binary_string):
+    decimal = 0
+    reverse_string = binary_string[::-1]
+    for i in range(0, len(reverse_string)):
+        if reverse_string[i] == '1':
+            decimal += 2 ** i
         else:
-            print(f'packet data type is {type(packet)}')
-            data = packet.decode('ascii')
-            ba = bytearray(packet)
-            print(f'Usind ascii table convert data to bytearray and show it as decimal: {ba}')
-            print(f'packet data is {data}')
-            print(f'packet data type if {type(data)}')
-        packet = None
+            continue
+    stm_key_char = chr(decimal)
+    return bytes(stm_key_char, 'utf-8')
+
+
+def main(data):
+    serial_instance = ini()
+    data_stm = convert_string_to_bytes(data)
+    write_comport(data_stm, serial_instance)
+
+
+if __name__ == "__main__":
+    main('11001100')

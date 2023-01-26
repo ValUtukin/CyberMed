@@ -1,4 +1,5 @@
 from tkinter import *
+import src.comports as comport
 
 
 def left_rotate():
@@ -11,12 +12,23 @@ def right_rotate():
 
 def get_bytestring():
     bytestring = str(bytestring_entry.get())
-    warning_label = Label(root, text='8 bits!', background='#f65e05', font=('Arial', 10,))
+    warning_label = Label(root, text='8 bits!', background='#f65e05', font=('Arial', 10))
     if len(bytestring) == 8:
-        warning_label["text"] = ''
-        warning_label["background"] = '#0585e8'
-        warning_label.place(relx=0.81, rely=0.01, relheight=0.056, relwidth=0.15)
-        print(f'We got nice byte => {bytestring}')
+        for i in range(0, 8):
+            if bytestring[i] in '01':
+                continue
+            else:
+                warning_label["text"] = '1 and 0'
+                warning_label["background"] = '#f65e05'
+                warning_label["font"] = ('Arial', 10)
+                warning_label.place(relx=0.81, rely=0.01, relheight=0.056, relwidth=0.15)
+                break
+        else:
+            warning_label["text"] = 'Sent!'
+            warning_label["background"] = '#08fa46'
+            warning_label["font"] = ('Arial', 10)
+            warning_label.place(relx=0.81, rely=0.01, relheight=0.056, relwidth=0.15)
+            comport.main(bytestring)
     else:
         warning_label.place(relx=0.81, rely=0.01, relheight=0.056, relwidth=0.15)
 
