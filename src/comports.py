@@ -58,8 +58,6 @@ def main(config, pwm_int):
     time.sleep(0.1)
     pwm = bytes(chr(pwm_int), 'ascii')
     write_comport(pwm, serial_instance)
-    print(f'We sent data_stm:{data_stm}, type:{type(data_stm)}')
-    print(f'We sent pwm:{pwm}, type:{type(pwm)}')
 
 
 if __name__ == "__main__":
