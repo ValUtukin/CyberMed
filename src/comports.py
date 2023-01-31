@@ -1,4 +1,5 @@
 import serial
+import time
 
 
 def ini():
@@ -7,7 +8,7 @@ def ini():
     serial_inst.bytesize = 8
     serial_inst.parity = 'N'
     serial_inst.stopbits = 1
-    serial_inst.port = 'COM3'
+    serial_inst.port = 'COM8'
     serial_inst.open()
     return serial_inst
 
@@ -23,7 +24,9 @@ def show_available_ports():
 
 
 def write_comport(data, serial_inst):
+    # time.sleep(0.1)
     serial_inst.write(data)
+    # print(f'we sent {data}')
 
 
 def read_com_port(serial_inst):
@@ -45,14 +48,19 @@ def convert_string_to_bytes(binary_string):
         else:
             continue
     stm_key_char = chr(decimal)
-    return bytes(stm_key_char, 'utf-8')
+    return bytes(stm_key_char, 'ascii')
 
 
-def main(data):
+def main(config, pwm_int):
     serial_instance = ini()
-    data_stm = convert_string_to_bytes(data)
+    data_stm = convert_string_to_bytes(config)
     write_comport(data_stm, serial_instance)
+    time.sleep(0.1)
+    pwm = bytes(chr(pwm_int), 'ascii')
+    write_comport(pwm, serial_instance)
+    print(f'We sent data_stm:{data_stm}, type:{type(data_stm)}')
+    print(f'We sent pwm:{pwm}, type:{type(pwm)}')
 
 
 if __name__ == "__main__":
-    main('11001100')
+    main('01100011', 20)
