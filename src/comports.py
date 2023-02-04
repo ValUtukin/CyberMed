@@ -4,7 +4,7 @@ import time
 
 def ini():
     serial_inst = serial.Serial()
-    serial_inst.baudrate = 9600
+    serial_inst.baudrate = 115200
     serial_inst.bytesize = 8
     serial_inst.parity = 'N'
     serial_inst.stopbits = 1
@@ -55,9 +55,8 @@ def main(config, pwm_int):
     serial_instance = ini()
     data_stm = convert_string_to_bytes(config)
     write_comport(data_stm, serial_instance)
-    time.sleep(0.1)
-    pwm = bytes(chr(pwm_int), 'ascii')
-    write_comport(pwm, serial_instance)
+    time.sleep(0.0005)
+    write_comport(pwm_int, serial_instance)
 
 
 if __name__ == "__main__":

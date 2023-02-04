@@ -26,7 +26,8 @@ def motor1_left(pwm):
         config_byte = '01010001'  # 1st Motor, left rotation
         print('Motor #1 - left')
         print(f"We're about to send {config_byte} with PWM:{int_pwm} \n")
-        comport.main(config_byte, int_pwm)
+        char_pwm = bytes(chr(int_pwm), 'ascii')
+        comport.main(config_byte, char_pwm)
         return 'All sent'
     else:
         return 'Incorrect PWM'
@@ -37,15 +38,16 @@ def motor1_right(pwm):
         int_pwm = int(pwm)
         config_byte = '01100001'  # 1st Motor, right rotation
         print('Motor #1 - right')
-        print(f"We're about to send {config_byte} with PWM:{int_pwm} \n")
-        comport.main(config_byte, int_pwm)
+        print(f"We're about to send {config_byte} with PWM:{int_pwm}\n")
+        char_pwm = bytes(chr(int_pwm), 'ascii')
+        comport.main(config_byte, char_pwm)
         return 'All sent'
     else:
         return 'Incorrect PWM'
 
 
 def motor1_stop():
-    config_byte = '01000000'
+    config_byte = '01000001'
     comport.main(config_byte, 0)
 
 
@@ -55,7 +57,8 @@ def motor2_left(pwm):
         config_byte = '01010011'  # 2nd Motor, left rotation
         print('Motor #2 - left')
         print(f"We're about to send {config_byte} with PWM:{int_pwm} \n")
-        comport.main(config_byte, int_pwm)
+        char_pwm = bytes(chr(int_pwm), 'ascii')
+        comport.main(config_byte, char_pwm)
         return 'All sent'
     else:
         return 'Incorrect PWM'
@@ -67,14 +70,15 @@ def motor2_right(pwm):
         config_byte = '01100011'  # 2nd Motor, right rotation
         print('Motor #2 - right')
         print(f"We're about to send {config_byte} with PWM:{int_pwm} \n")
-        comport.main(config_byte, int_pwm)
+        char_pwm = bytes(chr(int_pwm), 'ascii')
+        comport.main(config_byte, char_pwm)
         return 'All sent'
     else:
         return 'Incorrect PWM'
 
 
 def motor2_stop():
-    config_byte = '01000010'
+    config_byte = '01000011'
     comport.main(config_byte, 0)
 
 
