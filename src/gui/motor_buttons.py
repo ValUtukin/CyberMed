@@ -47,8 +47,8 @@ def motor1_right(pwm):
 
 
 def motor1_stop():
-    config_byte = '01000001'
-    comport.main(config_byte, 0)
+    config_byte = '00000001'
+    comport.main(config_byte)
 
 
 def motor2_left(pwm):
@@ -78,8 +78,8 @@ def motor2_right(pwm):
 
 
 def motor2_stop():
-    config_byte = '01000011'
-    comport.main(config_byte, 0)
+    config_byte = '00000011'
+    comport.main(config_byte)
 
 
 def main():
