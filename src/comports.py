@@ -24,9 +24,7 @@ def show_available_ports():
 
 
 def write_comport(data, serial_inst):
-    # time.sleep(0.1)
     serial_inst.write(data)
-    # print(f'we sent {data}')
 
 
 def read_com_port(serial_inst):
@@ -51,12 +49,13 @@ def convert_string_to_bytes(binary_string):
     return bytes(stm_key_char, 'ascii')
 
 
-def main(config, pwm_int):
+def main(config, pwm_int=0):
     serial_instance = ini()
     data_stm = convert_string_to_bytes(config)
     write_comport(data_stm, serial_instance)
     time.sleep(0.0005)
-    write_comport(pwm_int, serial_instance)
+    if pwm_int != 0:
+        write_comport(pwm_int, serial_instance)
 
 
 if __name__ == "__main__":

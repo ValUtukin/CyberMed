@@ -29,13 +29,11 @@ def get_bytestring():
 
 def motor1_rotate_left():
     pwm = motor1_pwm_entry.get()
-    motor1_pwm_entry.delete(0, 'end')
     mb.motor1_left(pwm)
 
 
 def motor1_rotate_right():
     pwm = motor1_pwm_entry.get()
-    motor1_pwm_entry.delete(0, 'end')
     mb.motor1_right(pwm)
 
 
@@ -45,13 +43,11 @@ def motor1_rotate_stop():
 
 def motor2_rotate_left():
     pwm = motor2_pwm_entry.get()
-    motor2_pwm_entry.delete(0, 'end')
     mb.motor2_left(pwm)
 
 
 def motor2_rotate_right():
     pwm = motor2_pwm_entry.get()
-    motor2_pwm_entry.delete(0, 'end')
     mb.motor2_right(pwm)
 
 
