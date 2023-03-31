@@ -180,11 +180,14 @@ class View:
             button.config(bg='SystemButtonFace')
 
     def configure_relatives_buttons(self, group_buttons, pressed_button):
-        self.switch_button_color(group_buttons[pressed_button])
-        current_button_group_copy = group_buttons.copy()
-        del current_button_group_copy[pressed_button]
-        for i in range(0, len(current_button_group_copy)):
-            self.switch_button_color(current_button_group_copy[i], color='SystemButtonFace')
+        if group_buttons[pressed_button]['bg'] != 'SystemButtonFace':
+            return 0
+        else:
+            self.switch_button_color(group_buttons[pressed_button])
+            current_button_group_copy = group_buttons.copy()
+            del current_button_group_copy[pressed_button]
+            for i in range(0, len(current_button_group_copy)):
+                self.switch_button_color(current_button_group_copy[i], color='SystemButtonFace')
 
     def adc_change(self):
         pub.sendMessage("Adc_change")
