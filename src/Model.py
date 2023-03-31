@@ -44,8 +44,9 @@ class Model:
         if self.validate_pwm(pwm):
             char_pwm = bytes(chr(pwm), 'ascii')
             com.send_command(self.comport, config, motor_byte=motor_byte, pwm_int=char_pwm)
-            time.sleep(limited_lime)
-            com.send_command(self.comport, config='00000010', motor_byte='00000000')
-            print('Thread is over')
+            time.sleep(limited_lime)  # Wait until motor rotate for "limited_time" sec and then stop it
+            motor_number_str = motor_byte[5::]
+            motor_stop_byte = '00000' + motor_number_str
+            com.send_command(self.comport, config='00000010', motor_byte=motor_stop_byte)
         else:
             print('Model - Bad pwm')
