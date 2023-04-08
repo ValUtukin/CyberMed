@@ -18,8 +18,7 @@ class View:
                                                  onvalue=True, offvalue=False)
         self.adc_status = BooleanVar()
         self.adc_checkbox = Checkbutton(self.container, text='with ADC', background='#b8dffe',
-                                               command=self.adc_change, variable=self.adc_status,
-                                               onvalue=True, offvalue=False)
+                                               variable=self.adc_status, onvalue=True, offvalue=False)
         self.global_timer_frame = tk.Frame(self.container, bg='#b8dffe')
         self.global_timer_label = Label(self.global_timer_frame, text='Global Time-limited motion', background='#b8dffe', font=('Arial', 10))
         self.global_timer_entry = Entry(self.global_timer_frame)

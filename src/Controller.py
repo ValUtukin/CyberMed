@@ -16,7 +16,6 @@ class Controller:
         self.view.setup()
 
         pub.subscribe(self.power_switch, "Power_switch")
-        pub.subscribe(self.adc_change, "Adc_change")
 
         pub.subscribe(self.motor1_rotate_left, "Motor1_rotate_left")
         pub.subscribe(self.motor1_rotate_right, "Motor1_rotate_right")
@@ -46,22 +45,6 @@ class Controller:
         else:
             com.send_command(self.comport, config='00000001', power_byte='00000000')
 
-    def adc_change(self):
-        adc_status = self.view.adc_status.get()
-        comport_thread = thread.Thread(target=self.model.motor1_save_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, config='00001000', adc='00000001')
-            data = com.read_com_port(self.comport)
-            print(f'Data is {data}, len = {len(data)}, type is {type(data)}')
-            comport_thread.start()
-            comport_thread.join()
-        else:
-            com.send_adc(self.comport, config='00001000', adc='00000000')
-            if comport_thread.is_alive():
-                comport_thread.join()
-            else:
-                print('Thread is down')
-
     def motor1_pwm_scal_change(self):  # code for get scale value and send it in dynamic mode
         pass
     #     pwm = self.view.motor1_pwm_scale.get()
@@ -71,6 +54,11 @@ class Controller:
     def motor1_rotate_left(self):
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -91,6 +79,11 @@ class Controller:
     def motor1_rotate_right(self):
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -114,6 +107,11 @@ class Controller:
     def motor2_rotate_left(self):
         pwm = self.view.motor2_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -134,6 +132,11 @@ class Controller:
     def motor2_rotate_right(self):
         pwm = self.view.motor2_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -157,6 +160,11 @@ class Controller:
     def motor3_rotate_left(self):
         pwm = self.view.motor3_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -177,6 +185,11 @@ class Controller:
     def motor3_rotate_right(self):
         pwm = self.view.motor3_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -200,6 +213,11 @@ class Controller:
     def motor4_rotate_left(self):
         pwm = self.view.motor4_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -220,6 +238,11 @@ class Controller:
     def motor4_rotate_right(self):
         pwm = self.view.motor4_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -243,6 +266,11 @@ class Controller:
     def motor5_rotate_left(self):
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())
@@ -263,6 +291,11 @@ class Controller:
     def motor5_rotate_right(self):
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
+        adc_status = self.view.adc_status.get()
+        if adc_status:
+            com.send_adc(self.comport, '00001000', '00000001')
+            adc_thread = thread.Thread(target=self.model.get_adc_data)
+            adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
                 sec = float(self.view.global_timer_entry.get())

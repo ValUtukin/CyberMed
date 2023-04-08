@@ -30,10 +30,38 @@ class Model:
         else:
             return False  # PWM neither a number nor a string
 
-    def motor1_save_adc_data(self):
+    def hexstr_to_decint(self, hexstr, reverse_flag=False):
+        final_decimal_list = list()
+        if reverse_flag:
+            target_hexstr = hexstr[::-1]
+            if len(target_hexstr) % 2 == 0:
+                hex_bytes_list = [target_hexstr[i - 1:i + 1] for i in range(1, len(target_hexstr), 2)]
+            else:
+                hex_bytes_list = [target_hexstr[i - 1:i + 1] for i in range(1, len(target_hexstr), 2)]
+                hex_bytes_list.append(target_hexstr[len(target_hexstr) - 1])
+        else:
+            target_hexstr = hexstr
+            if len(target_hexstr) % 2 == 0:
+                hex_bytes_list = [target_hexstr[i - 1:i + 1] for i in range(1, len(target_hexstr), 2)]
+            else:
+                hex_bytes_list = [target_hexstr[i - 1:i + 1] for i in range(1, len(target_hexstr), 2)]
+                hex_bytes_list.append(target_hexstr[len(target_hexstr) - 1])
+        for i in range(0, len(hex_bytes_list)):
+            decimal = int(hex_bytes_list[i], 16)
+            if decimal != 0:
+                final_decimal_list.append(decimal)
+            else:
+                continue
+        return final_decimal_list
+
+    def get_adc_data(self):
         if self.comport.isOpen():
-            data = self.comport.read(1)
+            data = self.comport.read_all()
             print(f'Data is {data}, len = {len(data)}, type is {type(data)}')
+            data_hexstr = data.hex()
+            print(f'data_str is {data_hexstr}, type is {type(data_hexstr)}')
+            decimal_list = self.hexstr_to_decint(data_hexstr, reverse_flag=False)
+            print(*decimal_list)
         else:
             self.comport.open()
             data = self.comport.read(1)
