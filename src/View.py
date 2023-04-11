@@ -1,4 +1,5 @@
 import tkinter as tk
+import cv2 as cv
 from pubsub import pub
 from tkinter import *
 from PIL import ImageTk, Image
@@ -11,6 +12,7 @@ class View:
     def setup(self):
         self.create_widgets()
         self.setup_layout()
+        self.init_camera_first_frame()
 
     def create_widgets(self):
         self.figure_frame = tk.Frame(self.container, bg='#09AD4B')
@@ -192,6 +194,27 @@ class View:
             del current_button_group_copy[pressed_button]
             for i in range(0, len(current_button_group_copy)):
                 self.switch_button_color(current_button_group_copy[i], color='SystemButtonFace')
+
+    def rescale_frame(self, img, scale=0.3):
+        width = int(img.shape[1] * scale)
+        height = int(img.shape[0] * scale)
+        dimensions = (width, height)
+        return cv.resize(img, dimensions, interpolation=cv.INTER_AREA)
+
+    def fit_image_into_label(self, image, rescale_flag=False, given_scale=0.5):
+        if rescale_flag:
+            img = self.rescale_frame(image, scale=given_scale)
+        else:
+            img = image
+        cvimage = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        img = Image.fromarray(cvimage)
+        imgtk = ImageTk.PhotoImage(image=img)
+        self.figure_label.imgtk = imgtk
+        self.figure_label.configure(image=imgtk)
+
+    def init_camera_first_frame(self):
+        initial_image = cv.imread('../Images/No_graph.png')
+        self.fit_image_into_label(initial_image)
 
     def adc_change(self):
         pub.sendMessage("Adc_change")
