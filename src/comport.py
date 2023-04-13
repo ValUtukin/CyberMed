@@ -5,6 +5,7 @@ import time
 def ini(comport_name='COM2'):
     serial_inst = serial.Serial()
     serial_inst.baudrate = 115200
+    serial_inst.timeout = 5.0
     serial_inst.bytesize = 8
     serial_inst.parity = 'N'
     serial_inst.stopbits = 1

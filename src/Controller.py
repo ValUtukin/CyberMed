@@ -10,7 +10,7 @@ import time
 class Controller:
     def __init__(self, parent):
         self.parent = parent
-        self.comport = com.ini('COM2')
+        self.comport = com.ini('COM3')
         self.model = Model(self.comport)
         self.view = View(parent)
         self.view.setup()
@@ -55,9 +55,9 @@ class Controller:
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -73,16 +73,20 @@ class Controller:
             else:
                 char_pwm = bytes(chr(pwm), 'ascii')
                 com.send_command(self.comport, config='00000110', motor_byte='00001000', pwm_int=char_pwm)
+                self.model.draw_adc_figure()
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 1 rotate left')
 
     def motor1_rotate_right(self):
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -100,6 +104,9 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00010000', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 1 rotate right')
 
     def motor1_rotate_stop(self):
         com.send_command(self.comport, config='00000010', motor_byte='00000000')
@@ -108,9 +115,9 @@ class Controller:
         pwm = self.view.motor2_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -128,14 +135,17 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00001001', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 2 rotate left')
 
     def motor2_rotate_right(self):
         pwm = self.view.motor2_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -153,6 +163,9 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00010001', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 2 rotate right')
 
     def motor2_rotate_stop(self):
         com.send_command(self.comport, config='00000010', motor_byte='00000001')
@@ -161,9 +174,9 @@ class Controller:
         pwm = self.view.motor3_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -181,14 +194,17 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00001010', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 3 rotate left')
 
     def motor3_rotate_right(self):
         pwm = self.view.motor3_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -206,6 +222,9 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00010010', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 3 rotate right')
 
     def motor3_rotate_stop(self):
         com.send_command(self.comport, config='00000010', motor_byte='00000010')
@@ -214,9 +233,9 @@ class Controller:
         pwm = self.view.motor4_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -234,14 +253,17 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00001011', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 4 rotate left')
 
     def motor4_rotate_right(self):
         pwm = self.view.motor4_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -259,6 +281,9 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00010011', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 4 rotate right')
 
     def motor4_rotate_stop(self):
         com.send_command(self.comport, config='00000010', motor_byte='00000011')
@@ -267,9 +292,9 @@ class Controller:
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -287,14 +312,17 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00001100', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 5 rotate left')
 
     def motor5_rotate_right(self):
         pwm = self.view.motor1_pwm_scale.get()
         global_timer_status = self.view.global_timer_status.get()
         adc_status = self.view.adc_status.get()
+        adc_thread = thread.Thread(target=self.model.get_adc_data)
         if adc_status:
             com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread = thread.Thread(target=self.model.get_adc_data)
             adc_thread.start()
         if self.model.validate_pwm(pwm):
             if global_timer_status:
@@ -312,6 +340,9 @@ class Controller:
                 com.send_command(self.comport, config='00000110', motor_byte='00010100', pwm_int=char_pwm)
         else:
             print("Incorrect PWM")
+        if adc_thread.is_alive():
+            adc_thread.join()
+            self.model.draw_adc_figure('Motor 5 rotate right')
 
     def motor5_rotate_stop(self):
         com.send_command(self.comport, config='00000010', motor_byte='00000100')
@@ -321,10 +352,10 @@ if __name__ == '__main__':
     root = Tk()
     root['bg'] = '#0585e8'
     root.title('Motor Client')
-    root.geometry('800x600')
+    root.geometry('1600x900')
     photo = PhotoImage(file="../Images/cyber_hand.png")
     root.iconphoto(False, photo)
-    root.resizable(width=False, height=True)
+    root.resizable(width=False, height=False)
 
     application = Controller(root)
     root.mainloop()

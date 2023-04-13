@@ -8,6 +8,7 @@ from PIL import ImageTk, Image
 class View:
     def __init__(self, parent):
         self.container = parent
+        pub.subscribe(self.adc_figure_update, 'Adc figure updated')
 
     def setup(self):
         self.create_widgets()
@@ -215,6 +216,10 @@ class View:
     def init_camera_first_frame(self):
         initial_image = cv.imread('../Images/No_graph.png')
         self.fit_image_into_label(initial_image)
+
+    def adc_figure_update(self):
+        figure = cv.imread('../Images/AdcFigure.png')
+        self.fit_image_into_label(figure)
 
     def adc_change(self):
         pub.sendMessage("Adc_change")
