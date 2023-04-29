@@ -3,8 +3,7 @@ from Model import Model
 from tkinter import *
 from pubsub import pub
 import comport as com
-import threading as thread
-import time
+from MotorController import MotorController
 
 
 class Controller:
@@ -15,28 +14,67 @@ class Controller:
         self.view = View(parent)
         self.view.setup()
 
+        self.upper_motors_frame = self.view.upper_motors_frame
+        self.lower_motors_frame = self.view.lower_motors_frame
+
+        self.upper_controller = MotorController(self.comport, 'Upper')
+        self.lower_controller = MotorController(self.comport, 'Lower')
+
+        self.adc_status = False
+        self.global_timer_status = False
+        self.global_timer_time = 0.0
+
+        pub.subscribe(self.adc_switch, "Adc_switch")
+        pub.subscribe(self.global_timer_switch, "Global_timer_switch")
         pub.subscribe(self.power_switch, "Power_switch")
 
-        pub.subscribe(self.motor1_rotate_left, "Motor1_rotate_left")
-        pub.subscribe(self.motor1_rotate_right, "Motor1_rotate_right")
-        pub.subscribe(self.motor1_rotate_stop, "Motor1_rotate_stop")
-        pub.subscribe(self.motor1_pwm_scal_change, "Motor1_pwm_scale_change")
+        pub.subscribe(self.upper_motor1_rotate_left, "Upper_motor1_rotate_left")
+        pub.subscribe(self.upper_motor1_rotate_right, "Upper_motor1_rotate_right")
+        pub.subscribe(self.upper_motor1_rotate_stop, "Upper_motor1_rotate_stop")
 
-        pub.subscribe(self.motor2_rotate_left, "Motor2_rotate_left")
-        pub.subscribe(self.motor2_rotate_right, "Motor2_rotate_right")
-        pub.subscribe(self.motor2_rotate_stop, "Motor2_rotate_stop")
+        pub.subscribe(self.upper_motor2_rotate_left, "Upper_motor2_rotate_left")
+        pub.subscribe(self.upper_motor2_rotate_right, "Upper_motor2_rotate_right")
+        pub.subscribe(self.upper_motor2_rotate_stop, "Upper_motor2_rotate_stop")
 
-        pub.subscribe(self.motor3_rotate_left, "Motor3_rotate_left")
-        pub.subscribe(self.motor3_rotate_right, "Motor3_rotate_right")
-        pub.subscribe(self.motor3_rotate_stop, "Motor3_rotate_stop")
+        pub.subscribe(self.upper_motor3_rotate_left, "Upper_motor3_rotate_left")
+        pub.subscribe(self.upper_motor3_rotate_right, "Upper_motor3_rotate_right")
+        pub.subscribe(self.upper_motor3_rotate_stop, "Upper_motor3_rotate_stop")
 
-        pub.subscribe(self.motor4_rotate_left, "Motor4_rotate_left")
-        pub.subscribe(self.motor4_rotate_right, "Motor4_rotate_right")
-        pub.subscribe(self.motor4_rotate_stop, "Motor4_rotate_stop")
+        pub.subscribe(self.upper_motor4_rotate_left, "Upper_motor4_rotate_left")
+        pub.subscribe(self.upper_motor4_rotate_right, "Upper_motor4_rotate_right")
+        pub.subscribe(self.upper_motor4_rotate_stop, "Upper_motor4_rotate_stop")
 
-        pub.subscribe(self.motor5_rotate_left, "Motor5_rotate_left")
-        pub.subscribe(self.motor5_rotate_right, "Motor5_rotate_right")
-        pub.subscribe(self.motor5_rotate_stop, "Motor5_rotate_stop")
+        pub.subscribe(self.upper_motor5_rotate_left, "Upper_motor5_rotate_left")
+        pub.subscribe(self.upper_motor5_rotate_right, "Upper_motor5_rotate_right")
+        pub.subscribe(self.upper_motor5_rotate_stop, "Upper_motor5_rotate_stop")
+
+        pub.subscribe(self.lower_motor1_rotate_left, "Lower_motor1_rotate_left")
+        pub.subscribe(self.lower_motor1_rotate_right, "Lower_motor1_rotate_right")
+        pub.subscribe(self.lower_motor1_rotate_stop, "Lower_motor1_rotate_stop")
+
+        pub.subscribe(self.lower_motor2_rotate_left, "Lower_motor2_rotate_left")
+        pub.subscribe(self.lower_motor2_rotate_right, "Lower_motor2_rotate_right")
+        pub.subscribe(self.lower_motor2_rotate_stop, "Lower_motor2_rotate_stop")
+
+        pub.subscribe(self.lower_motor3_rotate_left, "Lower_motor3_rotate_left")
+        pub.subscribe(self.lower_motor3_rotate_right, "Lower_motor3_rotate_right")
+        pub.subscribe(self.lower_motor3_rotate_stop, "Lower_motor3_rotate_stop")
+
+        pub.subscribe(self.lower_motor4_rotate_left, "Lower_motor4_rotate_left")
+        pub.subscribe(self.lower_motor4_rotate_right, "Lower_motor4_rotate_right")
+        pub.subscribe(self.lower_motor4_rotate_stop, "Lower_motor4_rotate_stop")
+
+        pub.subscribe(self.lower_motor5_rotate_left, "Lower_motor5_rotate_left")
+        pub.subscribe(self.lower_motor5_rotate_right, "Lower_motor5_rotate_right")
+        pub.subscribe(self.lower_motor5_rotate_stop, "Lower_motor5_rotate_stop")
+
+    def adc_switch(self):
+        self.adc_status = self.view.adc_status.get()
+
+    def global_timer_switch(self):
+        self.global_timer_status = self.view.global_timer_status.get()
+        if self.global_timer_status:
+            self.global_timer_time = float(self.view.global_timer_entry.get())
 
     def power_switch(self):
         power_status = self.view.power_status.get()
@@ -45,307 +83,292 @@ class Controller:
         else:
             com.send_command(self.comport, config='00000001', power_byte='00000000')
 
-    def motor1_pwm_scal_change(self):  # code for get scale value and send it in dynamic mode
-        pass
-    #     pwm = self.view.motor1_pwm_scale.get()
-    #     char_pwm = bytes(chr(pwm), 'ascii')
-    #     com.send_command(self.comport, config='00000110', motor_byte='00001000', pwm_int=char_pwm)
-
-    def motor1_rotate_left(self):
-        pwm = self.view.motor1_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001000', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor1_timer_status.get():
-                sec = float(self.view.motor1_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001000', pwm, sec,))
-                time_limited_thread.start()
-            else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00001000', pwm_int=char_pwm)
-                self.model.draw_adc_figure()
+    def upper_motor1_rotate_left(self):
+        local_timer_status = self.view.upper_motors_frame.motor1_timer_status.get()
+        pwm = self.upper_motors_frame.motor1_pwm_scale.get()
+        if local_timer_status:  # Local timer has bigger priority. So if local time was given, so here we go that time
+            time = float(self.view.upper_motors_frame.motor1_timer_entry.get())
+            self.upper_controller.motor1_rotate_left(self.adc_status, pwm, time)
         else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 1 rotate left')
+            if self.global_timer_status:  # If local time is False, we check is there global time (low priority).
+                time = self.global_timer_time
+                self.upper_controller.motor1_rotate_left(self.adc_status, pwm, time)
+            else:  # If no time limits, here we go in unlimited rotation
+                self.upper_controller.motor1_rotate_left(self.adc_status, pwm)
 
-    def motor1_rotate_right(self):
-        pwm = self.view.motor1_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010000', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor1_timer_status.get():
-                sec = float(self.view.motor1_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010000', pwm, sec,))
-                time_limited_thread.start()
-            else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00010000', pwm_int=char_pwm)
+    def upper_motor1_rotate_right(self):
+        local_timer_status = self.view.upper_motors_frame.motor1_timer_status.get()
+        pwm = self.upper_motors_frame.motor1_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor1_timer_entry.get())
+            self.upper_controller.motor1_rotate_right(self.adc_status, pwm, time)
         else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 1 rotate right')
-
-    def motor1_rotate_stop(self):
-        com.send_command(self.comport, config='00000010', motor_byte='00000000')
-
-    def motor2_rotate_left(self):
-        pwm = self.view.motor2_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001001', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor2_timer_status.get():
-                sec = float(self.view.motor2_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001001', pwm, sec,))
-                time_limited_thread.start()
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor1_rotate_right(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00001001', pwm_int=char_pwm)
-        else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 2 rotate left')
+                self.upper_controller.motor1_rotate_right(self.adc_status, pwm)
 
-    def motor2_rotate_right(self):
-        pwm = self.view.motor2_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010001', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor2_timer_status.get():
-                sec = float(self.view.motor2_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010001', pwm, sec,))
-                time_limited_thread.start()
+    def upper_motor1_rotate_stop(self):
+        self.upper_controller.motor1_rotate_stop()
+
+    def upper_motor2_rotate_left(self):
+        local_timer_status = self.view.upper_motors_frame.motor2_timer_status.get()
+        pwm = self.upper_motors_frame.motor2_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor2_timer_entry.get())
+            self.upper_controller.motor2_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor2_rotate_left(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00010001', pwm_int=char_pwm)
+                self.upper_controller.motor2_rotate_left(self.adc_status, pwm)
+
+    def upper_motor2_rotate_right(self):
+        local_timer_status = self.view.upper_motors_frame.motor2_timer_status.get()
+        pwm = self.upper_motors_frame.motor2_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor2_timer_entry.get())
+            self.upper_controller.motor2_rotate_right(self.adc_status, pwm, time)
         else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 2 rotate right')
-
-    def motor2_rotate_stop(self):
-        com.send_command(self.comport, config='00000010', motor_byte='00000001')
-
-    def motor3_rotate_left(self):
-        pwm = self.view.motor3_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001010', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor3_timer_status.get():
-                sec = float(self.view.motor3_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001010', pwm, sec,))
-                time_limited_thread.start()
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor2_rotate_right(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00001010', pwm_int=char_pwm)
-        else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 3 rotate left')
+                self.upper_controller.motor2_rotate_right(self.adc_status, pwm)
 
-    def motor3_rotate_right(self):
-        pwm = self.view.motor3_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010010', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor3_timer_status.get():
-                sec = float(self.view.motor3_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010010', pwm, sec,))
-                time_limited_thread.start()
+    def upper_motor2_rotate_stop(self):
+        self.upper_controller.motor2_rotate_stop()
+
+    def upper_motor3_rotate_left(self):
+        local_timer_status = self.view.upper_motors_frame.motor3_timer_status.get()
+        pwm = self.upper_motors_frame.motor3_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor3_timer_entry.get())
+            self.upper_controller.motor3_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor3_rotate_left(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00010010', pwm_int=char_pwm)
+                self.upper_controller.motor3_rotate_left(self.adc_status, pwm)
+
+    def upper_motor3_rotate_right(self):
+        local_timer_status = self.view.upper_motors_frame.motor3_timer_status.get()
+        pwm = self.upper_motors_frame.motor3_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor3_timer_entry.get())
+            self.upper_controller.motor3_rotate_right(self.adc_status, pwm, time)
         else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 3 rotate right')
-
-    def motor3_rotate_stop(self):
-        com.send_command(self.comport, config='00000010', motor_byte='00000010')
-
-    def motor4_rotate_left(self):
-        pwm = self.view.motor4_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001011', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor4_timer_status.get():
-                sec = float(self.view.motor4_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001011', pwm, sec,))
-                time_limited_thread.start()
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor3_rotate_right(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00001011', pwm_int=char_pwm)
-        else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 4 rotate left')
+                self.upper_controller.motor3_rotate_right(self.adc_status, pwm)
 
-    def motor4_rotate_right(self):
-        pwm = self.view.motor4_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010011', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor4_timer_status.get():
-                sec = float(self.view.motor4_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010011', pwm, sec,))
-                time_limited_thread.start()
+    def upper_motor3_rotate_stop(self):
+        self.upper_controller.motor3_rotate_stop()
+
+    def upper_motor4_rotate_left(self):
+        local_timer_status = self.view.upper_motors_frame.motor4_timer_status.get()
+        pwm = self.upper_motors_frame.motor4_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor4_timer_entry.get())
+            self.upper_controller.motor4_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor4_rotate_left(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00010011', pwm_int=char_pwm)
+                self.upper_controller.motor4_rotate_left(self.adc_status, pwm)
+
+    def upper_motor4_rotate_right(self):
+        local_timer_status = self.view.upper_motors_frame.motor4_timer_status.get()
+        pwm = self.upper_motors_frame.motor4_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor4_timer_entry.get())
+            self.upper_controller.motor4_rotate_right(self.adc_status, pwm, time)
         else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 4 rotate right')
-
-    def motor4_rotate_stop(self):
-        com.send_command(self.comport, config='00000010', motor_byte='00000011')
-
-    def motor5_rotate_left(self):
-        pwm = self.view.motor1_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001100', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor5_timer_status.get():
-                sec = float(self.view.motor5_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00001100', pwm, sec,))
-                time_limited_thread.start()
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor4_rotate_right(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00001100', pwm_int=char_pwm)
-        else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 5 rotate left')
+                self.upper_controller.motor4_rotate_right(self.adc_status, pwm)
 
-    def motor5_rotate_right(self):
-        pwm = self.view.motor1_pwm_scale.get()
-        global_timer_status = self.view.global_timer_status.get()
-        adc_status = self.view.adc_status.get()
-        adc_thread = thread.Thread(target=self.model.get_adc_data)
-        if adc_status:
-            com.send_adc(self.comport, '00001000', '00000001')
-            adc_thread.start()
-        if self.model.validate_pwm(pwm):
-            if global_timer_status:
-                sec = float(self.view.global_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010100', pwm, sec,))
-                time_limited_thread.start()
-            elif self.view.motor5_timer_status.get():
-                sec = float(self.view.motor5_timer_entry.get())
-                time_limited_thread = thread.Thread(target=self.model.time_limited_motion,
-                                                    args=('00000110', '00010100', pwm, sec,))
-                time_limited_thread.start()
+    def upper_motor4_rotate_stop(self):
+        self.upper_controller.motor4_rotate_stop()
+
+    def upper_motor5_rotate_left(self):
+        local_timer_status = self.view.upper_motors_frame.motor5_timer_status.get()
+        pwm = self.upper_motors_frame.motor5_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor5_timer_entry.get())
+            self.upper_controller.motor5_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor5_rotate_left(self.adc_status, pwm, time)
             else:
-                char_pwm = bytes(chr(pwm), 'ascii')
-                com.send_command(self.comport, config='00000110', motor_byte='00010100', pwm_int=char_pwm)
-        else:
-            print("Incorrect PWM")
-        if adc_thread.is_alive():
-            adc_thread.join()
-            self.model.draw_adc_figure('Motor 5 rotate right')
+                self.upper_controller.motor5_rotate_left(self.adc_status, pwm)
 
-    def motor5_rotate_stop(self):
-        com.send_command(self.comport, config='00000010', motor_byte='00000100')
+    def upper_motor5_rotate_right(self):
+        local_timer_status = self.view.upper_motors_frame.motor5_timer_status.get()
+        pwm = self.upper_motors_frame.motor5_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.upper_motors_frame.motor5_timer_entry.get())
+            self.upper_controller.motor5_rotate_right(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.upper_controller.motor5_rotate_right(self.adc_status, pwm, time)
+
+    def upper_motor5_rotate_stop(self):
+        self.upper_controller.motor5_rotate_stop()
+
+    def lower_motor1_rotate_left(self):
+        local_timer_status = self.view.lower_motors_frame.motor1_timer_status.get()
+        pwm = self.lower_motors_frame.motor1_pwm_scale.get()
+        if local_timer_status:  # Local timer has bigger priority. So if local time was given, so here we go that time
+            time = float(self.view.lower_motors_frame.motor1_timer_entry.get())
+            self.lower_controller.motor1_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:  # If local time is False, we check is there global time (low priority).
+                time = self.global_timer_time
+                self.lower_controller.motor1_rotate_left(self.adc_status, pwm, time)
+            else:  # If no time limits, here we go in unlimited rotation
+                self.lower_controller.motor1_rotate_left(self.adc_status, pwm)
+
+    def lower_motor1_rotate_right(self):
+        local_timer_status = self.view.lower_motors_frame.motor1_timer_status.get()
+        pwm = self.lower_motors_frame.motor1_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor1_timer_entry.get())
+            self.lower_controller.motor1_rotate_right(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor1_rotate_right(self.adc_status, pwm, time)
+            print("Incorrect PWM")
+
+    def lower_motor1_rotate_stop(self):
+        self.lower_controller.motor1_rotate_stop()
+
+    def lower_motor2_rotate_left(self):
+        local_timer_status = self.view.lower_motors_frame.motor2_timer_status.get()
+        pwm = self.lower_motors_frame.motor2_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor2_timer_entry.get())
+            self.lower_controller.motor2_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor2_rotate_left(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor2_rotate_left(self.adc_status, pwm)
+
+    def lower_motor2_rotate_right(self):
+        local_timer_status = self.view.lower_motors_frame.motor2_timer_status.get()
+        pwm = self.lower_motors_frame.motor2_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor2_timer_entry.get())
+            self.lower_controller.motor2_rotate_right(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor2_rotate_right(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor2_rotate_right(self.adc_status, pwm)
+
+    def lower_motor2_rotate_stop(self):
+        self.lower_controller.motor2_rotate_stop()
+
+    def lower_motor3_rotate_left(self):
+        local_timer_status = self.view.lower_motors_frame.motor3_timer_status.get()
+        pwm = self.lower_motors_frame.motor3_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor3_timer_entry.get())
+            self.lower_controller.motor3_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor3_rotate_left(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor3_rotate_left(self.adc_status, pwm)
+
+    def lower_motor3_rotate_right(self):
+        local_timer_status = self.view.lower_motors_frame.motor3_timer_status.get()
+        pwm = self.lower_motors_frame.motor3_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor3_timer_entry.get())
+            self.lower_controller.motor3_rotate_right(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor3_rotate_right(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor3_rotate_right(self.adc_status, pwm)
+
+    def lower_motor3_rotate_stop(self):
+        self.lower_controller.motor3_rotate_stop()
+
+    def lower_motor4_rotate_left(self):
+        local_timer_status = self.view.lower_motors_frame.motor4_timer_status.get()
+        pwm = self.lower_motors_frame.motor4_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor4_timer_entry.get())
+            self.lower_controller.motor4_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor4_rotate_left(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor4_rotate_left(self.adc_status, pwm)
+
+    def lower_motor4_rotate_right(self):
+        local_timer_status = self.view.lower_motors_frame.motor4_timer_status.get()
+        pwm = self.lower_motors_frame.motor4_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor4_timer_entry.get())
+            self.lower_controller.motor4_rotate_right(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor4_rotate_right(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor4_rotate_right(self.adc_status, pwm)
+
+    def lower_motor4_rotate_stop(self):
+        self.lower_controller.motor4_rotate_stop()
+
+    def lower_motor5_rotate_left(self):
+        local_timer_status = self.view.lower_motors_frame.motor5_timer_status.get()
+        pwm = self.lower_motors_frame.motor5_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor5_timer_entry.get())
+            self.lower_controller.motor5_rotate_left(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor5_rotate_left(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor5_rotate_left(self.adc_status, pwm)
+
+    def lower_motor5_rotate_right(self):
+        local_timer_status = self.view.lower_motors_frame.motor5_timer_status.get()
+        pwm = self.lower_motors_frame.motor5_pwm_scale.get()
+        if local_timer_status:
+            time = float(self.view.lower_motors_frame.motor5_timer_entry.get())
+            self.lower_controller.motor5_rotate_right(self.adc_status, pwm, time)
+        else:
+            if self.global_timer_status:
+                time = self.global_timer_time
+                self.lower_controller.motor5_rotate_right(self.adc_status, pwm, time)
+            else:
+                self.lower_controller.motor5_rotate_right(self.adc_status, pwm)
+
+    def lower_motor5_rotate_stop(self):
+        self.lower_controller.motor5_rotate_stop()
 
 
 if __name__ == '__main__':
