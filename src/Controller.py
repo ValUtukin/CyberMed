@@ -9,16 +9,17 @@ from MotorController import MotorController
 class Controller:
     def __init__(self, parent):
         self.parent = parent
-        self.comport = com.ini('COM3')
-        self.model = Model(self.comport)
+        self.upper_comport = com.ini('COM3')
+        self.lower_comport = com.ini('COM2')
+        self.model = Model(self.upper_comport, self.lower_comport)
         self.view = View(parent)
         self.view.setup()
 
         self.upper_motors_frame = self.view.upper_motors_frame
         self.lower_motors_frame = self.view.lower_motors_frame
 
-        self.upper_controller = MotorController(self.comport, 'Upper')
-        self.lower_controller = MotorController(self.comport, 'Lower')
+        self.upper_controller = MotorController(self.upper_comport, 'Upper')
+        self.lower_controller = MotorController(self.lower_comport, 'Lower')
 
         self.adc_status = False
         self.global_timer_status = False
@@ -76,12 +77,12 @@ class Controller:
         if self.global_timer_status:
             self.global_timer_time = float(self.view.global_timer_entry.get())
 
-    def power_switch(self):
+    def power_switch(self, comport):
         power_status = self.view.power_status.get()
         if power_status:
-            com.send_command(self.comport, config='00000001', power_byte='00000001')
+            com.send_command(comport, config='00000001', power_byte='00000001')
         else:
-            com.send_command(self.comport, config='00000001', power_byte='00000000')
+            com.send_command(comport, config='00000001', power_byte='00000000')
 
     def upper_motor1_rotate_left(self):
         local_timer_status = self.view.upper_motors_frame.motor1_timer_status.get()

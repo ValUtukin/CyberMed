@@ -5,8 +5,9 @@ from pubsub import pub
 
 
 class Model:
-    def __init__(self, serial_inst):
-        self.comport = serial_inst
+    def __init__(self, upper_comport, lower_comport):
+        self.upper_comport = upper_comport
+        self.lower_comport = lower_comport
         self.adc_data = None
 
     def validate_pwm(self, pwm):
@@ -27,9 +28,9 @@ class Model:
                         if 0 <= int(pwm) <= 50:
                             return True
                         else:
-                            return False  # PWM needs to be an integer between 0 and 100
+                            return False  # PWM needs to be an integer between 0 and 50
                 else:
-                    return False  # PWM must be 1, 2 or 3 digits long
+                    return False  # PWM must be 1, 2 digits long
         else:
             return False  # PWM neither a number nor a string
 
@@ -52,10 +53,10 @@ class Model:
                 continue
         return final_decimal_list
 
-    def get_adc_data(self):
+    def get_adc_data(self, comport):
         # time.sleep(5.0)
-        if self.comport.isOpen():
-            data = self.comport.read(2000)
+        if comport.isOpen():
+            data = comport.read(2000)
             # print(f'Data is {data}, len = {len(data)}, type is {type(data)}')
             data_hexstr = data.hex()
             # print(f'data_str is {data_hexstr}, type is {type(data_hexstr)}')
@@ -80,13 +81,13 @@ class Model:
         plt.savefig('../Images/AdcFigure.png')
         pub.sendMessage('Adc figure updated')
 
-    def time_limited_motion(self, config, motor_byte, pwm, limited_lime):
+    def time_limited_motion(self, comport, config, motor_byte, pwm, limited_lime):
         if self.validate_pwm(pwm):
             char_pwm = bytes(chr(pwm), 'ascii')
-            com.send_command(self.comport, config, motor_byte=motor_byte, pwm_int=char_pwm)
+            com.send_command(comport, config, motor_byte=motor_byte, pwm_int=char_pwm)
             time.sleep(limited_lime)  # Wait until motor rotate for "limited_time" sec and then stop it
             motor_number_str = motor_byte[5::]
             motor_stop_byte = '00000' + motor_number_str
-            com.send_command(self.comport, config='00000010', motor_byte=motor_stop_byte)
+            com.send_command(comport, config='00000010', motor_byte=motor_stop_byte)
         else:
             print('Model - Bad pwm')
