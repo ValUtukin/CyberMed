@@ -11,7 +11,7 @@ class Controller:
         self.parent = parent
         self.upper_comport = com.ini('COM3')
         self.lower_comport = com.ini('COM2')
-        self.model = Model(self.upper_comport, self.lower_comport)
+        self.model = Model()
         self.view = View(parent)
         self.view.setup()
 
@@ -25,64 +25,72 @@ class Controller:
         self.global_timer_status = False
         self.global_timer_time = 0.0
 
-        pub.subscribe(self.adc_switch, "Adc_switch")
-        pub.subscribe(self.global_timer_switch, "Global_timer_switch")
-        pub.subscribe(self.power_switch, "Power_switch")
+        pub.subscribe(self.upper_power_switch, "Upper_power_switch")
+        pub.subscribe(self.lower_power_switch, "Lower_power_switch")
 
         pub.subscribe(self.upper_motor1_rotate_left, "Upper_motor1_rotate_left")
         pub.subscribe(self.upper_motor1_rotate_right, "Upper_motor1_rotate_right")
         pub.subscribe(self.upper_motor1_rotate_stop, "Upper_motor1_rotate_stop")
+        pub.subscribe(self.upper_motor1_adc_change, "Upper_motor1_adc_change")
 
         pub.subscribe(self.upper_motor2_rotate_left, "Upper_motor2_rotate_left")
         pub.subscribe(self.upper_motor2_rotate_right, "Upper_motor2_rotate_right")
         pub.subscribe(self.upper_motor2_rotate_stop, "Upper_motor2_rotate_stop")
+        pub.subscribe(self.upper_motor2_adc_change, "Upper_motor2_adc_change")
 
         pub.subscribe(self.upper_motor3_rotate_left, "Upper_motor3_rotate_left")
         pub.subscribe(self.upper_motor3_rotate_right, "Upper_motor3_rotate_right")
         pub.subscribe(self.upper_motor3_rotate_stop, "Upper_motor3_rotate_stop")
+        pub.subscribe(self.upper_motor3_adc_change, "Upper_motor3_adc_change")
 
         pub.subscribe(self.upper_motor4_rotate_left, "Upper_motor4_rotate_left")
         pub.subscribe(self.upper_motor4_rotate_right, "Upper_motor4_rotate_right")
         pub.subscribe(self.upper_motor4_rotate_stop, "Upper_motor4_rotate_stop")
+        pub.subscribe(self.upper_motor4_adc_change, "Upper_motor4_adc_change")
 
         pub.subscribe(self.upper_motor5_rotate_left, "Upper_motor5_rotate_left")
         pub.subscribe(self.upper_motor5_rotate_right, "Upper_motor5_rotate_right")
         pub.subscribe(self.upper_motor5_rotate_stop, "Upper_motor5_rotate_stop")
+        pub.subscribe(self.upper_motor5_adc_change, "Upper_motor5_adc_change")
 
         pub.subscribe(self.lower_motor1_rotate_left, "Lower_motor1_rotate_left")
         pub.subscribe(self.lower_motor1_rotate_right, "Lower_motor1_rotate_right")
         pub.subscribe(self.lower_motor1_rotate_stop, "Lower_motor1_rotate_stop")
+        pub.subscribe(self.lower_motor1_adc_change, "Lower_motor1_adc_change")
 
         pub.subscribe(self.lower_motor2_rotate_left, "Lower_motor2_rotate_left")
         pub.subscribe(self.lower_motor2_rotate_right, "Lower_motor2_rotate_right")
         pub.subscribe(self.lower_motor2_rotate_stop, "Lower_motor2_rotate_stop")
+        pub.subscribe(self.lower_motor2_adc_change, "Lower_motor2_adc_change")
 
         pub.subscribe(self.lower_motor3_rotate_left, "Lower_motor3_rotate_left")
         pub.subscribe(self.lower_motor3_rotate_right, "Lower_motor3_rotate_right")
         pub.subscribe(self.lower_motor3_rotate_stop, "Lower_motor3_rotate_stop")
+        pub.subscribe(self.lower_motor3_adc_change, "Lower_motor3_adc_change")
 
         pub.subscribe(self.lower_motor4_rotate_left, "Lower_motor4_rotate_left")
         pub.subscribe(self.lower_motor4_rotate_right, "Lower_motor4_rotate_right")
         pub.subscribe(self.lower_motor4_rotate_stop, "Lower_motor4_rotate_stop")
+        pub.subscribe(self.lower_motor4_adc_change, "Lower_motor4_adc_change")
 
         pub.subscribe(self.lower_motor5_rotate_left, "Lower_motor5_rotate_left")
         pub.subscribe(self.lower_motor5_rotate_right, "Lower_motor5_rotate_right")
         pub.subscribe(self.lower_motor5_rotate_stop, "Lower_motor5_rotate_stop")
+        pub.subscribe(self.lower_motor5_adc_change, "Lower_motor5_adc_change")
 
-    def adc_switch(self):
-        self.adc_status = self.view.adc_status.get()
-
-    def global_timer_switch(self):
-        self.global_timer_status = self.view.global_timer_status.get()
-        if self.global_timer_status:
-            self.global_timer_time = float(self.view.global_timer_entry.get())
-
-    def power_switch(self, comport):
-        power_status = self.view.power_status.get()
+    def power_switch(self, comport, power_status):
         if power_status:
             com.send_command(comport, config='00000001', power_byte='00000001')
         else:
             com.send_command(comport, config='00000001', power_byte='00000000')
+
+    def upper_power_switch(self):
+        upper_power_status = self.upper_motors_frame.power_status.get()
+        self.power_switch(self.upper_comport, upper_power_status)
+
+    def lower_power_switch(self):
+        lower_power_status = self.lower_motors_frame.power_status.get()
+        self.power_switch(self.lower_comport, lower_power_status)
 
     def upper_motor1_rotate_left(self):
         local_timer_status = self.view.upper_motors_frame.motor1_timer_status.get()
@@ -113,6 +121,9 @@ class Controller:
     def upper_motor1_rotate_stop(self):
         self.upper_controller.motor1_rotate_stop()
 
+    def upper_motor1_adc_change(self):
+        com.send_adc(self.upper_comport, '00100000', '00000001')
+
     def upper_motor2_rotate_left(self):
         local_timer_status = self.view.upper_motors_frame.motor2_timer_status.get()
         pwm = self.upper_motors_frame.motor2_pwm_scale.get()
@@ -141,6 +152,9 @@ class Controller:
 
     def upper_motor2_rotate_stop(self):
         self.upper_controller.motor2_rotate_stop()
+
+    def upper_motor2_adc_change(self):
+        com.send_adc(self.upper_comport, '00100000', '00000001')
 
     def upper_motor3_rotate_left(self):
         local_timer_status = self.view.upper_motors_frame.motor3_timer_status.get()
@@ -171,6 +185,9 @@ class Controller:
     def upper_motor3_rotate_stop(self):
         self.upper_controller.motor3_rotate_stop()
 
+    def upper_motor3_adc_change(self):
+        com.send_adc(self.upper_comport, '00100000', '00000001')
+
     def upper_motor4_rotate_left(self):
         local_timer_status = self.view.upper_motors_frame.motor4_timer_status.get()
         pwm = self.upper_motors_frame.motor4_pwm_scale.get()
@@ -200,6 +217,9 @@ class Controller:
     def upper_motor4_rotate_stop(self):
         self.upper_controller.motor4_rotate_stop()
 
+    def upper_motor4_adc_change(self):
+        com.send_adc(self.upper_comport, '00100000', '00000001')
+
     def upper_motor5_rotate_left(self):
         local_timer_status = self.view.upper_motors_frame.motor5_timer_status.get()
         pwm = self.upper_motors_frame.motor5_pwm_scale.get()
@@ -226,6 +246,9 @@ class Controller:
 
     def upper_motor5_rotate_stop(self):
         self.upper_controller.motor5_rotate_stop()
+
+    def upper_motor5_adc_change(self):
+        com.send_adc(self.upper_comport, '00100000', '00000001')
 
     def lower_motor1_rotate_left(self):
         local_timer_status = self.view.lower_motors_frame.motor1_timer_status.get()
@@ -254,6 +277,9 @@ class Controller:
 
     def lower_motor1_rotate_stop(self):
         self.lower_controller.motor1_rotate_stop()
+
+    def lower_motor1_adc_change(self):
+        com.send_adc(self.lower_comport, '00100000', '00000001')
 
     def lower_motor2_rotate_left(self):
         local_timer_status = self.view.lower_motors_frame.motor2_timer_status.get()
@@ -284,6 +310,9 @@ class Controller:
     def lower_motor2_rotate_stop(self):
         self.lower_controller.motor2_rotate_stop()
 
+    def lower_motor2_adc_change(self):
+        com.send_adc(self.lower_comport, '00100000', '00000001')
+
     def lower_motor3_rotate_left(self):
         local_timer_status = self.view.lower_motors_frame.motor3_timer_status.get()
         pwm = self.lower_motors_frame.motor3_pwm_scale.get()
@@ -312,6 +341,9 @@ class Controller:
 
     def lower_motor3_rotate_stop(self):
         self.lower_controller.motor3_rotate_stop()
+
+    def lower_motor3_adc_change(self):
+        com.send_adc(self.lower_comport, '00100000', '00000001')
 
     def lower_motor4_rotate_left(self):
         local_timer_status = self.view.lower_motors_frame.motor4_timer_status.get()
@@ -342,6 +374,9 @@ class Controller:
     def lower_motor4_rotate_stop(self):
         self.lower_controller.motor4_rotate_stop()
 
+    def lower_motor4_adc_change(self):
+        com.send_adc(self.lower_comport, '00100000', '00000001')
+
     def lower_motor5_rotate_left(self):
         local_timer_status = self.view.lower_motors_frame.motor5_timer_status.get()
         pwm = self.lower_motors_frame.motor5_pwm_scale.get()
@@ -370,6 +405,9 @@ class Controller:
 
     def lower_motor5_rotate_stop(self):
         self.lower_controller.motor5_rotate_stop()
+
+    def lower_motor5_adc_change(self):
+        com.send_adc(self.lower_comport, '00100000', '00000001')
 
 
 if __name__ == '__main__':

@@ -58,19 +58,25 @@ def send_adc(serial_inst, config, adc='0'):
     write_comport(adc_stm, serial_inst)
 
 
-def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_int=0):
+def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=0, time_bytes=0):
+    bytearray_str = bytearray()
+
     config_stm = convert_string_to_bytes(config)
     power_stm = convert_string_to_bytes(power_byte)
     motor_stm = convert_string_to_bytes(motor_byte)
+    char_pwm = bytes(chr(pwm_bytes), 'ascii')
+    char_time = bytes(chr(time_bytes), 'ascii')
 
-    write_comport(config_stm, serial_inst)
-    time.sleep(0.0005)
+    bytearray_str += config_stm
     if power_byte != '0':
-        write_comport(power_stm, serial_inst)
+        bytearray_str += power_stm
     if motor_byte != '0':
-        write_comport(motor_stm, serial_inst)
-    if pwm_int != 0:
-        write_comport(pwm_int, serial_inst)
+        bytearray_str += motor_stm
+    if pwm_bytes != 0:
+        bytearray_str += char_pwm
+    if time_bytes != 0:
+        bytearray_str += char_time
+    write_comport(bytearray_str, serial_inst)
 
 
 def main():

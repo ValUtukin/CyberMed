@@ -1,13 +1,10 @@
 import comport as com
-import time
 import matplotlib.pyplot as plt
 from pubsub import pub
 
 
 class Model:
-    def __init__(self, upper_comport, lower_comport):
-        self.upper_comport = upper_comport
-        self.lower_comport = lower_comport
+    def __init__(self):
         self.adc_data = None
 
     def validate_pwm(self, pwm):
@@ -81,13 +78,9 @@ class Model:
         plt.savefig('../Images/AdcFigure.png')
         pub.sendMessage('Adc figure updated')
 
-    def time_limited_motion(self, comport, config, motor_byte, pwm, limited_lime):
+    def time_limited_motion(self, comport, config, motor_byte, pwm, limited_time):
         if self.validate_pwm(pwm):
-            char_pwm = bytes(chr(pwm), 'ascii')
-            com.send_command(comport, config, motor_byte=motor_byte, pwm_int=char_pwm)
-            time.sleep(limited_lime)  # Wait until motor rotate for "limited_time" sec and then stop it
-            motor_number_str = motor_byte[5::]
-            motor_stop_byte = '00000' + motor_number_str
-            com.send_command(comport, config='00000010', motor_byte=motor_stop_byte)
+            time_int = int(limited_time / 0.1)
+            com.send_command(comport, config, motor_byte=motor_byte, pwm_bytes=pwm, time_bytes=time_int)
         else:
             print('Model - Bad pwm')
