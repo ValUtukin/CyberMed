@@ -22,7 +22,7 @@ class Model:
                         else:
                             return False  # PWM must be a number
                     else:
-                        if 0 <= int(pwm) <= 50:
+                        if 0 <= int(pwm) <= 100:
                             return True
                         else:
                             return False  # PWM needs to be an integer between 0 and 50
@@ -30,6 +30,12 @@ class Model:
                     return False  # PWM must be 1, 2 digits long
         else:
             return False  # PWM neither a number nor a string
+
+    def convert_delay(self, delay):
+        if len(delay) != 0:
+            return float(delay)
+        else:
+            return 0.0
 
     def hexstr_to_decint(self, hexstr, reverse_flag=False):
         final_decimal_list = list()
@@ -63,6 +69,16 @@ class Model:
         else:
             print('Model/get_adc_data() - COM Port is closed')
 
+    def send_adc(self, comport, motor_frame):
+        m1_adc_status = motor_frame.motor1_adc_status.get()
+        m2_adc_status = motor_frame.motor2_adc_status.get()
+        m3_adc_status = motor_frame.motor3_adc_status.get()
+        m4_adc_status = motor_frame.motor4_adc_status.get()
+        m5_adc_status = motor_frame.motor5_adc_status.get()
+
+        adc_decimal = m1_adc_status*2**0 + m2_adc_status*2**1 + m3_adc_status*2**2 + m4_adc_status*2**3 + m5_adc_status*2**4
+        com.send_adc(comport, '01000000', adc_decimal)
+
     def draw_adc_figure(self, motor_title='Default plot title'):
         plt.cla()
         data = self.adc_data
@@ -78,9 +94,10 @@ class Model:
         plt.savefig('../Images/AdcFigure.png')
         pub.sendMessage('Adc figure updated')
 
-    def time_limited_motion(self, comport, config, motor_byte, pwm, limited_time):
+    def time_limited_motion(self, comport, config, motor_byte, pwm, limited_time, delay):
         if self.validate_pwm(pwm):
             time_int = int(limited_time / 0.1)
-            com.send_command(comport, config, motor_byte=motor_byte, pwm_bytes=pwm, time_bytes=time_int)
+            delay_int = int(delay / 0.1)
+            com.send_command(comport, config, motor_byte=motor_byte, pwm_bytes=pwm, time_bytes=time_int, delay=delay_int)
         else:
             print('Model - Bad pwm')
