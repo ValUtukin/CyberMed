@@ -51,14 +51,17 @@ def convert_string_to_bytes(binary_string):
     return bytes(chr(decimal), 'ascii')
 
 
-def send_adc(serial_inst, config, adc='0'):
+def send_adc(serial_inst, config, adc=0):
+    stm_bytearray = bytearray()
     config_stm = convert_string_to_bytes(config)
-    adc_stm = convert_string_to_bytes(adc)
-    write_comport(config_stm, serial_inst)
-    write_comport(adc_stm, serial_inst)
+    adc_stm = bytes(chr(adc), 'ascii')
+    stm_bytearray += config_stm
+    stm_bytearray += adc_stm
+
+    write_comport(stm_bytearray, serial_inst)
 
 
-def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=0, time_bytes=0):
+def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=0, time_bytes=0, delay=0):
     bytearray_str = bytearray()
 
     config_stm = convert_string_to_bytes(config)
@@ -66,6 +69,7 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
     motor_stm = convert_string_to_bytes(motor_byte)
     char_pwm = bytes(chr(pwm_bytes), 'ascii')
     char_time = bytes(chr(time_bytes), 'ascii')
+    char_delay = bytes(chr(delay), 'ascii')
 
     bytearray_str += config_stm
     if power_byte != '0':
@@ -76,6 +80,8 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
         bytearray_str += char_pwm
     if time_bytes != 0:
         bytearray_str += char_time
+    if delay != 0:
+        bytearray_str += char_delay
     write_comport(bytearray_str, serial_inst)
 
 
