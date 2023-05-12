@@ -3,17 +3,17 @@ import cv2 as cv
 from pubsub import pub
 from tkinter import *
 from PIL import ImageTk, Image
-from MotorsFrame import MotorsFrame
+from UpperMotorFrame import UpperMotorFrame
+from LowerMotorFrame import LowerMotorFrame
 
 
 class View:
     def __init__(self, parent):
         self.container = parent
-        self.upper_motors_frame = MotorsFrame(self.container, 'Upper')
-        self.lower_motors_frame = MotorsFrame(self.container, 'Lower')
+        self.upper_motor_frame = UpperMotorFrame(self.container, 'Upper')
+        self.lower_motor_frame = LowerMotorFrame(self.container, 'Lower')
 
         pub.subscribe(self.adc_figure_update, 'Adc figure updated')
-
 
     def setup(self):
         self.create_widgets()
@@ -28,11 +28,11 @@ class View:
         self.figure_frame.place(relx=0.4, rely=0.01, height=480, width=640)
         self.figure_label.pack(anchor="nw")
 
-        self.upper_motors_frame.main_frame.place(relx=0.005, rely=0.01, height=340, width=600)
-        self.upper_motors_frame.setup_layout()
+        self.upper_motor_frame.main_frame.place(relx=0.005, rely=0.01, height=340, width=600)
+        self.upper_motor_frame.setup_layout()
 
-        self.lower_motors_frame.main_frame.place(relx=0.005, rely=0.4, height=340, width=600)
-        self.lower_motors_frame.setup_layout()
+        self.lower_motor_frame.main_frame.place(relx=0.005, rely=0.4, height=340, width=600)
+        self.lower_motor_frame.setup_layout()
 
     def rescale_frame(self, img, scale=0.3):
         width = int(img.shape[1] * scale)
