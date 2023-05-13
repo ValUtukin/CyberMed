@@ -1,5 +1,5 @@
 import comport as com
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from pubsub import pub
 
 
@@ -79,20 +79,20 @@ class Model:
         adc_decimal = m1_adc_status*2**0 + m2_adc_status*2**1 + m3_adc_status*2**2 + m4_adc_status*2**3 + m5_adc_status*2**4
         com.send_adc(comport, '01000000', adc_decimal)
 
-    def draw_adc_figure(self, motor_title='Default plot title'):
-        plt.cla()
-        data = self.adc_data
-        for i in range(0, len(data)):
-            data[i] *= 3.3
-            data[i] /= 265
-        x = [i for i in range(0, len(data))]
-        plt.plot(x, data)
-        plt.title(motor_title)
-        plt.xlabel('time')
-        plt.ylabel('Some Voltage')
-        plt.grid()
-        plt.savefig('../Images/AdcFigure.png')
-        pub.sendMessage('Adc figure updated')
+    # def draw_adc_figure(self, motor_title='Default plot title'):
+    #     plt.cla()
+    #     data = self.adc_data
+    #     for i in range(0, len(data)):
+    #         data[i] *= 3.3
+    #         data[i] /= 265
+    #     x = [i for i in range(0, len(data))]
+    #     plt.plot(x, data)
+    #     plt.title(motor_title)
+    #     plt.xlabel('time')
+    #     plt.ylabel('Some Voltage')
+    #     plt.grid()
+    #     plt.savefig('../Images/AdcFigure.png')
+    #     pub.sendMessage('Adc figure updated')
 
     def time_limited_motion(self, comport, config, motor_byte, pwm, limited_time, delay):
         if self.validate_pwm(pwm):

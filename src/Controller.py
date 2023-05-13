@@ -10,7 +10,7 @@ class Controller:
     def __init__(self, parent):
         self.parent = parent
         self.upper_comport = com.ini('COM7')
-        self.lower_comport = com.ini('COM2')
+        self.lower_comport = com.ini('COM6')
         self.model = Model()
         self.view = View(parent)
         self.view.setup()
