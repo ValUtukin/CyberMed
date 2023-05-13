@@ -86,11 +86,15 @@ class Controller:
 
     def upper_power_switch(self):
         upper_power_status = self.upper_motor_frame.power_status.get()
+        lower_power_status = upper_power_status
         self.power_switch(self.upper_comport, upper_power_status)
+        self.power_switch(self.lower_comport, lower_power_status)
 
     def lower_power_switch(self):
         lower_power_status = self.lower_motor_frame.power_status.get()
+        upper_power_status = lower_power_status
         self.power_switch(self.lower_comport, lower_power_status)
+        self.power_switch(self.upper_comport, upper_power_status)
 
     def upper_motor1_rotate_left(self):
         timer_status = self.view.upper_motor_frame.motor1_timer_status.get()
