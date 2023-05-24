@@ -14,6 +14,9 @@ class UpperMotorFrame:
         self.power_checkbox = Checkbutton(self.main_frame, text="Power", background='#01B6CF',
                                           command=self.power_switch,
                                           variable=self.power_status, onvalue=True, offvalue=False)
+        self.send_adc_status = BooleanVar()
+        self.send_adc_checkbox = Checkbutton(self.main_frame, text='Send ADC', background='#01B6CF', command=self.send_adc,
+                                               variable=self.send_adc_status, onvalue=True, offvalue=False)
         self.motor1_label = Label(self.main_frame, text='Pinky', background='#b8dffe', font=('Arial', 10))
         self.motor1_left_button = Button(self.main_frame, text='Compress', command=self.motor1_rotate_left)
         self.motor1_right_button = Button(self.main_frame, text='Release', command=self.motor1_rotate_right)
@@ -21,6 +24,7 @@ class UpperMotorFrame:
         self.motor1_buttons = [self.motor1_left_button, self.motor1_right_button, self.motor1_stop_button]
         self.motor1_pwm_scale = Scale(self.main_frame, from_=0, to=100, orient=HORIZONTAL, length=100, width=10,
                                       label="PWM")
+        self.motor1_pwm_scale.set(50)
         self.motor1_timer_frame = tk.Frame(self.main_frame, bg='#01B6CF')
         self.motor1_timer_label = Label(self.motor1_timer_frame, text='Motor#1 Time-limited motion',
                                         background='#01B6CF', font=('Arial', 10))
@@ -28,7 +32,9 @@ class UpperMotorFrame:
         self.motor1_delay_label = Label(self.motor1_timer_frame, text=': Delay', background='#01B6CF',
                                         font=('Arial', 10))
         self.motor1_timer_entry = Entry(self.motor1_timer_frame)
+        self.motor1_timer_entry.insert(0, '2.0')
         self.motor1_delay_entry = Entry(self.motor1_timer_frame)
+        self.motor1_delay_entry.insert(0, '0.5')
         self.motor1_timer_sec_label = Label(self.motor1_timer_frame, text='sec', background='#01B6CF',
                                             font=('Arial', 10))
         self.motor1_timer_status = BooleanVar()
@@ -36,8 +42,7 @@ class UpperMotorFrame:
                                                  variable=self.motor1_timer_status, onvalue=True, offvalue=False)
         self.motor1_adc_status = BooleanVar()
         self.motor1_adc_checkbox = Checkbutton(self.main_frame, text='ADC', background='#01B6CF',
-                                               command=self.motor1_adc_change, variable=self.motor1_adc_status,
-                                               onvalue=True, offvalue=False)
+                                               variable=self.motor1_adc_status, onvalue=True, offvalue=False)
 
         self.motor2_label = Label(self.main_frame, text='Thumb', background='#b8dffe', font=('Arial', 10))
         self.motor2_left_button = Button(self.main_frame, text='Compress', command=self.motor2_rotate_left)
@@ -46,6 +51,7 @@ class UpperMotorFrame:
         self.motor2_buttons = [self.motor2_left_button, self.motor2_right_button, self.motor2_stop_button]
         self.motor2_pwm_scale = Scale(self.main_frame, from_=0, to=100, orient=HORIZONTAL, length=100, width=10,
                                       label="PWM")
+        self.motor2_pwm_scale.set(50)
         self.motor2_timer_frame = tk.Frame(self.main_frame, bg='#01B6CF')
         self.motor2_timer_label = Label(self.motor2_timer_frame, text='Motor#2 Time-limited motion',
                                         background='#01B6CF', font=('Arial', 10))
@@ -53,7 +59,9 @@ class UpperMotorFrame:
         self.motor2_delay_label = Label(self.motor2_timer_frame, text=': Delay', background='#01B6CF',
                                         font=('Arial', 10))
         self.motor2_delay_entry = Entry(self.motor2_timer_frame)
+        self.motor2_delay_entry.insert(0, '0.5')
         self.motor2_timer_entry = Entry(self.motor2_timer_frame)
+        self.motor2_timer_entry.insert(0, '2.0')
         self.motor2_timer_sec_label = Label(self.motor2_timer_frame, text='sec', background='#01B6CF',
                                             font=('Arial', 10))
         self.motor2_timer_status = BooleanVar()
@@ -61,8 +69,7 @@ class UpperMotorFrame:
                                                  variable=self.motor2_timer_status, onvalue=True, offvalue=False)
         self.motor2_adc_status = BooleanVar()
         self.motor2_adc_checkbox = Checkbutton(self.main_frame, text='ADC', background='#01B6CF',
-                                               command=self.motor2_adc_change, variable=self.motor2_adc_status,
-                                               onvalue=True, offvalue=False)
+                                               variable=self.motor2_adc_status, onvalue=True, offvalue=False)
 
         self.motor3_label = Label(self.main_frame, text='Middle', background='#b8dffe', font=('Arial', 10))
         self.motor3_left_button = Button(self.main_frame, text='Compress', command=self.motor3_rotate_left)
@@ -71,6 +78,7 @@ class UpperMotorFrame:
         self.motor3_buttons = [self.motor3_left_button, self.motor3_right_button, self.motor3_stop_button]
         self.motor3_pwm_scale = Scale(self.main_frame, from_=0, to=100, orient=HORIZONTAL, length=100, width=10,
                                       label="PWM")
+        self.motor3_pwm_scale.set(50)
         self.motor3_timer_frame = tk.Frame(self.main_frame, bg='#01B6CF')
         self.motor3_timer_label = Label(self.motor3_timer_frame, text='Motor#3 Time-limited motion',
                                         background='#01B6CF', font=('Arial', 10))
@@ -78,7 +86,9 @@ class UpperMotorFrame:
         self.motor3_delay_label = Label(self.motor3_timer_frame, text=': Delay', background='#01B6CF',
                                         font=('Arial', 10))
         self.motor3_delay_entry = Entry(self.motor3_timer_frame)
+        self.motor3_delay_entry.insert(0, '0.5')
         self.motor3_timer_entry = Entry(self.motor3_timer_frame)
+        self.motor3_timer_entry.insert(0, '2.0')
         self.motor3_timer_sec_label = Label(self.motor3_timer_frame, text='sec', background='#01B6CF',
                                             font=('Arial', 10))
         self.motor3_timer_status = BooleanVar()
@@ -86,8 +96,7 @@ class UpperMotorFrame:
                                                  variable=self.motor3_timer_status, onvalue=True, offvalue=False)
         self.motor3_adc_status = BooleanVar()
         self.motor3_adc_checkbox = Checkbutton(self.main_frame, text='ADC', background='#01B6CF',
-                                               command=self.motor3_adc_change, variable=self.motor3_adc_status,
-                                               onvalue=True, offvalue=False)
+                                               variable=self.motor3_adc_status, onvalue=True, offvalue=False)
 
         self.motor4_label = Label(self.main_frame, text='Index', background='#b8dffe', font=('Arial', 10))
         self.motor4_left_button = Button(self.main_frame, text='Compress', command=self.motor4_rotate_left)
@@ -96,6 +105,7 @@ class UpperMotorFrame:
         self.motor4_buttons = [self.motor4_left_button, self.motor4_right_button, self.motor4_stop_button]
         self.motor4_pwm_scale = Scale(self.main_frame, from_=0, to=100, orient=HORIZONTAL, length=100, width=10,
                                       label="PWM")
+        self.motor4_pwm_scale.set(50)
         self.motor4_timer_frame = tk.Frame(self.main_frame, bg='#01B6CF')
         self.motor4_timer_label = Label(self.motor4_timer_frame, text='Motor#4 Time-limited motion',
                                         background='#01B6CF', font=('Arial', 10))
@@ -103,7 +113,9 @@ class UpperMotorFrame:
         self.motor4_delay_label = Label(self.motor4_timer_frame, text=': Delay', background='#01B6CF',
                                         font=('Arial', 10))
         self.motor4_delay_entry = Entry(self.motor4_timer_frame)
+        self.motor4_delay_entry.insert(0, '0.5')
         self.motor4_timer_entry = Entry(self.motor4_timer_frame)
+        self.motor4_timer_entry.insert(0, '2.0')
         self.motor4_timer_sec_label = Label(self.motor4_timer_frame, text='sec', background='#01B6CF',
                                             font=('Arial', 10))
         self.motor4_timer_status = BooleanVar()
@@ -111,8 +123,7 @@ class UpperMotorFrame:
                                                  variable=self.motor4_timer_status, onvalue=True, offvalue=False)
         self.motor4_adc_status = BooleanVar()
         self.motor4_adc_checkbox = Checkbutton(self.main_frame, text='ADC', background='#01B6CF',
-                                               command=self.motor4_adc_change, variable=self.motor4_adc_status,
-                                               onvalue=True, offvalue=False)
+                                               variable=self.motor4_adc_status, onvalue=True, offvalue=False)
 
         self.motor5_label = Label(self.main_frame, text='Ring', background='#b8dffe', font=('Arial', 10))
         self.motor5_left_button = Button(self.main_frame, text='Compress', command=self.motor5_rotate_left)
@@ -121,6 +132,7 @@ class UpperMotorFrame:
         self.motor5_buttons = [self.motor5_left_button, self.motor5_right_button, self.motor5_stop_button]
         self.motor5_pwm_scale = Scale(self.main_frame, from_=0, to=100, orient=HORIZONTAL, length=100, width=10,
                                       label="PWM")
+        self.motor5_pwm_scale.set(50)
         self.motor5_timer_frame = tk.Frame(self.main_frame, bg='#01B6CF')
         self.motor5_timer_label = Label(self.motor5_timer_frame, text='Motor#5 Time-limited motion',
                                         background='#01B6CF', font=('Arial', 10))
@@ -128,7 +140,9 @@ class UpperMotorFrame:
         self.motor5_delay_label = Label(self.motor5_timer_frame, text=': Delay', background='#01B6CF',
                                         font=('Arial', 10))
         self.motor5_delay_entry = Entry(self.motor5_timer_frame)
+        self.motor5_delay_entry.insert(0, '0.5')
         self.motor5_timer_entry = Entry(self.motor5_timer_frame)
+        self.motor5_timer_entry.insert(0, '2.0')
         self.motor5_timer_sec_label = Label(self.motor5_timer_frame, text='sec', background='#01B6CF',
                                             font=('Arial', 10))
         self.motor5_timer_status = BooleanVar()
@@ -136,12 +150,12 @@ class UpperMotorFrame:
                                                  variable=self.motor5_timer_status, onvalue=True, offvalue=False)
         self.motor5_adc_status = BooleanVar()
         self.motor5_adc_checkbox = Checkbutton(self.main_frame, text='ADC', background='#01B6CF',
-                                               command=self.motor5_adc_change, variable=self.motor5_adc_status,
-                                               onvalue=True, offvalue=False)
+                                               variable=self.motor5_adc_status, onvalue=True, offvalue=False)
 
     def setup_layout(self):
         self.main_label.place(relx=0.4, rely=0.01)
         self.power_checkbox.place(relx=0.005, rely=0.01, relheight=0.07, relwidth=0.1)
+        self.send_adc_checkbox.place(relx=0.11, rely=0.01, relheight=0.07, relwidth=0.13)
 
         self.motor2_label.place(relx=0.005, rely=0.16, relheight=0.03)
         self.motor2_left_button.place(relx=0.09, rely=0.14, relheight=0.08, relwidth=0.11)
@@ -218,6 +232,12 @@ class UpperMotorFrame:
         self.motor1_timer_checkbox.place(relx=0.02, rely=0.05, relheight=0.3, relwidth=0.1)
         self.motor1_adc_checkbox.place(relx=0.91, rely=0.83)
 
+    def who_are_you(self):
+        return f'{self.identifier}MotorFrame'
+
+    def send_adc(self):
+        pub.sendMessage(f"{self.identifier}_frame_send_ADC")
+
     def switch_button_color(self, button, color='#19e676'):
         if button['bg'] == 'SystemButtonFace':
             button.config(bg=color)
@@ -249,9 +269,6 @@ class UpperMotorFrame:
         pub.sendMessage(f"{self.identifier}_motor1_rotate_stop")
         self.configure_relatives_buttons(self.motor1_buttons, 2)
 
-    def motor1_adc_change(self):
-        pub.sendMessage(f"{self.identifier}_motor1_adc_change")
-
     def motor2_rotate_left(self):
         pub.sendMessage(f"{self.identifier}_motor2_rotate_left")
         self.configure_relatives_buttons(self.motor2_buttons, 0)
@@ -263,9 +280,6 @@ class UpperMotorFrame:
     def motor2_rotate_stop(self):
         pub.sendMessage(f"{self.identifier}_motor2_rotate_stop")
         self.configure_relatives_buttons(self.motor2_buttons, 2)
-
-    def motor2_adc_change(self):
-        pub.sendMessage(f"{self.identifier}_motor2_adc_change")
 
     def motor3_rotate_left(self):
         pub.sendMessage(f"{self.identifier}_motor3_rotate_left")
@@ -279,9 +293,6 @@ class UpperMotorFrame:
         pub.sendMessage(f"{self.identifier}_motor3_rotate_stop")
         self.configure_relatives_buttons(self.motor3_buttons, 2)
 
-    def motor3_adc_change(self):
-        pub.sendMessage(f"{self.identifier}_motor3_adc_change")
-
     def motor4_rotate_left(self):
         pub.sendMessage(f"{self.identifier}_motor4_rotate_left")
         self.configure_relatives_buttons(self.motor4_buttons, 0)
@@ -294,9 +305,6 @@ class UpperMotorFrame:
         pub.sendMessage(f"{self.identifier}_motor4_rotate_stop")
         self.configure_relatives_buttons(self.motor4_buttons, 2)
 
-    def motor4_adc_change(self):
-        pub.sendMessage(f"{self.identifier}_motor4_adc_change")
-
     def motor5_rotate_left(self):
         pub.sendMessage(f"{self.identifier}_motor5_rotate_left")
         self.configure_relatives_buttons(self.motor5_buttons, 0)
@@ -308,9 +316,6 @@ class UpperMotorFrame:
     def motor5_rotate_stop(self):
         pub.sendMessage(f"{self.identifier}_motor5_rotate_stop")
         self.configure_relatives_buttons(self.motor5_buttons, 2)
-
-    def motor5_adc_change(self):
-        pub.sendMessage(f"{self.identifier}_motor5_adc_change")
 
 
 if __name__ == '__main__':
