@@ -5,10 +5,10 @@ import time
 def ini(comport_name='COM2'):
     serial_inst = serial.Serial()
     serial_inst.baudrate = 115200
-    serial_inst.timeout = 5.0
     serial_inst.bytesize = 8
     serial_inst.parity = 'N'
     serial_inst.stopbits = 1
+    serial_inst.timeout = 5.0
     serial_inst.port = comport_name
     serial_inst.open()
     return serial_inst
@@ -35,7 +35,7 @@ def read_com_port(serial_inst):
             if packet is None:
                 return "No data"
             else:
-                return packet.decode('ascii')
+                return packet.decode('utf-8')
         else:
             pass
 
@@ -51,24 +51,21 @@ def convert_string_to_bytes(binary_string):
     return bytes(chr(decimal), 'ascii')
 
 
-def send_adc(serial_inst, config, adc=0):
-    stm_bytearray = bytearray()
+def send_adc(serial_inst, config, adc='0'):
     config_stm = convert_string_to_bytes(config)
-    adc_stm = bytes(chr(adc), 'ascii')
-    stm_bytearray += config_stm
-    stm_bytearray += adc_stm
-
-    write_comport(stm_bytearray, serial_inst)
+    adc_stm = convert_string_to_bytes(adc)
+    write_comport(config_stm, serial_inst)
+    write_comport(adc_stm, serial_inst)
 
 
-def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=0, time_bytes=0, delay=0):
+def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=0, time_int=0, delay=0):
     bytearray_str = bytearray()
 
     config_stm = convert_string_to_bytes(config)
     power_stm = convert_string_to_bytes(power_byte)
     motor_stm = convert_string_to_bytes(motor_byte)
     char_pwm = bytes(chr(pwm_bytes), 'ascii')
-    char_time = bytes(chr(time_bytes), 'ascii')
+    char_time = bytes(chr(time_int), 'ascii')
     char_delay = bytes(chr(delay), 'ascii')
 
     bytearray_str += config_stm
@@ -78,7 +75,7 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
         bytearray_str += motor_stm
     if pwm_bytes != 0:
         bytearray_str += char_pwm
-    if time_bytes != 0:
+    if time_int != 0:
         bytearray_str += char_time
     if delay != 0:
         bytearray_str += char_delay
@@ -87,6 +84,15 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
 
 def main():
     show_available_ports()
+    serial_inst = ini('COM2')
+    # data = ''
+    # for i in range(0, 100):
+    #     data += str(i)
+    # new_data = bytes(data, 'ascii')
+    # # print(len(new_data))
+    # while True:
+    #     data = serial_inst.read_all()
+    #     print(data)
 
 
 if __name__ == "__main__":
