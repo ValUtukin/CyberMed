@@ -52,7 +52,7 @@ class View:
         self.figure_label.configure(image=imgtk)
 
     def init_camera_first_frame(self):
-        initial_image = cv.imread('../Images/No_graph.png')
+        initial_image = cv.imread('../../Images/No_graph.png')
         self.fit_image_into_label(initial_image)
 
     def adc_figure_update(self):
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     root['bg'] = '#0585e8'
     root.title('Motor Client')
     root.geometry('1600x900')
-    photo = PhotoImage(file="../Images/cyber_hand.png")
+    photo = PhotoImage(file="../../Images/cyber_hand.png")
     root.iconphoto(False, photo)
     root.resizable(width=False, height=False)
 

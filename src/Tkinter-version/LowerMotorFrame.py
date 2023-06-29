@@ -323,7 +323,7 @@ if __name__ == '__main__':
     root['bg'] = '#0585e8'
     root.title('Motor Client')
     root.geometry('1600x900')
-    photo = PhotoImage(file="../Images/cyber_hand.png")
+    photo = PhotoImage(file="../../Images/cyber_hand.png")
     root.iconphoto(False, photo)
     root.resizable(width=False, height=False)
 

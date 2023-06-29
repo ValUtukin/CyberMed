@@ -9,8 +9,8 @@ from MotorController import MotorController
 class Controller:
     def __init__(self, parent):
         self.parent = parent
-        self.upper_comport = com.ini('COM6')
-        self.lower_comport = com.ini('COM7')
+        self.upper_comport = com.ini('COM2')
+        self.lower_comport = com.ini('COM3')
         self.model = Model()
         self.view = View(parent)
         self.view.setup()
@@ -393,7 +393,7 @@ if __name__ == '__main__':
     root['bg'] = '#0585e8'
     root.title('Motor Client')
     root.geometry('1600x900')
-    photo = PhotoImage(file="../Images/cyber_hand.png")
+    photo = PhotoImage(file="../../Images/cyber_hand.png")
     root.iconphoto(False, photo)
     root.resizable(width=False, height=False)
 

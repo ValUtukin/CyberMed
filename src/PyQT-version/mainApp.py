@@ -1,5 +1,5 @@
 import sys
-import view
+import View
 from Model import *
 import comport as com
 from PyQt5 import QtWidgets, QtCore
@@ -10,12 +10,12 @@ def send_power(comport):
     com.send_command(comport, config='00000001', power_byte='00000001')  # Send power ON
 
 
-class App(QtWidgets.QMainWindow, view.Ui_MainWindow):
+class App(QtWidgets.QMainWindow, View.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.upper_comport = com.ini('COM7')
-        self.lower_comport = com.ini('COM6')
+        self.upper_comport = com.ini('COM2')
+        self.lower_comport = com.ini('COM3')
         self.model = Model(self.upper_comport, self.lower_comport)
 
         self.upper_send_power_btn.clicked.connect(self.upper_send_power)
@@ -126,7 +126,7 @@ class App(QtWidgets.QMainWindow, view.Ui_MainWindow):
         if adc_number != 0:
             self.model.upper_send_adc(adc_decimal)
         else:
-            print('main.py/upper_collect_adc - adc_number is zero')
+            print('mainApp.py/upper_collect_adc - adc_number is zero')
 
     def upper_motor1_rotate_left(self, args=None):
         if not args:  # Without args

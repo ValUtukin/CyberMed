@@ -1,5 +1,4 @@
 import serial
-import time
 
 
 def ini(comport_name='COM2'):
@@ -84,15 +83,6 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
 
 def main():
     show_available_ports()
-    serial_inst = ini('COM2')
-    # data = ''
-    # for i in range(0, 100):
-    #     data += str(i)
-    # new_data = bytes(data, 'ascii')
-    # # print(len(new_data))
-    # while True:
-    #     data = serial_inst.read_all()
-    #     print(data)
 
 
 if __name__ == "__main__":
