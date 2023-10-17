@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>1600</width>
+      <height>700</height>
+     </rect>
+    </property>
+    <widget class="QWidget" name="page">
+     <widget class="QLabel" name="welcome_label">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>200</y>
+        <width>421</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_2"/>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1600</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuWindow_Select">
+    <property name="title">
+     <string>Window Select</string>
+    </property>
+    <addaction name="actionManual_Controll"/>
+    <addaction name="actionPre_saved_moves"/>
+   </widget>
+   <addaction name="menuWindow_Select"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionManual_Controll">
+   <property name="text">
+    <string>Manual Controll</string>
+   </property>
+  </action>
+  <action name="actionPre_saved_moves">
+   <property name="text">
+    <string>Pre-saved moves</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
