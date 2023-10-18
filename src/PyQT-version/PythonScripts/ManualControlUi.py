@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\PyCharmProjects\PyQt\view.ui'
+# Form implementation generated from reading ui file 'C:\PyCharmProjects\PyQt_withHub\CyberMed\src\PyQT-version\UIs\ManualControl.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -9,16 +9,17 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from pyqtgraph import PlotWidget
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(891, 697)
+        MainWindow.resize(1500, 695)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.lower_frame = QtWidgets.QWidget(self.centralwidget)
-        self.lower_frame.setGeometry(QtCore.QRect(10, 330, 721, 301))
+        self.lower_frame.setGeometry(QtCore.QRect(10, 340, 721, 301))
         self.lower_frame.setObjectName("lower_frame")
         self.lower_motor4_right_btn = QtWidgets.QPushButton(self.lower_frame)
         self.lower_motor4_right_btn.setGeometry(QtCore.QRect(120, 210, 71, 31))
@@ -35,18 +36,12 @@ class Ui_MainWindow(object):
         self.lower_motor4_time_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor4_time_input.setGeometry(QtCore.QRect(460, 210, 61, 31))
         self.lower_motor4_time_input.setObjectName("lower_motor4_time_input")
-
-        self.lower_motor4_time_input.setPlainText('1.5')
-
         self.lower_motor1_label = QtWidgets.QLabel(self.lower_frame)
         self.lower_motor1_label.setGeometry(QtCore.QRect(10, 70, 31, 16))
         self.lower_motor1_label.setObjectName("lower_motor1_label")
         self.lower_motor5_time_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor5_time_input.setGeometry(QtCore.QRect(460, 260, 61, 31))
         self.lower_motor5_time_input.setObjectName("lower_motor5_time_input")
-
-        self.lower_motor5_time_input.setPlainText('1.5')
-
         self.lower_motor5_stop_btn = QtWidgets.QPushButton(self.lower_frame)
         self.lower_motor5_stop_btn.setGeometry(QtCore.QRect(190, 260, 71, 31))
         self.lower_motor5_stop_btn.setObjectName("lower_motor5_stop_btn")
@@ -65,9 +60,6 @@ class Ui_MainWindow(object):
         self.lower_motor2_delay_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor2_delay_input.setGeometry(QtCore.QRect(560, 110, 61, 31))
         self.lower_motor2_delay_input.setObjectName("lower_motor2_delay_input")
-
-        self.lower_motor2_delay_input.setPlainText('1.0')
-
         self.lower_motor5_left_btn = QtWidgets.QPushButton(self.lower_frame)
         self.lower_motor5_left_btn.setGeometry(QtCore.QRect(50, 260, 71, 31))
         self.lower_motor5_left_btn.setObjectName("lower_motor5_left_btn")
@@ -109,9 +101,6 @@ class Ui_MainWindow(object):
         self.lower_motor3_delay_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor3_delay_input.setGeometry(QtCore.QRect(560, 160, 61, 31))
         self.lower_motor3_delay_input.setObjectName("lower_motor3_delay_input")
-
-        self.lower_motor3_delay_input.setPlainText('1.0')
-
         self.lower_time_label_1 = QtWidgets.QLabel(self.lower_frame)
         self.lower_time_label_1.setGeometry(QtCore.QRect(530, 60, 21, 21))
         self.lower_time_label_1.setObjectName("lower_time_label_1")
@@ -121,15 +110,9 @@ class Ui_MainWindow(object):
         self.lower_motor5_delay_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor5_delay_input.setGeometry(QtCore.QRect(560, 260, 61, 31))
         self.lower_motor5_delay_input.setObjectName("lower_motor5_delay_input")
-
-        self.lower_motor5_delay_input.setPlainText('1.0')
-
         self.lower_motor3_time_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor3_time_input.setGeometry(QtCore.QRect(460, 160, 61, 31))
         self.lower_motor3_time_input.setObjectName("lower_motor3_time_input")
-
-        self.lower_motor3_time_input.setPlainText('1.5')
-
         self.lower_motor2_right_btn = QtWidgets.QPushButton(self.lower_frame)
         self.lower_motor2_right_btn.setGeometry(QtCore.QRect(120, 110, 71, 31))
         self.lower_motor2_right_btn.setObjectName("lower_motor2_right_btn")
@@ -145,15 +128,9 @@ class Ui_MainWindow(object):
         self.lower_motor2_time_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor2_time_input.setGeometry(QtCore.QRect(460, 110, 61, 31))
         self.lower_motor2_time_input.setObjectName("lower_motor2_time_input")
-
-        self.lower_motor2_time_input.setPlainText('1.5')
-
         self.lower_motor1_time_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor1_time_input.setGeometry(QtCore.QRect(460, 60, 61, 31))
         self.lower_motor1_time_input.setObjectName("lower_motor1_time_input")
-
-        self.lower_motor1_time_input.setPlainText('1.5')
-
         self.lower_motor1_pwm_scale = QtWidgets.QSlider(self.lower_frame)
         self.lower_motor1_pwm_scale.setGeometry(QtCore.QRect(270, 50, 181, 41))
         self.lower_motor1_pwm_scale.setMaximum(100)
@@ -183,9 +160,6 @@ class Ui_MainWindow(object):
         self.lower_motor1_delay_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor1_delay_input.setGeometry(QtCore.QRect(560, 60, 61, 31))
         self.lower_motor1_delay_input.setObjectName("lower_motor1_delay_input")
-
-        self.lower_motor1_delay_input.setPlainText('1.0')
-
         self.lower_motor2_stop_btn = QtWidgets.QPushButton(self.lower_frame)
         self.lower_motor2_stop_btn.setGeometry(QtCore.QRect(190, 110, 71, 31))
         self.lower_motor2_stop_btn.setObjectName("lower_motor2_stop_btn")
@@ -195,9 +169,6 @@ class Ui_MainWindow(object):
         self.lower_motor4_delay_input = QtWidgets.QPlainTextEdit(self.lower_frame)
         self.lower_motor4_delay_input.setGeometry(QtCore.QRect(560, 210, 61, 31))
         self.lower_motor4_delay_input.setObjectName("lower_motor4_delay_input")
-
-        self.lower_motor4_delay_input.setPlainText('1.0')
-
         self.lower_motor5_pwm_scale = QtWidgets.QSlider(self.lower_frame)
         self.lower_motor5_pwm_scale.setGeometry(QtCore.QRect(270, 250, 181, 41))
         self.lower_motor5_pwm_scale.setMaximum(100)
@@ -244,8 +215,6 @@ class Ui_MainWindow(object):
         self.lower_send_adc = QtWidgets.QPushButton(self.lower_frame)
         self.lower_send_adc.setGeometry(QtCore.QRect(640, 10, 75, 23))
         self.lower_send_adc.setObjectName("lower_send_adc")
-
-        # Upper Part
         self.upper_frame = QtWidgets.QWidget(self.centralwidget)
         self.upper_frame.setGeometry(QtCore.QRect(10, 10, 721, 311))
         self.upper_frame.setObjectName("upper_frame")
@@ -261,9 +230,6 @@ class Ui_MainWindow(object):
         self.upper_motor4_time_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor4_time_input.setGeometry(QtCore.QRect(460, 220, 61, 31))
         self.upper_motor4_time_input.setObjectName("upper_motor4_time_input")
-
-        self.upper_motor4_time_input.setPlainText('1.5')
-
         self.upper_motor3_right_btn = QtWidgets.QPushButton(self.upper_frame)
         self.upper_motor3_right_btn.setGeometry(QtCore.QRect(120, 170, 71, 31))
         self.upper_motor3_right_btn.setObjectName("upper_motor3_right_btn")
@@ -276,9 +242,6 @@ class Ui_MainWindow(object):
         self.upper_motor5_time_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor5_time_input.setGeometry(QtCore.QRect(460, 270, 61, 31))
         self.upper_motor5_time_input.setObjectName("upper_motor5_time_input")
-
-        self.upper_motor5_time_input.setPlainText('1.5')
-
         self.upper_motor3_stop_btn = QtWidgets.QPushButton(self.upper_frame)
         self.upper_motor3_stop_btn.setGeometry(QtCore.QRect(190, 170, 71, 31))
         self.upper_motor3_stop_btn.setObjectName("upper_motor3_stop_btn")
@@ -297,9 +260,6 @@ class Ui_MainWindow(object):
         self.upper_motor2_delay_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor2_delay_input.setGeometry(QtCore.QRect(560, 120, 61, 31))
         self.upper_motor2_delay_input.setObjectName("upper_motor2_delay_input")
-
-        self.upper_motor2_delay_input.setPlainText('1.0')
-
         self.upper_time_label_5 = QtWidgets.QLabel(self.upper_frame)
         self.upper_time_label_5.setGeometry(QtCore.QRect(530, 270, 21, 21))
         self.upper_time_label_5.setObjectName("upper_time_label_5")
@@ -338,9 +298,6 @@ class Ui_MainWindow(object):
         self.upper_motor3_delay_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor3_delay_input.setGeometry(QtCore.QRect(560, 170, 61, 31))
         self.upper_motor3_delay_input.setObjectName("upper_motor3_delay_input")
-
-        self.upper_motor3_delay_input.setPlainText('1.0')
-
         self.upper_time_label_1 = QtWidgets.QLabel(self.upper_frame)
         self.upper_time_label_1.setGeometry(QtCore.QRect(530, 70, 21, 21))
         self.upper_time_label_1.setObjectName("upper_time_label_1")
@@ -350,15 +307,9 @@ class Ui_MainWindow(object):
         self.upper_motor5_delay_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor5_delay_input.setGeometry(QtCore.QRect(560, 270, 61, 31))
         self.upper_motor5_delay_input.setObjectName("upper_motor5_delay_input")
-
-        self.upper_motor5_delay_input.setPlainText('1.0')
-
         self.upper_motor3_time_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor3_time_input.setGeometry(QtCore.QRect(460, 170, 61, 31))
         self.upper_motor3_time_input.setObjectName("upper_motor3_time_input")
-
-        self.upper_motor3_time_input.setPlainText('1.5')
-
         self.upper_motor2_right_btn = QtWidgets.QPushButton(self.upper_frame)
         self.upper_motor2_right_btn.setGeometry(QtCore.QRect(120, 120, 71, 31))
         self.upper_motor2_right_btn.setObjectName("upper_motor2_right_btn")
@@ -374,15 +325,9 @@ class Ui_MainWindow(object):
         self.upper_motor2_time_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor2_time_input.setGeometry(QtCore.QRect(460, 120, 61, 31))
         self.upper_motor2_time_input.setObjectName("upper_motor2_time_input")
-
-        self.upper_motor2_time_input.setPlainText('1.5')
-
         self.upper_motor1_time_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor1_time_input.setGeometry(QtCore.QRect(460, 70, 61, 31))
         self.upper_motor1_time_input.setObjectName("upper_motor1_time_input")
-
-        self.upper_motor1_time_input.setPlainText('1.5')
-
         self.upper_motor1_pwm_scale = QtWidgets.QSlider(self.upper_frame)
         self.upper_motor1_pwm_scale.setGeometry(QtCore.QRect(270, 60, 181, 41))
         self.upper_motor1_pwm_scale.setMaximum(100)
@@ -412,9 +357,6 @@ class Ui_MainWindow(object):
         self.upper_motor1_delay_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor1_delay_input.setGeometry(QtCore.QRect(560, 70, 61, 31))
         self.upper_motor1_delay_input.setObjectName("upper_motor1_delay_input")
-
-        self.upper_motor1_delay_input.setPlainText('1.0')
-
         self.upper_motor2_stop_btn = QtWidgets.QPushButton(self.upper_frame)
         self.upper_motor2_stop_btn.setGeometry(QtCore.QRect(190, 120, 71, 31))
         self.upper_motor2_stop_btn.setObjectName("upper_motor2_stop_btn")
@@ -424,9 +366,6 @@ class Ui_MainWindow(object):
         self.upper_motor4_delay_input = QtWidgets.QPlainTextEdit(self.upper_frame)
         self.upper_motor4_delay_input.setGeometry(QtCore.QRect(560, 220, 61, 31))
         self.upper_motor4_delay_input.setObjectName("upper_motor4_delay_input")
-
-        self.upper_motor4_delay_input.setPlainText('1.0')
-
         self.upper_motor5_pwm_scale = QtWidgets.QSlider(self.upper_frame)
         self.upper_motor5_pwm_scale.setGeometry(QtCore.QRect(270, 260, 181, 41))
         self.upper_motor5_pwm_scale.setMaximum(100)
@@ -473,7 +412,39 @@ class Ui_MainWindow(object):
         self.upper_send_adc = QtWidgets.QPushButton(self.upper_frame)
         self.upper_send_adc.setGeometry(QtCore.QRect(640, 10, 75, 23))
         self.upper_send_adc.setObjectName("upper_send_adc")
+        self.graphicsView = PlotWidget(self.centralwidget)
+        self.graphicsView.setGeometry(QtCore.QRect(840, 120, 591, 441))
+        self.graphicsView.setObjectName("graphicsView")
+        self.stop_receive_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.stop_receive_btn.setGeometry(QtCore.QRect(840, 20, 75, 23))
+        self.stop_receive_btn.setObjectName("stop_receive_btn")
+        self.save_graph_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.save_graph_btn.setGeometry(QtCore.QRect(930, 20, 75, 23))
+        self.save_graph_btn.setObjectName("save_graph_btn")
         MainWindow.setCentralWidget(self.centralwidget)
+
+        # Lower part default time/delay values
+        self.lower_motor4_time_input.setPlainText('1.5')
+        self.lower_motor5_time_input.setPlainText('1.5')
+        self.lower_motor2_delay_input.setPlainText('1.0')
+        self.lower_motor3_delay_input.setPlainText('1.0')
+        self.lower_motor5_delay_input.setPlainText('1.0')
+        self.lower_motor3_time_input.setPlainText('1.5')
+        self.lower_motor2_time_input.setPlainText('1.5')
+        self.lower_motor1_time_input.setPlainText('1.5')
+        self.lower_motor1_delay_input.setPlainText('1.0')
+        self.lower_motor4_delay_input.setPlainText('1.0')
+        # Upper part default time/delay values
+        self.upper_motor4_time_input.setPlainText('1.5')
+        self.upper_motor5_time_input.setPlainText('1.5')
+        self.upper_motor2_delay_input.setPlainText('1.0')
+        self.upper_motor3_delay_input.setPlainText('1.0')
+        self.upper_motor5_delay_input.setPlainText('1.0')
+        self.upper_motor3_time_input.setPlainText('1.5')
+        self.upper_motor2_time_input.setPlainText('1.5')
+        self.upper_motor1_time_input.setPlainText('1.5')
+        self.upper_motor1_delay_input.setPlainText('1.0')
+        self.upper_motor4_delay_input.setPlainText('1.0')
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -567,3 +538,6 @@ class Ui_MainWindow(object):
         self.upper_motor4_adc_box.setText(_translate("MainWindow", "ADC"))
         self.upper_motor5_adc_box.setText(_translate("MainWindow", "ADC"))
         self.upper_send_adc.setText(_translate("MainWindow", "Send ADC"))
+        self.stop_receive_btn.setText(_translate("MainWindow", "Stop Receive"))
+        self.save_graph_btn.setText(_translate("MainWindow", "Save Graph"))
+

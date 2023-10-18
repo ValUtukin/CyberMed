@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1600</width>
-    <height>700</height>
+    <width>1500</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>1600</width>
+      <x>0</x>
+      <y>0</y>
+      <width>1400</width>
       <height>700</height>
      </rect>
     </property>
@@ -27,14 +27,14 @@
      <widget class="QLabel" name="welcome_label">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>200</y>
+        <x>550</x>
+        <y>300</y>
         <width>421</width>
         <height>81</height>
        </rect>
       </property>
       <property name="text">
-       <string>TextLabel</string>
+       <string>Welcome Text</string>
       </property>
      </widget>
     </widget>
@@ -46,7 +46,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1600</width>
+     <width>1500</width>
      <height>21</height>
     </rect>
    </property>
@@ -54,15 +54,15 @@
     <property name="title">
      <string>Window Select</string>
     </property>
-    <addaction name="actionManual_Controll"/>
+    <addaction name="actionManual_Control"/>
     <addaction name="actionPre_saved_moves"/>
    </widget>
    <addaction name="menuWindow_Select"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionManual_Controll">
+  <action name="actionManual_Control">
    <property name="text">
-    <string>Manual Controll</string>
+    <string>Manual Control</string>
    </property>
   </action>
   <action name="actionPre_saved_moves">

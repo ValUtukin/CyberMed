@@ -1,16 +1,15 @@
 import sys
-import View
+import ManualControlUi
 from Model import *
 import comport as com
 from PyQt5 import QtWidgets, QtCore
-from PyQt5 import uic
 
 
 def send_power(comport):
     com.send_command(comport, config='00000001', power_byte='00000001')  # Send power ON
 
 
-class App(QtWidgets.QMainWindow, View.Ui_MainWindow):
+class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -126,7 +125,7 @@ class App(QtWidgets.QMainWindow, View.Ui_MainWindow):
         if adc_number != 0:
             self.model.upper_send_adc(adc_decimal)
         else:
-            print('mainApp.py/upper_collect_adc - adc_number is zero')
+            print('ManualControl.py/upper_collect_adc - adc_number is zero')
 
     def upper_motor1_rotate_left(self, args=None):
         if not args:  # Without args
@@ -319,7 +318,6 @@ class App(QtWidgets.QMainWindow, View.Ui_MainWindow):
         send_power(self.upper_comport)
 
     def lower_collect_adc(self):
-        print('main.py/lower_collect_adc')
         m1_status = self.lower_motor1_adc_box.isChecked()
         m2_status = self.lower_motor2_adc_box.isChecked()
         m3_status = self.lower_motor3_adc_box.isChecked()
@@ -330,7 +328,7 @@ class App(QtWidgets.QMainWindow, View.Ui_MainWindow):
         if adc_number != 0:
             self.model.lower_send_adc(adc_decimal)
         else:
-            print('main.py/lower_collect_adc - adc_number is zero')
+            print('ManualControl.py/lower_collect_adc - adc_number is zero')
 
     def lower_motor1_rotate_left(self, args=None):
         if not args:
@@ -520,7 +518,7 @@ class App(QtWidgets.QMainWindow, View.Ui_MainWindow):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    window = App()
+    window = ManualControl()
     window.show()
     app.exec_()
 
