@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1500</width>
-    <height>695</height>
+    <width>1346</width>
+    <height>697</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>340</y>
+      <y>330</y>
       <width>721</width>
       <height>301</height>
      </rect>
@@ -1575,7 +1575,7 @@
    <widget class="PlotWidget" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>840</x>
+      <x>740</x>
       <y>120</y>
       <width>591</width>
       <height>441</height>
@@ -1585,7 +1585,7 @@
    <widget class="QPushButton" name="stop_receive_btn">
     <property name="geometry">
      <rect>
-      <x>840</x>
+      <x>740</x>
       <y>20</y>
       <width>75</width>
       <height>23</height>
@@ -1598,7 +1598,7 @@
    <widget class="QPushButton" name="save_graph_btn">
     <property name="geometry">
      <rect>
-      <x>930</x>
+      <x>830</x>
       <y>20</y>
       <width>75</width>
       <height>23</height>

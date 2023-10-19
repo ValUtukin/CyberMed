@@ -23,3 +23,14 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
 
     def fist_release(self):
         print('PreSavedMoves/Fist Release')
+
+
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    window = PreSavedMoves()
+    window.show()
+    app.exec_()
+
+
+if __name__ == '__main__':
+    main()

@@ -17,11 +17,17 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_comport = com.ini('COM3')
         self.model = Model(self.upper_comport, self.lower_comport)
 
+        self.add_graph1()  # Add initial dummy graph 1
+        self.add_graph2()  # Add initial dummy graph 2
+
         self.upper_send_power_btn.clicked.connect(self.upper_send_power)
         self.lower_send_power_btn.clicked.connect(self.lower_send_power)
 
         self.upper_send_adc.clicked.connect(self.upper_collect_adc)
         self.lower_send_adc.clicked.connect(self.lower_collect_adc)
+
+        self.stop_receive_btn.clicked.connect(self.stop_receive)
+        self.save_graph_btn.clicked.connect(self.save_plot_widget_as_jpg)
 
         self.upper_motor1_left_btn.clicked.connect(self.upper_motor1_rotate_left)
         self.upper_motor1_right_btn.clicked.connect(self.upper_motor1_rotate_right)
@@ -93,6 +99,33 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_motor5_pwm_scale.valueChanged.connect(self.update_lower_label_5)
         self.lower_motor5_buttons = [self.lower_motor5_left_btn, self.lower_motor5_right_btn,
                                      self.lower_motor5_stop_btn]
+
+    def add_graph1(self):
+        x1 = [1, 2, 3, 4, 5, 6, 7, 8]
+        y1 = [10, 50, 20, 70, 30, 1, 1, 1]
+
+        plot_item1 = self.graphics_layout_widget.addPlot(row=0, col=0, title="Graph 1")
+        plot_item1.plot(x1, y1, pen='r')
+        plot_item1.showGrid(x=True, y=True, alpha=1.0)
+
+    def add_graph2(self):
+        x2 = [1, 2, 3, 4, 5, 6, 7, 8]
+        y2 = [10, 5, 2, 7, 3, 2, 3, 4]
+
+        plot_item2 = self.graphics_layout_widget.addPlot(row=1, col=0, title="Graph 2")
+        plot_item2.plot(x2, y2, pen='g')
+        plot_item2.showGrid(x=True, y=True, alpha=1.0)
+
+    def stop_receive(self):
+        print('Stop receive')
+        if self.timer.isActive():  # If timer is active then stop it and run again
+            self.timer.stop()
+
+    def save_plot_widget_as_jpg(self, filename='default.jpg'):
+        print('Save graph')
+        # base_path = r'C:\Users\Bogh\TestFolder\\'
+        # exporter = pg.exporters.ImageExporter(self.graphics_layout_widget.scene())
+        # exporter.export(base_path + filename)
 
     def switch_button_color(self, button, color='#19e676'):
         if button.styleSheet() == 'background-color:' or button.styleSheet() == '':

@@ -9,17 +9,17 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from pyqtgraph import PlotWidget
+import pyqtgraph as pg
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1500, 695)
+        MainWindow.resize(1346, 697)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.lower_frame = QtWidgets.QWidget(self.centralwidget)
-        self.lower_frame.setGeometry(QtCore.QRect(10, 340, 721, 301))
+        self.lower_frame.setGeometry(QtCore.QRect(10, 330, 721, 301))
         self.lower_frame.setObjectName("lower_frame")
         self.lower_motor4_right_btn = QtWidgets.QPushButton(self.lower_frame)
         self.lower_motor4_right_btn.setGeometry(QtCore.QRect(120, 210, 71, 31))
@@ -412,14 +412,19 @@ class Ui_MainWindow(object):
         self.upper_send_adc = QtWidgets.QPushButton(self.upper_frame)
         self.upper_send_adc.setGeometry(QtCore.QRect(640, 10, 75, 23))
         self.upper_send_adc.setObjectName("upper_send_adc")
-        self.graphicsView = PlotWidget(self.centralwidget)
-        self.graphicsView.setGeometry(QtCore.QRect(840, 120, 591, 441))
+
+        self.graphicsView = pg.PlotWidget(self.centralwidget)
+        self.graphics_layout_widget = pg.GraphicsLayoutWidget()
+        self.plotLayout = QtWidgets.QVBoxLayout(self.graphicsView)
+        self.plotLayout.addWidget(self.graphics_layout_widget)
+        self.graphicsView.setGeometry(QtCore.QRect(740, 120, 591, 441))
         self.graphicsView.setObjectName("graphicsView")
+
         self.stop_receive_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.stop_receive_btn.setGeometry(QtCore.QRect(840, 20, 75, 23))
+        self.stop_receive_btn.setGeometry(QtCore.QRect(740, 20, 75, 23))
         self.stop_receive_btn.setObjectName("stop_receive_btn")
         self.save_graph_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.save_graph_btn.setGeometry(QtCore.QRect(930, 20, 75, 23))
+        self.save_graph_btn.setGeometry(QtCore.QRect(830, 20, 75, 23))
         self.save_graph_btn.setObjectName("save_graph_btn")
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -540,4 +545,4 @@ class Ui_MainWindow(object):
         self.upper_send_adc.setText(_translate("MainWindow", "Send ADC"))
         self.stop_receive_btn.setText(_translate("MainWindow", "Stop Receive"))
         self.save_graph_btn.setText(_translate("MainWindow", "Save Graph"))
-
+from pyqtgraph import PlotWidget

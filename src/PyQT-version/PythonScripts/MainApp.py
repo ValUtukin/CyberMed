@@ -25,7 +25,6 @@ class MyApplication(QMainWindow):
         self.stackedWidget.addWidget(self.manual_control)
         self.stackedWidget.addWidget(self.pre_saved_moves)
 
-
     def manual_control(self):
         self.stackedWidget.setCurrentWidget(self.manual_control)
 
