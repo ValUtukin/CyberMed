@@ -7,9 +7,9 @@ def ini(comport_name='COM2'):
     serial_inst.bytesize = 8
     serial_inst.parity = 'N'
     serial_inst.stopbits = 1
-    serial_inst.timeout = 5.0
+    serial_inst.timeout = 2.0
     serial_inst.port = comport_name
-    serial_inst.open()
+    open_comport(serial_inst)
     return serial_inst
 
 
@@ -50,11 +50,21 @@ def convert_string_to_bytes(binary_string):
     return bytes(chr(decimal), 'ascii')
 
 
-def send_adc(serial_inst, config, adc='0'):
+def send_adc(serial_inst, config, adc=0):
+    bytearray_str = bytearray()
+
     config_stm = convert_string_to_bytes(config)
-    adc_stm = convert_string_to_bytes(adc)
-    write_comport(config_stm, serial_inst)
-    write_comport(adc_stm, serial_inst)
+    adc_stm = bytes(chr(adc), 'ascii')
+    print(f"comport/send_adc - we about to send: config - {config_stm}, adc - {adc_stm}")
+
+    bytearray_str += config_stm
+    if adc_stm != 0:
+        bytearray_str += adc_stm
+
+    print(f"comport/send_adc - send {bytearray_str}")
+    write_comport(bytearray_str, serial_inst)
+    # write_comport(config_stm, serial_inst)
+    # write_comport(adc_stm, serial_inst)
 
 
 def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=0, time_int=0, delay=0):
@@ -78,7 +88,21 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
         bytearray_str += char_time
     if delay != 0:
         bytearray_str += char_delay
+    print(f"comport/send_command - send {bytearray_str}")
     write_comport(bytearray_str, serial_inst)
+
+
+def open_comport(serial_inst):
+    serial_inst.open()
+    serial_inst.reset_input_buffer()
+    serial_inst.reset_output_buffer()
+
+
+def close_comport(serial_inst):
+    if serial_inst.is_open:
+        serial_inst.reset_input_buffer()
+        serial_inst.reset_output_buffer()
+        serial_inst.close()
 
 
 def main():
