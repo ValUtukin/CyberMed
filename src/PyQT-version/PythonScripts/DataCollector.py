@@ -10,6 +10,7 @@ class DataCollector(QObject):
     def __init__(self, set_num, args=None, comport=None):
         super().__init__()
         self.data_set_holder = dict()
+        self.holder_state = [False] * 5
         self.initial_delay = None
         if not args:
             self.initial_byte_count = None
@@ -38,11 +39,13 @@ class DataCollector(QObject):
     def get_comport(self):
         return self.comport
 
-    def add_set(self, number):
-        if number > 0:
-            self.data_set_holder[f'array{number}'] = list()
-        else:
-            print(f"DataCollector/add_set - number must be greater than 0. Got {number} instead")
+    def set_holder_state(self, state_arr):
+        self.delete_all_sets()
+        counter = 0
+        for i in range(0, len(state_arr)):
+            if state_arr[i]:
+                self.data_set_holder[f'{counter}'] = list()
+                counter += 1
 
     def get_set(self, number=0):
         for arr in self.data_set_holder:
@@ -84,47 +87,28 @@ class DataCollector(QObject):
         set_to_clear = self.data_set_holder[set_name]
         set_to_clear.clear()
 
-    def start_collecting(self, byte_count=0):
-        print(f"DataCollector/start_collecting - Delay before collecting: {self.initial_delay}")
+    def delete_all_sets(self):
+        self.data_set_holder.clear()
+
+    def start_collecting(self):
         time.sleep(self.initial_delay)
-
-        if not byte_count:
-            print(f'DataCollector/start_collecting - got no params, byte_count is {byte_count}. Read initial number of bytes.')
-            if not self.initial_byte_count:
-                print(f'DataCollector/start_collecting - initial_byte_count also None: self.initial_byte_count is {self.initial_byte_count}')
-            else:
-                print(f'DataCollector/start_collecting - initial_byte_count not None: {self.initial_byte_count}')
-                if self.holder_len:
-                    print(f'DataCollector/start_collecting - start to read from {self.comport.name}, bytes to read: {self.initial_byte_count}')
-                    for i in range(0, self.initial_byte_count, 25):
-                        data = self.comport.read(25)
-                        if len(data) == 0:
-                            self.add_value_to_set('array1', 0)
-                        else:
-                            for j in range(0, len(data)):
-                                print(f"{j + 1}) {data[j]}, type {type(data[j])}")
-                                new_data = data[j] * 3.3 / 4096
-                                self.add_value_to_set('array1', new_data)
-                        self.segment_received.emit()
-                        print("DataCollector/start_collecting - start sleeping...")
-                        time.sleep(0.5)
-                    print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
-                    com.close_comport(self.comport)
+        if self.holder_len:
+            for i in range(0, self.initial_byte_count, 25):
+                data = self.comport.read(25)
+                if len(data) == 0:
+                    self.add_value_to_set('0', 0)
                 else:
-                    print(f"DataCollector.start_collecting - data_set_holder's len is 0")
-        else:
-            if self.holder_len:
-                for i in range(0, byte_count):
-                    data = int(self.comport.read().hex())
-                    self.add_value_to_set('array1', data)
-            else:
-                print(f"DataCollector.start_collecting - data_set_holder's len is 0")
+                    for j in range(0, len(data)):
+                        print(f"{j + 1}) {data[j]}, type {type(data[j])}")
+                        new_data = data[j] * 3.3 / 4096
+                        set_name = str(j % len(self.data_set_holder))
+                        self.add_value_to_set(set_name, new_data)
+                self.segment_received.emit()
+                print("DataCollector/start_collecting - start sleeping...")
+                time.sleep(0.1)
+            print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
+            com.close_comport(self.comport)
         self.finished.emit()
-
-    def collect_infinitely(self):
-        while True:
-            data = int(self.comport.read().hex(), 16)
-            self.add_value_to_set("array1", data)
 
 
 if __name__ == '__main__':
@@ -132,9 +116,3 @@ if __name__ == '__main__':
     collector = DataCollector(5, serial_ins)
     data_sets, num = collector.get_data_sets()
     print(data_sets)
-
-    print(collector.get_set(3))
-    # collector.start_collecting(2000)
-    # data_sets, num = collector.get_data_sets()
-    # print(data_sets)
-    # print(len(data_sets['array1']))
