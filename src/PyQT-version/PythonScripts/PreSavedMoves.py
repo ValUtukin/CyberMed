@@ -10,12 +10,6 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
-        text = "Fist"
-        self.fist_label.setText(f"<font color='#00AB5D', size=24>{text}</font>")
-
-        self.fist_compress_btn.clicked.connect(self.fist_compress)
-        self.fist_release_btn.clicked.connect(self.fist_release)
-
         print('PreSavedMoves/__init__()')
 
     def fist_compress(self):

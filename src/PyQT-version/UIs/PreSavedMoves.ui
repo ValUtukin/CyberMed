@@ -6,61 +6,110 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1300</width>
-    <height>700</height>
+    <width>1346</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="fist_compress_btn">
+   <widget class="QLabel" name="current_script_label">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>60</y>
-      <width>71</width>
+      <x>10</x>
+      <y>10</y>
+      <width>151</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Compress</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Currently used script file:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="fist_label">
+   <widget class="QLabel" name="script_file_path_label">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>60</y>
-      <width>51</width>
+      <x>170</x>
+      <y>10</y>
+      <width>561</width>
       <height>31</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true"> background-color: white; border-bottom-style: solid; border-bottom-width: 1px;</string>
+    </property>
     <property name="text">
-     <string>Fist</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;TextLabel&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="fist_release_btn">
+   <widget class="QPushButton" name="open_script_file_btn">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>60</y>
+      <x>740</x>
+      <y>10</y>
       <width>75</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Release</string>
+     <string>Open...</string>
     </property>
    </widget>
-   <widget class="QOpenGLWidget" name="openGLWidget">
+   <widget class="QPushButton" name="load_script_file_btn">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>30</y>
-      <width>800</width>
-      <height>600</height>
+      <x>820</x>
+      <y>10</y>
+      <width>75</width>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>Load</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="move_script_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>721</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-style: solid;border-color: rgb(0, 0, 0);border-width: 1px;
+background-color: white; text-align: justify; text-justify: inter-word;</string>
+    </property>
+    <property name="text">
+     <string>Text</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="send_full_sequence_btn">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>150</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Send Full Sequence</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="send_next_command_btn">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>150</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Send Next Command</string>
     </property>
    </widget>
   </widget>
@@ -69,7 +118,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1300</width>
+     <width>1346</width>
      <height>21</height>
     </rect>
    </property>

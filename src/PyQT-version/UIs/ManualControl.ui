@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1346</width>
-    <height>697</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,6 +22,9 @@
       <width>721</width>
       <height>301</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <widget class="QPushButton" name="lower_motor4_right_btn">
      <property name="geometry">
@@ -1576,9 +1579,9 @@
     <property name="geometry">
      <rect>
       <x>740</x>
-      <y>120</y>
+      <y>60</y>
       <width>591</width>
-      <height>441</height>
+      <height>571</height>
      </rect>
     </property>
    </widget>
@@ -1606,6 +1609,78 @@
     </property>
     <property name="text">
      <string>Save Graph</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="save_move_script_btn">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>750</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save script</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="discard_move_script_btn">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>750</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Discard script</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="move_script_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>650</y>
+      <width>721</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-style: solid;border-color: rgb(0, 0, 0);border-width: 1px;
+background-color: white; text-align: justify; text-justify: inter-word;</string>
+    </property>
+    <property name="text">
+     <string>Text</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="script_file_path_label">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>750</y>
+      <width>471</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"> background-color: white; border-bottom-style: solid; border-bottom-width: 1px;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Path to file here&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="open_script_file_btn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>750</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Open...</string>
     </property>
    </widget>
   </widget>

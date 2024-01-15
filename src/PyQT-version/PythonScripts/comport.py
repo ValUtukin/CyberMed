@@ -90,6 +90,7 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
         bytearray_str += char_delay
     print(f"comport/send_command - send {bytearray_str}")
     write_comport(bytearray_str, serial_inst)
+    return bytearray_str
 
 
 def open_comport(serial_inst):

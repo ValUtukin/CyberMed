@@ -3,8 +3,8 @@ import ManualControlUi
 from DataCollector import DataCollector
 from Model import *
 import comport as com
-import random
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
 def send_power(comport):
@@ -35,7 +35,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.upper_comport = com.ini('COM4')
-        self.lower_comport = com.ini('COM7')
+        self.lower_comport = com.ini('COM3')
         self.lower_comport.flushInput()
         self.model = Model(self.upper_comport, self.lower_comport)
 
@@ -46,8 +46,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_current_plots_num = 0
         self.lower_current_plots_num = 0
 
-        # self.timer = QtCore.QTimer()
-        # self.timer.timeout.connect(self.update_plot)
+        self.move_script_file_path = None
 
         self.upper_data_collector_thread = QtCore.QThread()
         self.lower_data_collector_thread = QtCore.QThread()
@@ -66,6 +65,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.add_graph1()  # Add initial dummy graph 1
         self.add_graph2()  # Add initial dummy graph 2
 
+        self.place_default_text()
+
         self.upper_send_power_btn.clicked.connect(self.upper_send_power)
         self.lower_send_power_btn.clicked.connect(self.lower_send_power)
 
@@ -74,6 +75,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
 
         self.stop_receive_btn.clicked.connect(self.stop_receive)
         self.save_graph_btn.clicked.connect(self.save_plot_widget_as_jpg)
+
+        self.open_script_file_btn.clicked.connect(self.open_script_file)
+        self.save_move_script_btn.clicked.connect(self.save_script)
+        self.discard_move_script_btn.clicked.connect(self.discard_script)
 
         self.upper_motor1_left_btn.clicked.connect(self.upper_motor1_rotate_left)
         self.upper_motor1_right_btn.clicked.connect(self.upper_motor1_rotate_right)
@@ -190,6 +195,40 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         plot_item2.plot(x2, y2, pen='g')
         plot_item2.showGrid(x=True, y=True, alpha=1.0)
 
+    def place_default_text(self):
+        text = self.model.get_move_script_default_text()
+        self.move_script_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.move_script_label.setWordWrap(True)
+        self.move_script_label.setText(text)
+
+    def append_text(self, data):
+        current_text = self.move_script_label.text()
+        appended_str = " ".join(format(x, '02x') for x in data)
+        if current_text == self.model.get_move_script_default_text():
+            self.move_script_label.setText(appended_str + " ")
+        else:
+            self.move_script_label.setText(current_text + appended_str + " ")
+
+    def open_script_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt)")
+        if file_path:
+            self.script_file_path_label.setText(file_path)
+            self.move_script_file_path = file_path
+
+    def save_script(self):
+        if self.move_script_file_path is None:
+            QMessageBox.warning(self, 'Warning', 'Undefined file location')
+        else:
+            current_text = self.move_script_label.text()
+            with open(self.move_script_file_path, 'a') as file:
+                file.write(current_text)
+                file.close()
+            QMessageBox.information(self, 'Success', 'Data successfully saved!')
+
+    def discard_script(self):
+        pass
+
+    # TODO: Do something with these two (stop_receive, save_plot_...)
     def stop_receive(self):
         print('Stop receive')
         if self.timer.isActive():  # If timer is active then stop it and run again
@@ -200,12 +239,6 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         # base_path = r'C:\Users\Bogh\TestFolder\\'
         # exporter = pg.exporters.ImageExporter(self.graphics_layout_widget.scene())
         # exporter.export(base_path + filename)
-
-    # def switch_button_color(self, button, color='#19e676'):
-    #     if button.styleSheet() == 'background-color:' or button.styleSheet() == '':
-    #         button.setStyleSheet(f"background-color:{color}")
-    #     else:
-    #         button.setStyleSheet(f"background-color:")
 
     def upper_send_power(self):
         send_power(self.upper_comport)
@@ -250,7 +283,9 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.upper_motor1_pwm_scale.value()
             time = float(self.upper_motor1_time_input.toPlainText())
             delay = float(self.upper_motor1_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00001100', pwm, time, delay)
+            byte_data = time_limited_motion(self.upper_comport, '00011110', '00001100', pwm, time, delay)
+            print(f"Controller get this data: {byte_data} from model. Type: {type(byte_data)}")
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor1_buttons, 0)
 
             self.lower_motor1_rotate_right([15, time, delay])
