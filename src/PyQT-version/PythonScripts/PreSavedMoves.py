@@ -3,6 +3,7 @@ import PreSavedMovesUi
 from Model import *
 import comport as com
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
 class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
@@ -10,13 +11,41 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
-        print('PreSavedMoves/__init__()')
+        self.move_script_file_path = None
+        self.default_move_script_text = "Move script is now empty"
+        self.place_default_text()
 
-    def fist_compress(self):
-        print('PreSavedMoves/Fist compress')
+        self.open_script_file_btn.clicked.connect(self.open_move_script)
+        self.load_script_file_btn.clicked.connect(self.load_move_script)
+        self.send_full_sequence_btn.clicked.connect(self.send_full_sequence)
+        self.send_next_command_btn.clicked.connect(self.send_next_command)
 
-    def fist_release(self):
-        print('PreSavedMoves/Fist Release')
+    def place_default_text(self):
+        self.move_script_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.move_script_label.setWordWrap(True)
+        self.move_script_label.setText(self.default_move_script_text)
+
+    def open_move_script(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt)")
+        if file_path:
+            self.script_file_path_label.setText(file_path)
+            self.move_script_file_path = file_path
+
+    def load_move_script(self):
+        if self.move_script_file_path is None:
+            QMessageBox.warning(self, 'Warning', 'Undefined file location')
+        else:
+            with open(self.move_script_file_path, 'r') as file:
+                file_data = file.read()
+                self.move_script_label.setText(file_data)
+                file.close()
+            # QMessageBox.information(self, 'Success', 'Data successfully saved!')
+
+    def send_full_sequence(self):
+        pass
+
+    def send_next_command(self):
+        pass
 
 
 def main():

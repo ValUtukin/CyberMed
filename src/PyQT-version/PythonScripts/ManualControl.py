@@ -34,7 +34,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.upper_comport = com.ini('COM4')
+        self.upper_comport = com.ini('COM2')
         self.lower_comport = com.ini('COM3')
         self.lower_comport.flushInput()
         self.model = Model(self.upper_comport, self.lower_comport)
@@ -46,6 +46,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_current_plots_num = 0
         self.lower_current_plots_num = 0
 
+        self.default_move_script_text = "Move script is now empty"
         self.move_script_file_path = None
 
         self.upper_data_collector_thread = QtCore.QThread()
@@ -196,15 +197,14 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         plot_item2.showGrid(x=True, y=True, alpha=1.0)
 
     def place_default_text(self):
-        text = self.model.get_move_script_default_text()
         self.move_script_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.move_script_label.setWordWrap(True)
-        self.move_script_label.setText(text)
+        self.move_script_label.setText(self.default_move_script_text)
 
     def append_text(self, data):
         current_text = self.move_script_label.text()
         appended_str = " ".join(format(x, '02x') for x in data)
-        if current_text == self.model.get_move_script_default_text():
+        if current_text == self.default_move_script_text:
             self.move_script_label.setText(appended_str + " ")
         else:
             self.move_script_label.setText(current_text + appended_str + " ")

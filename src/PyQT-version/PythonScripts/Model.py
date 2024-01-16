@@ -12,13 +12,9 @@ def time_limited_motion(comport, config, motor_byte, pwm, limited_time, delay):
 
 
 class Model:
-    def __init__(self, upper_comport, lower_comport):
+    def __init__(self, upper_comport=None, lower_comport=None):
         self.upper_comport = upper_comport
         self.lower_comport = lower_comport
-        self.__move_script_default_text = "Move script is now empty"
-
-    def get_move_script_default_text(self):
-        return self.__move_script_default_text
 
     def upper_send_adc(self, adc_decimal):
         com.send_adc(self.upper_comport, '00100000', adc_decimal)
