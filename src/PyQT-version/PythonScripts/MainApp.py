@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.uic import loadUi
 from ManualControl import ManualControl
 from PreSavedMoves import PreSavedMoves
+from ElbowAndShoulder import ElbowAndShoulder
 from Model import *
 
 
@@ -33,21 +34,26 @@ class MyApplication(QMainWindow):
         self.rescan_comport_btn.clicked.connect(self.rescan_comport)
         self.reset_comport_btn.clicked.connect(self.reset_comport)
 
-        # Connect your menu actions to functions here
         self.actionManual_Control.triggered.connect(self.manual_control)
         self.actionPre_saved_moves.triggered.connect(self.pre_saved_moves)
+        self.actionElbow_and_Shoulder.triggered.connect(self.elbow_and_shoulder)
 
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
+        self.elbow_and_shoulder = ElbowAndShoulder()
 
         self.stackedWidget.addWidget(self.manual_control)
         self.stackedWidget.addWidget(self.pre_saved_moves)
+        self.stackedWidget.addWidget(self.elbow_and_shoulder)
 
     def manual_control(self):
         self.stackedWidget.setCurrentWidget(self.manual_control)
 
     def pre_saved_moves(self):
         self.stackedWidget.setCurrentWidget(self.pre_saved_moves)
+
+    def elbow_and_shoulder(self):
+        self.stackedWidget.setCurrentWidget(self.elbow_and_shoulder)
 
     # TODO: Add method to set selected comports inside Model and notice ManualControl and PreSavedMoves
     # TODO: Add colored labels for ports connection status and connect them to connect_upper_../connect_lower_..
