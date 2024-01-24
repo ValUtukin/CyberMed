@@ -42,6 +42,9 @@ class MyApplication(QMainWindow):
         self.pre_saved_moves = PreSavedMoves()
         self.elbow_and_shoulder = ElbowAndShoulder()
 
+        model_copy = self.model
+        self.manual_control.set_model(model_copy)
+
         self.stackedWidget.addWidget(self.manual_control)
         self.stackedWidget.addWidget(self.pre_saved_moves)
         self.stackedWidget.addWidget(self.elbow_and_shoulder)
@@ -88,6 +91,7 @@ class MyApplication(QMainWindow):
             self.upper_current_comport = com.ini(self.upper_current_comport_name)
             if self.upper_current_comport.is_open:
                 print('Upper comport is open')
+                self.model.set_upper_comport(self.upper_current_comport)
             else:
                 print('Upper comport is not open')
 
@@ -98,6 +102,7 @@ class MyApplication(QMainWindow):
             self.lower_current_comport = com.ini(self.lower_current_comport_name)
             if self.lower_current_comport.is_open:
                 print('Lower comport is open')
+                self.model.set_lower_comport(self.lower_current_comport)
             else:
                 print('Lower comport is not open')
 

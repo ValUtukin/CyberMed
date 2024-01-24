@@ -34,13 +34,15 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.upper_comport = com.ini('COM2')
-        self.lower_comport = com.ini('COM3')
-        self.lower_comport.flushInput()
-        self.model = Model(self.upper_comport, self.lower_comport)
+        # self.upper_comport = com.ini('COM2')
+        # self.lower_comport = com.ini('COM7')
+        self.upper_comport = None
+        self.lower_comport = None
+        self.model = None
 
         self.upper_adc_waiting_flag = False
         self.lower_adc_waiting_flag = False
+        # TODO: Need to reconnect DataCollectors from here to Model. Here must be no comport logic. Only Model has.
         self.upper_data_collector = DataCollector(1, 50, self.upper_comport)
         self.lower_data_collector = DataCollector(1, 50, self.lower_comport)
         self.upper_current_plots_num = 0
@@ -56,7 +58,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         # TODO: Add all ADC functionality to upper part
         self.upper_data_collector_thread.started.connect(self.upper_data_collector.start_collecting)
 
-        self.lower_data_collector_thread.started.connect(self.lower_data_collector.start_collecting)  # self.lower_data_collector.collect_infinitely
+        self.lower_data_collector_thread.started.connect(
+            self.lower_data_collector.start_collecting)  # self.lower_data_collector.collect_infinitely
         self.lower_data_collector.segment_received.connect(self.update_plot)
 
         # TODO: Add finish_thread for upper part
@@ -153,6 +156,17 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
                                      self.lower_motor5_stop_btn]
         self.update_counter = 0
 
+    def set_upper_comport(self, port):
+        self.upper_comport = port
+        print(f'ManualControl/set_upper_comport - upper comport update: {port}')
+
+    def set_lower_comport(self, port):
+        self.lower_comport = port
+        print(f'ManualControl/set_lower_comport - lower comport update: {port}')
+
+    def set_model(self, model):
+        self.model = model
+
     def update_plot(self):
         print(f'ManualControl/update_plot')
         sets, dict_len = self.lower_data_collector.get_data_sets()
@@ -160,8 +174,6 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         x_sets = list()
         plot_names = list()
         for key in sets.keys():
-            print(f'Key of the set: {key}')
-            print(sets[key])
             plot_names.append(int(key))
             data_sets.append(sets[key])
             x_sets.append([i for i in range(0, len(sets[key]))])
@@ -173,7 +185,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def set_plot(self, indexes):
         self.graphics_layout_widget.clear()
         for i in range(len(indexes)):
-            print(f'{i+1}) {indexes[i]}')
+            print(f'{i + 1}) {indexes[i]}')
             self.graphics_layout_widget.addPlot(row=i, col=0, title=f"Motor #{indexes[i] + 1}")
 
     def finish_lower_collector_thread(self):
@@ -201,13 +213,15 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.move_script_label.setWordWrap(True)
         self.move_script_label.setText(self.default_move_script_text)
 
+    # TODO: This method needs to be done
     def append_text(self, data):
-        current_text = self.move_script_label.text()
-        appended_str = " ".join(format(x, '02x') for x in data)
-        if current_text == self.default_move_script_text:
-            self.move_script_label.setText(appended_str + " ")
-        else:
-            self.move_script_label.setText(current_text + appended_str + " ")
+        print('ManualControl/append_text - ready to append: ', end="")
+        print(*data)
+        # current_text = self.move_script_label.text()
+        # if current_text == self.default_move_script_text:
+        #     self.move_script_label.setText(data + " ")
+        # else:
+        #     self.move_script_label.setText(current_text + data + " ")
 
     def open_script_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt)")
@@ -241,7 +255,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         # exporter.export(base_path + filename)
 
     def upper_send_power(self):
-        send_power(self.upper_comport)
+        self.model.power_command('Upper', config='00000001', power_byte='00000001')
         if self.upper_adc_waiting_flag:
             print("ManualControl/upper_send_power - we about to start ADC collecting")
         # send_power(self.lower_comport)
@@ -271,7 +285,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         m4_status = self.upper_motor4_adc_box.isChecked()
         m5_status = self.upper_motor5_adc_box.isChecked()
         adc_number = int(m1_status + m2_status + m3_status + m4_status + m5_status)
-        adc_decimal = m1_status*2**0 + m2_status*2**1 + m3_status*2**2 + m4_status*2**3 + m5_status*2**4
+        adc_decimal = m1_status * 2 ** 0 + m2_status * 2 ** 1 + m3_status * 2 ** 2 + m4_status * 2 ** 3 + m5_status * 2 ** 4
         if adc_number != 0:
             self.model.upper_send_adc(adc_decimal)
             self.upper_adc_waiting_flag = True
@@ -283,35 +297,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.upper_motor1_pwm_scale.value()
             time = float(self.upper_motor1_time_input.toPlainText())
             delay = float(self.upper_motor1_delay_input.toPlainText())
-            byte_data = time_limited_motion(self.upper_comport, '00011110', '00001100', pwm, time, delay)
-            print(f"Controller get this data: {byte_data} from model. Type: {type(byte_data)}")
+            self.model.send_command('Upper', '00011110', '00001100', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
             self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor1_buttons, 0)
 
             self.lower_motor1_rotate_right([15, time, delay])
             configure_relatives_buttons(self.lower_motor1_buttons, 1)
         else:  # With args
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00001100', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00001100', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor1_rotate_right(self, args=None):
         if not args:
             pwm = self.upper_motor1_pwm_scale.value()
             time = float(self.upper_motor1_time_input.toPlainText())
             delay = float(self.upper_motor1_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00010100', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00010100', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor1_buttons, 1)
 
             self.lower_motor1_rotate_left([15, time, delay])
             configure_relatives_buttons(self.lower_motor1_buttons, 0)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00010100', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00010100', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor1_rotate_stop(self):
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000100')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000100')
         configure_relatives_buttons(self.upper_motor1_buttons, 2)
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000001')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000001')
         configure_relatives_buttons(self.lower_motor1_buttons, 2)
 
     def update_upper_label_1(self, value):
@@ -322,33 +338,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.upper_motor2_pwm_scale.value()
             time = float(self.upper_motor2_time_input.toPlainText())
             delay = float(self.upper_motor2_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00001000', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00001000', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor2_buttons, 0)
 
             self.lower_motor2_rotate_right([15, time, delay])
             configure_relatives_buttons(self.lower_motor2_buttons, 1)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00001000', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00001000', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor2_rotate_right(self, args=None):
         if not args:
             pwm = self.upper_motor2_pwm_scale.value()
             time = float(self.upper_motor2_time_input.toPlainText())
             delay = float(self.upper_motor2_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00010000', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00010000', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor2_buttons, 1)
 
             self.lower_motor2_rotate_left([15, time, delay])
             configure_relatives_buttons(self.lower_motor2_buttons, 0)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00010000', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00010000', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor2_rotate_stop(self):
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000000')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000000')
         configure_relatives_buttons(self.upper_motor2_buttons, 2)
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000011')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000011')
         configure_relatives_buttons(self.lower_motor2_buttons, 2)
 
     def update_upper_label_2(self, value):
@@ -359,33 +379,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.upper_motor3_pwm_scale.value()
             time = float(self.upper_motor3_time_input.toPlainText())
             delay = float(self.upper_motor3_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00001010', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00001010', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor3_buttons, 0)
 
             self.lower_motor3_rotate_right([15, time, delay])
             configure_relatives_buttons(self.lower_motor3_buttons, 1)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00001010', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00001010', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor3_rotate_right(self, args=None):
         if not args:
             pwm = self.upper_motor3_pwm_scale.value()
             time = float(self.upper_motor3_time_input.toPlainText())
             delay = float(self.upper_motor3_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00010010', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00010010', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor3_buttons, 1)
 
             self.lower_motor3_rotate_left([15, time, delay])
             configure_relatives_buttons(self.lower_motor3_buttons, 0)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00010010', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00010010', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor3_rotate_stop(self):
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000010')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000010')
         configure_relatives_buttons(self.upper_motor3_buttons, 2)
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000010')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000010')
         configure_relatives_buttons(self.lower_motor3_buttons, 2)
 
     def update_upper_label_3(self, value):
@@ -396,33 +420,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.upper_motor4_pwm_scale.value()
             time = float(self.upper_motor4_time_input.toPlainText())
             delay = float(self.upper_motor4_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00001011', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00001011', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor4_buttons, 0)
 
             self.lower_motor4_rotate_right([15, time, delay])
             configure_relatives_buttons(self.lower_motor4_buttons, 1)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00001011', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00001011', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor4_rotate_right(self, args=None):
         if not args:
             pwm = self.upper_motor4_pwm_scale.value()
             time = float(self.upper_motor4_time_input.toPlainText())
             delay = float(self.upper_motor4_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00010011', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00010011', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor4_buttons, 1)
 
             self.lower_motor4_rotate_left([15, time, delay])
             configure_relatives_buttons(self.lower_motor4_buttons, 0)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00010011', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00010011', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor4_rotate_stop(self):
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000011')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000011')
         configure_relatives_buttons(self.upper_motor4_buttons, 2)
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000100')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000100')
         configure_relatives_buttons(self.lower_motor4_buttons, 2)
 
     def update_upper_label_4(self, value):
@@ -433,33 +461,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.upper_motor5_pwm_scale.value()
             time = float(self.upper_motor5_time_input.toPlainText())
             delay = float(self.upper_motor5_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00001001', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00001001', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor5_buttons, 0)
 
             self.lower_motor5_rotate_right([15, time, delay])
             configure_relatives_buttons(self.lower_motor5_buttons, 1)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00001001', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00001001', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor5_rotate_right(self, args=None):
         if not args:
             pwm = self.upper_motor5_pwm_scale.value()
             time = float(self.upper_motor5_time_input.toPlainText())
             delay = float(self.upper_motor5_delay_input.toPlainText())
-            time_limited_motion(self.upper_comport, '00011110', '00010001', pwm, time, delay)
+            self.model.send_command('Upper', '00011110', '00010001', pwm, time, delay)
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.upper_motor5_buttons, 1)
 
             self.lower_motor5_rotate_left([15, time, delay])
             configure_relatives_buttons(self.lower_motor5_buttons, 0)
         else:
-            time_limited_motion(self.upper_comport, config='00011110', motor_byte='00010001', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Upper', config='00011110', motor_byte='00010001', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def upper_motor5_rotate_stop(self):
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000001')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000001')
         configure_relatives_buttons(self.upper_motor5_buttons, 2)
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000000')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000000')
         configure_relatives_buttons(self.lower_motor5_buttons, 2)
 
     def update_upper_label_5(self, value):
@@ -467,13 +499,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
 
     # LOWER PART Methods
     def lower_send_power(self):
-        send_power(self.lower_comport)
+        self.model.power_command('Lower', config='00000001', power_byte='00000001')
         if self.lower_adc_waiting_flag:
             print("ManualControl/lower_send_power - we about to start ADC collecting")
             self.lower_data_collector_thread.start()
-            self.lower_comport.flushInput()
-            # self.timer.start(500)  # Update plot every 100 milliseconds
-        # send_power(self.upper_comport)
 
     def get_lower_time_delay(self, motor_num):
         time = 0.0
@@ -525,7 +554,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         for i in range(len(adc_state)):
             if adc_state[i]:
                 adc_number += 1
-                adc_decimal += 2**i
+                adc_decimal += 2 ** i
                 motor_indexes.append(i)
 
         if adc_number != 0:
@@ -551,33 +580,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.lower_motor1_pwm_scale.value()
             time = float(self.lower_motor1_time_input.toPlainText())
             delay = float(self.lower_motor1_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00001000', pwm, time, delay)  # Motor#2
+            self.model.send_command('Lower', '00011110', '00001000', pwm, time, delay)  # Motor#2
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor1_buttons, 0)
 
             self.upper_motor1_rotate_right([15, time, delay])
             configure_relatives_buttons(self.upper_motor1_buttons, 1)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00001000', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00001000', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor1_rotate_right(self, args=None):
         if not args:
             pwm = self.lower_motor1_pwm_scale.value()
             time = float(self.lower_motor1_time_input.toPlainText())
             delay = float(self.lower_motor1_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00010000', pwm, time, delay)  # Motor#2
+            self.model.send_command('Lower', '00011110', '00010000', pwm, time, delay)  # Motor#2
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor1_buttons, 1)
 
             self.upper_motor1_rotate_left([15, time, delay])
             configure_relatives_buttons(self.upper_motor1_buttons, 0)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00010000', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00010000', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor1_rotate_stop(self):
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000000')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000000')
         configure_relatives_buttons(self.lower_motor1_buttons, 2)
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000100')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000100')
         configure_relatives_buttons(self.upper_motor1_buttons, 2)
 
     def update_lower_label_1(self, value):
@@ -588,33 +621,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.lower_motor2_pwm_scale.value()
             time = float(self.lower_motor2_time_input.toPlainText())
             delay = float(self.lower_motor2_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00001001', pwm, time, delay)  # Motor#4
+            self.model.send_command('Lower', '00011110', '00001001', pwm, time, delay)  # Motor#4
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor2_buttons, 0)
 
             self.upper_motor2_rotate_right([15, time, delay])
             configure_relatives_buttons(self.upper_motor2_buttons, 1)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00001001', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00001001', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor2_rotate_right(self, args=None):
         if not args:
             pwm = self.lower_motor2_pwm_scale.value()
             time = float(self.lower_motor2_time_input.toPlainText())
             delay = float(self.lower_motor2_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00010001', pwm, time, delay)  # Motor#4
+            self.model.send_command('Lower', '00011110', '00010001', pwm, time, delay)  # Motor#4
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor2_buttons, 1)
 
             self.upper_motor2_rotate_left([15, time, delay])
             configure_relatives_buttons(self.upper_motor2_buttons, 0)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00010001', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00010001', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor2_rotate_stop(self):
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000001')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000001')
         configure_relatives_buttons(self.lower_motor2_buttons, 2)
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000000')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000000')
         configure_relatives_buttons(self.upper_motor2_buttons, 2)
 
     def update_lower_label_2(self, value):
@@ -625,33 +662,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.lower_motor3_pwm_scale.value()
             time = float(self.lower_motor3_time_input.toPlainText())
             delay = float(self.lower_motor3_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00001010', pwm, time, delay)
+            self.model.send_command('Lower', '00011110', '00001010', pwm, time, delay)
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor3_buttons, 0)
 
             self.upper_motor3_rotate_right([15, time, delay])
             configure_relatives_buttons(self.upper_motor3_buttons, 1)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00001010', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00001010', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor3_rotate_right(self, args=None):
         if not args:
             pwm = self.lower_motor3_pwm_scale.value()
             time = float(self.lower_motor3_time_input.toPlainText())
             delay = float(self.lower_motor3_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00010010', pwm, time, delay)
+            self.model.send_command('Lower', '00011110', '00010010', pwm, time, delay)
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor3_buttons, 1)
 
             self.upper_motor3_rotate_left([15, time, delay])
             configure_relatives_buttons(self.upper_motor3_buttons, 0)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00010010', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00010010', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor3_rotate_stop(self):
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000010')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000010')
         configure_relatives_buttons(self.lower_motor3_buttons, 2)
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000010')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000010')
         configure_relatives_buttons(self.upper_motor3_buttons, 2)
 
     def update_lower_label_3(self, value):
@@ -662,33 +703,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.lower_motor4_pwm_scale.value()
             time = float(self.lower_motor4_time_input.toPlainText())
             delay = float(self.lower_motor4_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00001011', pwm, time, delay)
+            self.model.send_command('Lower', '00011110', '00001011', pwm, time, delay)
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor4_buttons, 0)
 
             self.upper_motor4_rotate_right([15, time, delay])
             configure_relatives_buttons(self.upper_motor4_buttons, 1)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00001011', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00001011', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor4_rotate_right(self, args=None):
         if not args:
             pwm = self.lower_motor4_pwm_scale.value()
             time = float(self.lower_motor4_time_input.toPlainText())
             delay = float(self.lower_motor4_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00010011', pwm, time, delay)
+            self.model.send_command('Lower', '00011110', '00010011', pwm, time, delay)
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor4_buttons, 1)
 
             self.upper_motor4_rotate_left([15, time, delay])
             configure_relatives_buttons(self.upper_motor4_buttons, 0)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00010011', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00010011', pwm=args[0],
+                                    limited_time=args[1], delay=args[2])
 
     def lower_motor4_rotate_stop(self):
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000011')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000011')
         configure_relatives_buttons(self.lower_motor4_buttons, 2)
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000011')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000011')
         configure_relatives_buttons(self.upper_motor4_buttons, 2)
 
     def update_lower_label_4(self, value):
@@ -699,33 +744,37 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             pwm = self.lower_motor5_pwm_scale.value()
             time = float(self.lower_motor5_time_input.toPlainText())
             delay = float(self.lower_motor5_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00001100', pwm, time, delay)
+            self.model.send_command('Lower', '00011110', '00001100', pwm, time, delay)
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor5_buttons, 0)
 
             self.upper_motor5_rotate_right([15, time, delay])
             configure_relatives_buttons(self.upper_motor5_buttons, 1)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00001100', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00001100', pwm=args[0],
+                               limited_time=args[1], delay=args[2])
 
     def lower_motor5_rotate_right(self, args=None):
         if not args:
             pwm = self.lower_motor5_pwm_scale.value()
             time = float(self.lower_motor5_time_input.toPlainText())
             delay = float(self.lower_motor5_delay_input.toPlainText())
-            time_limited_motion(self.lower_comport, '00011110', '00010100', pwm, time, delay)
+            self.model.send_command('Lower', '00011110', '00010100', pwm, time, delay)
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text(byte_data)
             configure_relatives_buttons(self.lower_motor5_buttons, 1)
 
             self.upper_motor5_rotate_left([15, time, delay])
             configure_relatives_buttons(self.upper_motor5_buttons, 0)
         else:
-            time_limited_motion(self.lower_comport, config='00011110', motor_byte='00010100', pwm=args[0],
-                                limited_time=args[1], delay=args[2])
+            self.model.send_command('Lower', config='00011110', motor_byte='00010100', pwm=args[0],
+                               limited_time=args[1], delay=args[2])
 
     def lower_motor5_rotate_stop(self):
-        com.send_command(self.lower_comport, config='00000010', motor_byte='00000100')
+        self.model.stop_command('Lower', config='00000010', motor_byte='00000100')
         configure_relatives_buttons(self.lower_motor5_buttons, 2)
-        com.send_command(self.upper_comport, config='00000010', motor_byte='00000001')
+        self.model.stop_command('Upper', config='00000010', motor_byte='00000001')
         configure_relatives_buttons(self.upper_motor5_buttons, 2)
 
     def update_lower_label_5(self, value):
