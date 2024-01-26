@@ -1,7 +1,6 @@
 import sys
 import PreSavedMovesUi
-from Model import *
-import comport as com
+from Model import Model
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
@@ -11,6 +10,7 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
+        self.model = None
         self.move_script_file_path = None
         self.default_move_script_text = "Move script is now empty"
         self.place_default_text()
@@ -19,6 +19,9 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         self.load_script_file_btn.clicked.connect(self.load_move_script)
         self.send_full_sequence_btn.clicked.connect(self.send_full_sequence)
         self.send_next_command_btn.clicked.connect(self.send_next_command)
+
+    def set_model(self, model: Model):
+        self.model = model
 
     def place_default_text(self):
         self.move_script_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)

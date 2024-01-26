@@ -132,6 +132,7 @@
     <addaction name="actionManual_Control"/>
     <addaction name="actionPre_saved_moves"/>
     <addaction name="actionElbow_and_Shoulder"/>
+    <addaction name="actionMain_Window"/>
    </widget>
    <addaction name="menuWindow_Select"/>
   </widget>
@@ -149,6 +150,11 @@
   <action name="actionElbow_and_Shoulder">
    <property name="text">
     <string>Elbow and Shoulder</string>
+   </property>
+  </action>
+  <action name="actionMain_Window">
+   <property name="text">
+    <string>Main Window</string>
    </property>
   </action>
  </widget>

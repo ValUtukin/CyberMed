@@ -37,6 +37,8 @@ class MyApplication(QMainWindow):
         self.actionManual_Control.triggered.connect(self.manual_control)
         self.actionPre_saved_moves.triggered.connect(self.pre_saved_moves)
         self.actionElbow_and_Shoulder.triggered.connect(self.elbow_and_shoulder)
+        self.actionMain_Window.triggered.connect(self.main_window)
+        self.actionMain_Window.setEnabled(False)  # Disable Main Window action when App starts
 
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
@@ -44,6 +46,7 @@ class MyApplication(QMainWindow):
 
         model_copy = self.model
         self.manual_control.set_model(model_copy)
+        self.pre_saved_moves.set_model(model_copy)
 
         self.stackedWidget.addWidget(self.manual_control)
         self.stackedWidget.addWidget(self.pre_saved_moves)
@@ -51,12 +54,19 @@ class MyApplication(QMainWindow):
 
     def manual_control(self):
         self.stackedWidget.setCurrentWidget(self.manual_control)
+        self.actionMain_Window.setEnabled(True)
 
     def pre_saved_moves(self):
         self.stackedWidget.setCurrentWidget(self.pre_saved_moves)
+        self.actionMain_Window.setEnabled(True)
 
     def elbow_and_shoulder(self):
         self.stackedWidget.setCurrentWidget(self.elbow_and_shoulder)
+        self.actionMain_Window.setEnabled(True)
+
+    def main_window(self):
+        self.stackedWidget.setCurrentWidget(self.page)
+        self.actionMain_Window.setEnabled(False)
 
     # TODO: Add method to set selected comports inside Model and notice ManualControl and PreSavedMoves
     # TODO: Add colored labels for ports connection status and connect them to connect_upper_../connect_lower_..
@@ -107,17 +117,29 @@ class MyApplication(QMainWindow):
                 print('Lower comport is not open')
 
     def rescan_comport(self):
+        if self.upper_current_comport:
+            com.close_comport(self.upper_current_comport)
+        if self.lower_current_comport:
+            com.close_comport(self.lower_current_comport)
+
+        self.upper_current_comport_name = None
+        self.lower_current_comport_name = None
+
         self.upper_comport_comboBox.clear()
         self.lower_comport_comboBox.clear()
+
         self.available_ports = com.show_available_ports()
         self.upper_comport_comboBox.addItems(self.available_ports)
         self.lower_comport_comboBox.addItems(self.available_ports)
 
+    # TODO: Looks like this method simular to rescan_comport. Maybe should remove this one...?
     def reset_comport(self):
         self.upper_comport_comboBox.clear()
         self.lower_comport_comboBox.clear()
+
         self.upper_comport_comboBox.addItems(self.available_ports)
         self.lower_comport_comboBox.addItems(self.available_ports)
+
         self.upper_current_comport_name = None
         self.lower_current_comport_name = None
 

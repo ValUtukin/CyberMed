@@ -112,7 +112,6 @@ class DataCollector(QObject):
 
 
 if __name__ == '__main__':
-    serial_ins = com.ini('COM2')
-    collector = DataCollector(5, serial_ins)
+    collector = DataCollector(5)
     data_sets, num = collector.get_data_sets()
     print(data_sets)

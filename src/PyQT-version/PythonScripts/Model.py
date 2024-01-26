@@ -21,6 +21,9 @@ class Model:
     def set_upper_comport(self, port):
         self.upper_comport = port
         print(f'Model/set_upper_comport - upper comport update: {port}')
+        print(f'Settings of port: {port}:')
+        settings = port.get_settings()
+        print(settings)
 
     def set_lower_comport(self, port):
         self.lower_comport = port
@@ -67,6 +70,7 @@ class Model:
             print(f'Model/stop_command - unknown part: {part}')
 
     def power_command(self, part, config, power_byte):
+        print(f'Model/power_command - got power command: {part}, {config}, {power_byte}')
         if part == 'Upper':
             com.send_command(self.upper_comport, config, power_byte)
         elif part == 'Lower':
