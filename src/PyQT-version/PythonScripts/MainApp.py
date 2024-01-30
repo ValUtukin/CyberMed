@@ -7,6 +7,7 @@ from PyQt5.uic import loadUi
 from ManualControl import ManualControl
 from PreSavedMoves import PreSavedMoves
 from ElbowAndShoulder import ElbowAndShoulder
+from DataCollector import DataCollector
 from Model import *
 
 
@@ -43,7 +44,12 @@ class MyApplication(QMainWindow):
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
         self.elbow_and_shoulder = ElbowAndShoulder()
+        self.upper_collector = DataCollector(1)
+        self.lower_collector = DataCollector(1)
+        self.manual_control.set_upper_data_collector(self.upper_collector)
+        self.manual_control.set_lower_data_collector(self.lower_collector)
 
+        # Give copy of Model instance to other classes, so they can interact with comports through it
         model_copy = self.model
         self.manual_control.set_model(model_copy)
         self.pre_saved_moves.set_model(model_copy)
@@ -68,7 +74,6 @@ class MyApplication(QMainWindow):
         self.stackedWidget.setCurrentWidget(self.page)
         self.actionMain_Window.setEnabled(False)
 
-    # TODO: Add method to set selected comports inside Model and notice ManualControl and PreSavedMoves
     # TODO: Add colored labels for ports connection status and connect them to connect_upper_../connect_lower_..
     def update_upper_combo_box(self):
         current_index = self.upper_comport_comboBox.currentIndex()
@@ -94,6 +99,7 @@ class MyApplication(QMainWindow):
         print(f"update_lower: Upper - {self.upper_current_comport_name}, Lower - {self.lower_current_comport_name}")
         self.connect_lower_comport()
 
+    # TODO: Need to test comport setting process for upper_collector and lower_collector
     def connect_upper_comport(self):
         if self.upper_current_comport_name is None:
             print('MainApp/connect_upper_comport - upper comport name is None')
@@ -102,6 +108,7 @@ class MyApplication(QMainWindow):
             if self.upper_current_comport.is_open:
                 print('Upper comport is open')
                 self.model.set_upper_comport(self.upper_current_comport)
+                self.upper_collector.set_comport(self.upper_current_comport)
             else:
                 print('Upper comport is not open')
 
@@ -113,6 +120,7 @@ class MyApplication(QMainWindow):
             if self.lower_current_comport.is_open:
                 print('Lower comport is open')
                 self.model.set_lower_comport(self.lower_current_comport)
+                self.lower_collector.set_comport(self.lower_current_comport)
             else:
                 print('Lower comport is not open')
 

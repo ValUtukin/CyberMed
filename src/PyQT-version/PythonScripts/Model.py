@@ -20,14 +20,9 @@ class Model:
 
     def set_upper_comport(self, port):
         self.upper_comport = port
-        print(f'Model/set_upper_comport - upper comport update: {port}')
-        print(f'Settings of port: {port}:')
-        settings = port.get_settings()
-        print(settings)
 
     def set_lower_comport(self, port):
         self.lower_comport = port
-        print(f'Model/set_lower_comport - lower comport update: {port}')
 
     def upper_send_adc(self, adc_decimal):
         com.send_adc(self.upper_comport, '00100000', adc_decimal)

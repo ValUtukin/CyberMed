@@ -43,27 +43,15 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_adc_waiting_flag = False
         self.lower_adc_waiting_flag = False
         # TODO: Need to reconnect DataCollectors from here to Model. Here must be no comport logic. Only Model has.
-        self.upper_data_collector = DataCollector(1, 50, self.upper_comport)
-        self.lower_data_collector = DataCollector(1, 50, self.lower_comport)
+        # self.upper_data_collector = DataCollector(1, 50, self.upper_comport)
+        # self.lower_data_collector = DataCollector(1, 50, self.lower_comport)
+        self.upper_data_collector = None
+        self.lower_data_collector = None
         self.upper_current_plots_num = 0
         self.lower_current_plots_num = 0
 
         self.default_move_script_text = "Move script is now empty"
         self.move_script_file_path = None
-
-        self.upper_data_collector_thread = QtCore.QThread()
-        self.lower_data_collector_thread = QtCore.QThread()
-        self.upper_data_collector.moveToThread(self.upper_data_collector_thread)
-        self.lower_data_collector.moveToThread(self.lower_data_collector_thread)
-        # TODO: Add all ADC functionality to upper part
-        self.upper_data_collector_thread.started.connect(self.upper_data_collector.start_collecting)
-
-        self.lower_data_collector_thread.started.connect(self.lower_data_collector.start_collecting)
-        self.lower_data_collector.segment_received.connect(self.update_plot)
-
-        # TODO: Add finish_thread for upper part
-        self.upper_data_collector.finished.connect(self.upper_data_collector_thread.quit)
-        self.lower_data_collector.finished.connect(self.finish_lower_collector_thread)
 
         self.add_graph1()  # Add initial dummy graph 1
         self.add_graph2()  # Add initial dummy graph 2
@@ -166,6 +154,33 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def set_model(self, model: Model):
         self.model = model
 
+    # TODO: Need to test new ADC-thread functions for upper/lower part
+    def set_upper_data_collector(self, collector):
+        print('ManualControl/set_upper_data_collector - setting an upper collector:')
+        print(collector)
+        self.upper_data_collector = collector
+        self.__connect_upper_collector()
+
+    def set_lower_data_collector(self, collector):
+        print('ManualControl/set_lower_data_collector - setting a lower collector:')
+        print(collector)
+        self.lower_data_collector = collector
+        self.__connect_lower_collector()
+
+    def __connect_upper_collector(self):
+        self.upper_data_collector_thread = QtCore.QThread()
+        self.upper_data_collector.moveToThread(self.upper_data_collector_thread)
+        self.upper_data_collector_thread.started.connect(self.upper_data_collector.start_collecting)
+        self.upper_data_collector.segment_received.connect(self.update_plot)
+        self.upper_data_collector.finished.connect(self.upper_data_collector_thread.quit)
+
+    def __connect_lower_collector(self):
+        self.lower_data_collector_thread = QtCore.QThread()
+        self.lower_data_collector.moveToThread(self.lower_data_collector_thread)
+        self.lower_data_collector_thread.started.connect(self.lower_data_collector.start_collecting)
+        self.lower_data_collector.segment_received.connect(self.update_plot)
+        self.lower_data_collector.finished.connect(self.lower_data_collector_thread.quit)
+
     def update_plot(self):
         print(f'ManualControl/update_plot')
         sets, dict_len = self.lower_data_collector.get_data_sets()
@@ -186,6 +201,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         for i in range(len(indexes)):
             print(f'{i + 1}) {indexes[i]}')
             self.graphics_layout_widget.addPlot(row=i, col=0, title=f"Motor #{indexes[i] + 1}")
+
+    def finish_upper_collector_thread(self):
+        self.upper_data_collector_thread.quit()
+        com.open_comport(self.lower_comport)
 
     def finish_lower_collector_thread(self):
         self.lower_data_collector_thread.quit()
