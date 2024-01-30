@@ -234,20 +234,25 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     # TODO: This method needs to be done
     def append_text(self, part, data):
         if part == 'Upper':
-            print(f'Upper data:', end="")
-            print(*data, end=".")
-            for i in range(len(data)):
-                print(f'Data: {data[i]}, type: {type(data[i])}')
+            print(f'Upper data: {data}')
+            current_text = self.move_script_label.text()
+            if current_text == self.default_move_script_text:
+                text_data = data[-1] + " "
+                self.move_script_label.setText(f'<font color="red">{text_data}</font>')
+            else:
+                text_data = current_text + data[-1] + " "
+                self.move_script_label.setText(f'<font color="red">{text_data}</font>')
         elif part == 'Lower':
-            print(f'Lower data: {data}', end="")
-            print(*data)
+            print(f'Lower data: {data}')
+            current_text = self.move_script_label.text()
+            if current_text == self.default_move_script_text:
+                text_data = data[-1] + " "
+                self.move_script_label.setText(f'<font color="blue">{text_data}</font>')
+            else:
+                text_data = current_text + data[-1] + " "
+                self.move_script_label.setText(f'<font color="blue">{text_data}</font>')
         else:
             print(f'No such part: {part}')
-        # current_text = self.move_script_label.text()
-        # if current_text == self.default_move_script_text:
-        #     self.move_script_label.setText(data + " ")
-        # else:
-        #     self.move_script_label.setText(current_text + data + " ")
 
     def open_script_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt)")
@@ -259,9 +264,13 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         if self.move_script_file_path is None:
             QMessageBox.warning(self, 'Warning', 'Undefined file location')
         else:
-            current_text = self.move_script_label.text()
+            upper_text = self.model.get_upper_commands_list()
+            lower_text = self.model.get_lower_commands_list()
             with open(self.move_script_file_path, 'a') as file:
-                file.write(current_text)
+                for i in range(len(upper_text)):
+                    file.write(upper_text[i] + ' ')
+                    file.write(lower_text[i] + ' ')
+                # file.write(current_text)
                 file.close()
             QMessageBox.information(self, 'Success', 'Data successfully saved!')
 
@@ -632,6 +641,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010000', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor1_rotate_stop(self):
         self.model.stop_command('Lower', config='00000010', motor_byte='00000000')

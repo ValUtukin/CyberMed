@@ -44,8 +44,11 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
                 file.close()
             # QMessageBox.information(self, 'Success', 'Data successfully saved!')
 
+    # TODO: Data can be loaded from the file. Need to do data transition!
     def send_full_sequence(self):
-        pass
+        text_bytes = self.move_script_label.text().split()
+        print(f'PreSavedMoves/send_full_sequence - ready to send file data (len = {len(text_bytes)}):')
+        print(*text_bytes)
 
     def send_next_command(self):
         pass
