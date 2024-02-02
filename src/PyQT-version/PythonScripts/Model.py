@@ -54,7 +54,7 @@ class Model:
             byte_command = time_limited_motion(self.lower_comport, config, motor_byte, pwm, limited_time, delay)
             self.add_command_to_lower_list(byte_command)
         else:
-            print(f'Model/send_command - unknown command: {part}')
+            print(f'Model/send_command - unknown part: {part}')
 
     def stop_command(self, part, config, motor_byte):
         if part == 'Upper':
@@ -72,6 +72,14 @@ class Model:
             com.send_command(self.lower_comport, config, power_byte)
         else:
             print(f'Model/stop_command - unknown part: {part}')
+
+    def send_command_bytes(self, part, data):
+        if part == 'Upper':
+            com.send_bytearray(self.upper_comport, data)
+        elif part == 'Lower':
+            com.send_bytearray(self.lower_comport, data)
+        else:
+            print(f'Model/send_command_bytes - unknown part: {part}')
 
 
 if __name__ == '__main__':

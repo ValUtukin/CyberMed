@@ -5,6 +5,20 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
+def str_to_bytearray(hex_string):
+    # Split the string (1e 0c 35 etc.) into a list of hex values [1e, 0c, 35, etc.]
+    hex_values = hex_string.split()
+    # Convert each hex value back to its original byte representation using fromhex()
+    bytes_list = [bytes.fromhex(hex_value) for hex_value in hex_values]
+    # Concatenate the byte values into a single bytearray
+    original_bytearray = bytearray().join(bytes_list)
+    return original_bytearray
+
+
+def str_to_byte(hex_string):
+    return bytes.fromhex(hex_string)
+
+
 class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -19,6 +33,9 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         self.load_script_file_btn.clicked.connect(self.load_move_script)
         self.send_full_sequence_btn.clicked.connect(self.send_full_sequence)
         self.send_next_command_btn.clicked.connect(self.send_next_command)
+
+        self.current_cursor_position = 0
+        self.previous_cursor_position = 0
 
     def set_model(self, model: Model):
         self.model = model
@@ -46,12 +63,46 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
 
     # TODO: Data can be loaded from the file. Need to do data transition!
     def send_full_sequence(self):
-        text_bytes = self.move_script_label.text().split()
-        print(f'PreSavedMoves/send_full_sequence - ready to send file data (len = {len(text_bytes)}):')
-        print(*text_bytes)
+        text_bytes = self.move_script_label.text()
+        part_flag = True  # True - upper part, False - lower part
+        for i in range(0, len(text_bytes), 15):
+            command_str = text_bytes[i:i + 15]
+            command_byte = str_to_bytearray(command_str)
+            print(f'Command {command_byte}, type {type(command_byte)}, len {len(command_byte)}')
+            if part_flag:
+                self.model.send_command_bytes('Upper', command_byte)
+                part_flag = False
+            else:
+                self.model.send_command_bytes('Lower', command_byte)
+                part_flag = True
+        part_flag = True  # Set flag back to True. Just in case
+        self.model.power_command('Upper', config='00000001', power_byte='00000001')
+        self.model.power_command('Lower', config='00000001', power_byte='00000001')
 
     def send_next_command(self):
-        pass
+        if self.model is None:
+            QMessageBox.warning(self, 'Warning', 'Model is undefined.\nCould not use COMPORTs')
+        else:
+            full_text_bytes = self.move_script_label.text()
+            if self.current_cursor_position == len(full_text_bytes):
+                QMessageBox.warning(self, 'Warning', 'All commands already sent\nSet cursor at the start')
+                self.current_cursor_position = 0
+                self.previous_cursor_position = 0
+            else:
+                self.current_cursor_position += 30  # 30 - It's length of string with two commands in it (upper and lower)
+                text_bytes = full_text_bytes[:self.current_cursor_position]
+                upper_command_str = text_bytes[self.previous_cursor_position:self.previous_cursor_position + 15]
+                upper_command = str_to_bytearray(upper_command_str)
+                self.model.send_command_bytes('Upper', upper_command)
+
+                lower_command_str = text_bytes[self.previous_cursor_position + 15:self.previous_cursor_position + 30]
+                lower_command = str_to_bytearray(lower_command_str)
+                self.model.send_command_bytes('Lower', lower_command)
+
+                self.model.power_command('Upper', config='00000001', power_byte='00000001')
+                self.model.power_command('Lower', config='00000001', power_byte='00000001')
+
+                self.previous_cursor_position = self.current_cursor_position
 
 
 def main():

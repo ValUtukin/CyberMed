@@ -93,6 +93,11 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
     return bytearray_str
 
 
+def send_bytearray(serial_inst, data):
+    print(f'comport - send {data}, to {serial_inst}')
+    write_comport(data, serial_inst)
+
+
 def open_comport(serial_inst):
     serial_inst.open()
     serial_inst.reset_input_buffer()

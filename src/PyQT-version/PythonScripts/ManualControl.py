@@ -342,6 +342,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:  # With args
             self.model.send_command('Upper', config='00011110', motor_byte='00001000', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor1_rotate_right(self, args=None):
         if not args:
@@ -358,6 +360,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010000', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor1_rotate_stop(self):
         self.model.stop_command('Upper', config='00000010', motor_byte='00000000')
@@ -383,6 +387,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001001', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor2_rotate_right(self, args=None):
         if not args:
@@ -399,6 +405,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010001', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor2_rotate_stop(self):
         self.model.stop_command('Upper', config='00000010', motor_byte='00000001')
@@ -424,6 +432,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001010', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor3_rotate_right(self, args=None):
         if not args:
@@ -440,6 +450,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010010', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor3_rotate_stop(self):
         self.model.stop_command('Upper', config='00000010', motor_byte='00000010')
@@ -465,6 +477,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001011', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor4_rotate_right(self, args=None):
         if not args:
@@ -481,6 +495,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010011', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor4_rotate_stop(self):
         self.model.stop_command('Upper', config='00000010', motor_byte='00000011')
@@ -506,6 +522,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001100', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor5_rotate_right(self, args=None):
         if not args:
@@ -522,6 +540,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010100', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_upper_commands_list()
+            self.append_text('Upper', byte_data)
 
     def upper_motor5_rotate_stop(self):
         self.model.stop_command('Upper', config='00000010', motor_byte='00000100')
@@ -625,6 +645,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001000', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor1_rotate_right(self, args=None):
         if not args:
@@ -668,6 +690,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001001', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor2_rotate_right(self, args=None):
         if not args:
@@ -684,6 +708,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010001', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor2_rotate_stop(self):
         self.model.stop_command('Lower', config='00000010', motor_byte='00000001')
@@ -709,6 +735,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001010', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor3_rotate_right(self, args=None):
         if not args:
@@ -725,6 +753,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010010', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor3_rotate_stop(self):
         self.model.stop_command('Lower', config='00000010', motor_byte='00000010')
@@ -750,6 +780,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001011', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor4_rotate_right(self, args=None):
         if not args:
@@ -766,6 +798,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010011', pwm=args[0],
                                     limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor4_rotate_stop(self):
         self.model.stop_command('Lower', config='00000010', motor_byte='00000011')
@@ -791,6 +825,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001100', pwm=args[0],
                                limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor5_rotate_right(self, args=None):
         if not args:
@@ -807,6 +843,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010100', pwm=args[0],
                                limited_time=args[1], delay=args[2])
+            byte_data = self.model.get_lower_commands_list()
+            self.append_text('Lower', byte_data)
 
     def lower_motor5_rotate_stop(self):
         self.model.stop_command('Lower', config='00000010', motor_byte='00000100')
