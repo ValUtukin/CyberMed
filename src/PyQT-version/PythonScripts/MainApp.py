@@ -11,6 +11,17 @@ from DataCollector import DataCollector
 from Model import *
 
 
+def get_comport_name(device_full_name):
+    start = device_full_name.find('COM')
+    for i in range(start, len(device_full_name)):
+        if device_full_name[i] == ' ':
+            return device_full_name[start:i]
+        else:
+            continue
+    else:
+        return "Really strange COMPORT name"
+
+
 class MyApplication(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -78,7 +89,7 @@ class MyApplication(QMainWindow):
     def update_upper_combo_box(self):
         current_index = self.upper_comport_comboBox.currentIndex()
         lower_combo_box_current_index = self.lower_comport_comboBox.currentIndex()
-        self.upper_current_comport_name = self.upper_comport_comboBox.currentText()[:4]
+        self.upper_current_comport_name = get_comport_name(self.upper_comport_comboBox.currentText())
 
         self.lower_comport_comboBox.clear()
         self.lower_comport_comboBox.addItems(self.available_ports)
@@ -90,7 +101,7 @@ class MyApplication(QMainWindow):
     def update_lower_combo_box(self):
         current_index = self.lower_comport_comboBox.currentIndex()
         upper_combo_box_current_index = self.upper_comport_comboBox.currentIndex()
-        self.lower_current_comport_name = self.lower_comport_comboBox.currentText()[:4]
+        self.lower_current_comport_name = get_comport_name(self.lower_comport_comboBox.currentText())
 
         self.upper_comport_comboBox.clear()
         self.upper_comport_comboBox.addItems(self.available_ports)
