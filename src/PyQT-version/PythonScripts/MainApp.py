@@ -106,7 +106,6 @@ class MyApplication(QMainWindow):
         else:
             self.upper_current_comport = com.ini(self.upper_current_comport_name)
             if self.upper_current_comport.is_open:
-                print('Upper comport is open')
                 self.model.set_upper_comport(self.upper_current_comport)
                 self.upper_collector.set_comport(self.upper_current_comport)
             else:
@@ -118,7 +117,6 @@ class MyApplication(QMainWindow):
         else:
             self.lower_current_comport = com.ini(self.lower_current_comport_name)
             if self.lower_current_comport.is_open:
-                print('Lower comport is open')
                 self.model.set_lower_comport(self.lower_current_comport)
                 self.lower_collector.set_comport(self.lower_current_comport)
             else:

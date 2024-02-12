@@ -7,7 +7,6 @@ def time_limited_motion(comport, config, motor_byte, pwm, limited_time, delay):
     print(f'Model/time_limited_motion - we send: (conf={config}, motor={motor_byte}, {pwm}, {time_int}, {delay_int})')
     byte_data = com.send_command(comport, config, motor_byte=motor_byte, pwm_bytes=pwm, time_int=time_int,
                                  delay=delay_int)
-    print(f'Model get this data: {byte_data} from comport. Type: {type(byte_data)}')
     return byte_data
 
 
@@ -45,6 +44,12 @@ class Model:
         appended_str = " ".join(format(x, '02x') for x in command)
         self.lower_commands_list.append(appended_str)
         print(f'Model/add_command_to_lower_list - appending command to lower list: {appended_str}')
+
+    def clear_upper_command_list(self):
+        self.upper_commands_list.clear()
+
+    def clear_lower_command_list(self):
+        self.lower_commands_list.clear()
 
     def send_command(self, part, config, motor_byte, pwm, limited_time, delay):
         if part == 'Upper':

@@ -6,8 +6,9 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
 def str_to_bytearray(hex_string):
+    stripped_str = hex_string[2:-1]  # Remove 'U('/'L(' and ')' from command. See data files
     # Split the string (1e 0c 35 etc.) into a list of hex values [1e, 0c, 35, etc.]
-    hex_values = hex_string.split()
+    hex_values = stripped_str.split()
     # Convert each hex value back to its original byte representation using fromhex()
     bytes_list = [bytes.fromhex(hex_value) for hex_value in hex_values]
     # Concatenate the byte values into a single bytearray
@@ -46,7 +47,7 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         self.move_script_label.setText(self.default_move_script_text)
 
     def open_move_script(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt)")
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "../../../Data/", "Text Files (*.txt)")
         if file_path:
             self.script_file_path_label.setText(file_path)
             self.move_script_file_path = file_path
@@ -65,8 +66,8 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
     def send_full_sequence(self):
         text_bytes = self.move_script_label.text()
         part_flag = True  # True - upper part, False - lower part
-        for i in range(0, len(text_bytes), 15):
-            command_str = text_bytes[i:i + 15]
+        for i in range(0, len(text_bytes), 17):
+            command_str = text_bytes[i:i + 17]
             command_byte = str_to_bytearray(command_str)
             print(f'Command {command_byte}, type {type(command_byte)}, len {len(command_byte)}')
             if part_flag:
@@ -85,17 +86,17 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         else:
             full_text_bytes = self.move_script_label.text()
             if self.current_cursor_position == len(full_text_bytes):
-                QMessageBox.warning(self, 'Warning', 'All commands already sent\nSet cursor at the start')
+                QMessageBox.warning(self, 'Warning', 'All commands already sent\nSetting cursor at the start')
                 self.current_cursor_position = 0
                 self.previous_cursor_position = 0
             else:
-                self.current_cursor_position += 30  # 30 - It's length of string with two commands in it (upper and lower)
+                self.current_cursor_position += 34  # 30 - It's length of string with two commands in it (upper and lower)
                 text_bytes = full_text_bytes[:self.current_cursor_position]
-                upper_command_str = text_bytes[self.previous_cursor_position:self.previous_cursor_position + 15]
+                upper_command_str = text_bytes[self.previous_cursor_position:self.previous_cursor_position + 17]
                 upper_command = str_to_bytearray(upper_command_str)
                 self.model.send_command_bytes('Upper', upper_command)
 
-                lower_command_str = text_bytes[self.previous_cursor_position + 15:self.previous_cursor_position + 30]
+                lower_command_str = text_bytes[self.previous_cursor_position + 17:self.previous_cursor_position + 34]
                 lower_command = str_to_bytearray(lower_command_str)
                 self.model.send_command_bytes('Lower', lower_command)
 

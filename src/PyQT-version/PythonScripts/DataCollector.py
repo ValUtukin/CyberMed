@@ -21,7 +21,6 @@ class DataCollector(QObject):
                 for i in range(0, set_num):
                     self.data_set_holder[f'array{i + 1}'] = list()
                 self.holder_len = set_num
-                print(f'DataCollector/__init__ - Current len is {self.holder_len}')
             else:
                 print(f'DataCollector.py/__init__ - set_num is invalid: {set_num}. Must be greater than 0')
                 self.holder_len = 0

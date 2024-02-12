@@ -86,15 +86,14 @@ def send_command(serial_inst, config, power_byte='0', motor_byte='0', pwm_bytes=
         bytearray_str += char_pwm
     if time_int != 0:
         bytearray_str += char_time
-    if delay != 0:
+    if delay >= 0:
         bytearray_str += char_delay
-    print(f"comport/send_command - send {bytearray_str}")
     write_comport(bytearray_str, serial_inst)
     return bytearray_str
 
 
 def send_bytearray(serial_inst, data):
-    print(f'comport - send {data}, to {serial_inst}')
+    print(f"comport/send_bytearray - send {data}")
     write_comport(data, serial_inst)
 
 

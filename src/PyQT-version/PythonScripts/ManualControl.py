@@ -154,14 +154,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
 
     # TODO: Need to test new ADC-thread functions for upper/lower part
     def set_upper_data_collector(self, collector):
-        print('ManualControl/set_upper_data_collector - setting an upper collector:')
-        print(collector)
         self.upper_data_collector = collector
         self.__connect_upper_collector()
 
     def set_lower_data_collector(self, collector):
-        print('ManualControl/set_lower_data_collector - setting a lower collector:')
-        print(collector)
         self.lower_data_collector = collector
         self.__connect_lower_collector()
 
@@ -229,31 +225,30 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.move_script_label.setWordWrap(True)
         self.move_script_label.setText(self.default_move_script_text)
 
-    # TODO: This method needs to be done
     def append_text(self, part, data):
         if part == 'Upper':
             print(f'Upper data: {data}')
             current_text = self.move_script_label.text()
             if current_text == self.default_move_script_text:
-                text_data = data[-1] + " "
-                self.move_script_label.setText(f'<font color="red">{text_data}</font>')
+                text_data = "U(" + data[-1] + ")"
+                self.move_script_label.setText(text_data)
             else:
-                text_data = current_text + data[-1] + " "
-                self.move_script_label.setText(f'<font color="red">{text_data}</font>')
+                text_data = current_text + "U(" + data[-1] + ")"
+                self.move_script_label.setText(text_data)
         elif part == 'Lower':
             print(f'Lower data: {data}')
             current_text = self.move_script_label.text()
             if current_text == self.default_move_script_text:
-                text_data = data[-1] + " "
-                self.move_script_label.setText(f'<font color="blue">{text_data}</font>')
+                text_data = "L(" + data[-1] + ")"
+                self.move_script_label.setText(text_data)
             else:
-                text_data = current_text + data[-1] + " "
-                self.move_script_label.setText(f'<font color="blue">{text_data}</font>')
+                text_data = current_text + "L(" + data[-1] + ")"
+                self.move_script_label.setText(text_data)
         else:
             print(f'No such part: {part}')
 
     def open_script_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt)")
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "../../../Data/", "Text Files (*.txt)")
         if file_path:
             self.script_file_path_label.setText(file_path)
             self.move_script_file_path = file_path
@@ -266,14 +261,18 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             lower_text = self.model.get_lower_commands_list()
             with open(self.move_script_file_path, 'a') as file:
                 for i in range(len(upper_text)):
-                    file.write(upper_text[i] + ' ')
-                    file.write(lower_text[i] + ' ')
+                    file.write("U(" + upper_text[i] + ")")
+                    file.write("L(" + lower_text[i] + ")")
                 # file.write(current_text)
                 file.close()
             QMessageBox.information(self, 'Success', 'Data successfully saved!')
 
     def discard_script(self):
-        pass
+        self.move_script_label.clear()
+        self.place_default_text()
+
+        self.model.clear_upper_command_list()
+        self.model.clear_lower_command_list()
 
     # TODO: Do something with these two (stop_receive, save_plot_...)
     def stop_receive(self):
