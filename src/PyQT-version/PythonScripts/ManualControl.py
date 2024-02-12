@@ -7,11 +7,6 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
-def send_power(comport):
-    com.send_command(comport, config='00000001', power_byte='00000001')  # Send power ON
-    print(f"ManualControl/send_power - send power to {comport.name}")
-
-
 def switch_button_color(button, color='#19e676'):
     if button.styleSheet() == 'background-color:' or button.styleSheet() == '':
         button.setStyleSheet(f"background-color:{color}")
@@ -39,6 +34,9 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_comport = None
         self.lower_comport = None
         self.model = None
+
+        self.upper_opposite_pwm = 50
+        self.lower_opposite_pwm = 50
 
         self.upper_adc_waiting_flag = False
         self.lower_adc_waiting_flag = False
@@ -293,7 +291,33 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.model.power_command('Upper', config='00000001', power_byte='00000001')
         if self.upper_adc_waiting_flag:
             print("ManualControl/upper_send_power - we about to start ADC collecting")
-        # send_power(self.lower_comport)
+        self.model.power_command('Lower', config='00000001', power_byte='00000001')
+
+    def get_upper_time_delay(self, motor_num):
+        time = 0.0
+        delay = 0.0
+        if motor_num == 0:
+            time = float(self.upper_motor1_time_input.toPlainText())
+            delay = float(self.upper_motor1_delay_input.toPlainText())
+            return time, delay
+        elif motor_num == 1:
+            time = float(self.upper_motor2_time_input.toPlainText())
+            delay = float(self.upper_motor2_delay_input.toPlainText())
+            return time, delay
+        elif motor_num == 2:
+            time = float(self.upper_motor3_time_input.toPlainText())
+            delay = float(self.upper_motor3_delay_input.toPlainText())
+            return time, delay
+        elif motor_num == 3:
+            time = float(self.upper_motor4_time_input.toPlainText())
+            delay = float(self.upper_motor4_delay_input.toPlainText())
+            return time, delay
+        elif motor_num == 4:
+            time = float(self.upper_motor5_time_input.toPlainText())
+            delay = float(self.upper_motor5_delay_input.toPlainText())
+            return time, delay
+        else:
+            return time, delay
 
     def get_upper_adc_state(self) -> list:
         adc_arr = list()
@@ -337,7 +361,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor1_buttons, 0)
 
-            self.lower_motor1_rotate_right([15, time, delay])
+            self.lower_motor1_rotate_right([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor1_buttons, 1)
         else:  # With args
             self.model.send_command('Upper', config='00011110', motor_byte='00001000', pwm=args[0],
@@ -355,7 +379,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor1_buttons, 1)
 
-            self.lower_motor1_rotate_left([15, time, delay])
+            self.lower_motor1_rotate_left([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor1_buttons, 0)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010000', pwm=args[0],
@@ -382,7 +406,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor2_buttons, 0)
 
-            self.lower_motor2_rotate_right([15, time, delay])
+            self.lower_motor2_rotate_right([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor2_buttons, 1)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001001', pwm=args[0],
@@ -400,7 +424,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor2_buttons, 1)
 
-            self.lower_motor2_rotate_left([15, time, delay])
+            self.lower_motor2_rotate_left([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor2_buttons, 0)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010001', pwm=args[0],
@@ -427,7 +451,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor3_buttons, 0)
 
-            self.lower_motor3_rotate_right([15, time, delay])
+            self.lower_motor3_rotate_right([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor3_buttons, 1)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001010', pwm=args[0],
@@ -445,7 +469,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor3_buttons, 1)
 
-            self.lower_motor3_rotate_left([15, time, delay])
+            self.lower_motor3_rotate_left([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor3_buttons, 0)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010010', pwm=args[0],
@@ -472,7 +496,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor4_buttons, 0)
 
-            self.lower_motor4_rotate_right([15, time, delay])
+            self.lower_motor4_rotate_right([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor4_buttons, 1)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001011', pwm=args[0],
@@ -490,7 +514,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor4_buttons, 1)
 
-            self.lower_motor4_rotate_left([15, time, delay])
+            self.lower_motor4_rotate_left([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor4_buttons, 0)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010011', pwm=args[0],
@@ -517,7 +541,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor5_buttons, 0)
 
-            self.lower_motor5_rotate_right([15, time, delay])
+            self.lower_motor5_rotate_right([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor5_buttons, 1)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00001100', pwm=args[0],
@@ -535,7 +559,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
             configure_relatives_buttons(self.upper_motor5_buttons, 1)
 
-            self.lower_motor5_rotate_left([15, time, delay])
+            self.lower_motor5_rotate_left([self.lower_opposite_pwm, time, delay])
             configure_relatives_buttons(self.lower_motor5_buttons, 0)
         else:
             self.model.send_command('Upper', config='00011110', motor_byte='00010100', pwm=args[0],
@@ -558,6 +582,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         if self.lower_adc_waiting_flag:
             print("ManualControl/lower_send_power - we about to start ADC collecting")
             self.lower_data_collector_thread.start()
+        self.model.power_command('Upper', config='00000001', power_byte='00000001')
 
     def get_lower_time_delay(self, motor_num):
         time = 0.0
@@ -640,7 +665,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor1_buttons, 0)
 
-            self.upper_motor1_rotate_right([15, time, delay])
+            self.upper_motor1_rotate_right([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor1_buttons, 1)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001000', pwm=args[0],
@@ -658,7 +683,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor1_buttons, 1)
 
-            self.upper_motor1_rotate_left([15, time, delay])
+            self.upper_motor1_rotate_left([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor1_buttons, 0)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010000', pwm=args[0],
@@ -685,7 +710,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor2_buttons, 0)
 
-            self.upper_motor2_rotate_right([15, time, delay])
+            self.upper_motor2_rotate_right([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor2_buttons, 1)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001001', pwm=args[0],
@@ -703,7 +728,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor2_buttons, 1)
 
-            self.upper_motor2_rotate_left([15, time, delay])
+            self.upper_motor2_rotate_left([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor2_buttons, 0)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010001', pwm=args[0],
@@ -730,7 +755,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor3_buttons, 0)
 
-            self.upper_motor3_rotate_right([15, time, delay])
+            self.upper_motor3_rotate_right([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor3_buttons, 1)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001010', pwm=args[0],
@@ -748,7 +773,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor3_buttons, 1)
 
-            self.upper_motor3_rotate_left([15, time, delay])
+            self.upper_motor3_rotate_left([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor3_buttons, 0)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010010', pwm=args[0],
@@ -775,7 +800,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor4_buttons, 0)
 
-            self.upper_motor4_rotate_right([15, time, delay])
+            self.upper_motor4_rotate_right([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor4_buttons, 1)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001011', pwm=args[0],
@@ -793,7 +818,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor4_buttons, 1)
 
-            self.upper_motor4_rotate_left([15, time, delay])
+            self.upper_motor4_rotate_left([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor4_buttons, 0)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010011', pwm=args[0],
@@ -820,7 +845,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor5_buttons, 0)
 
-            self.upper_motor5_rotate_right([15, time, delay])
+            self.upper_motor5_rotate_right([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor5_buttons, 1)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00001100', pwm=args[0],
@@ -838,7 +863,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
             configure_relatives_buttons(self.lower_motor5_buttons, 1)
 
-            self.upper_motor5_rotate_left([15, time, delay])
+            self.upper_motor5_rotate_left([self.upper_opposite_pwm, time, delay])
             configure_relatives_buttons(self.upper_motor5_buttons, 0)
         else:
             self.model.send_command('Lower', config='00011110', motor_byte='00010100', pwm=args[0],
