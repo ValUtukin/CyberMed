@@ -1,12 +1,12 @@
-my_str = "1 2 COM34 4 5)"
-stripped = my_str[2:-1]
-print(f"Data: {stripped}, len: {len(stripped)}")
+def get_lower_opposite_pwm(up_pwm):
+    opposite_coefficient = 69/70
+    yield int(up_pwm * opposite_coefficient)
 
-result = my_str.find('COM')
-for i in range(result, len(my_str)):
-    if my_str[i] == ' ':
-        print(f'Blank space found. Position: {i}')
-        print(f'String before blank space: {my_str[result:i]}')
-        break
-    else:
-        continue
+
+def get_upper_opposite_pwm(low_pwm):
+    opposite_coefficient = 1/2
+    yield int(low_pwm * opposite_coefficient)
+
+
+upper_pwm_generator = get_upper_opposite_pwm
+print(upper_pwm_generator(60))
