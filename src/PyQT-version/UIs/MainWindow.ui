@@ -30,8 +30,8 @@
      <widget class="QLabel" name="welcome_label">
       <property name="geometry">
        <rect>
-        <x>500</x>
-        <y>270</y>
+        <x>470</x>
+        <y>310</y>
         <width>421</width>
         <height>81</height>
        </rect>
@@ -111,6 +111,239 @@
       <property name="text">
        <string>Reset</string>
       </property>
+     </widget>
+     <widget class="QGroupBox" name="motor_settings_groupBox">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>600</y>
+        <width>651</width>
+        <height>181</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Motor Settings</string>
+      </property>
+      <widget class="QLabel" name="upper_motor_stgs_label">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Upper Motors</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lower_motor_stgs_label">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Lower Motors</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="upper_motors_comboBox">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>40</y>
+         <width>101</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="lower_motors_comboBox">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>120</y>
+         <width>101</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QSlider" name="upper_motor_pwm_scale">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>40</y>
+         <width>160</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
+       <property name="tickInterval">
+        <number>10</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="upper_motor_pwm_label">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>20</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lower_motor_pwm_label">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>100</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+      <widget class="QSlider" name="lower_motor_pwm_scale">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>120</y>
+         <width>160</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
+       <property name="tickInterval">
+        <number>10</number>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="upper_constant_rotation_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>460</x>
+         <y>20</y>
+         <width>111</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Constant rotation</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="lower_constant_rotation_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>460</x>
+         <y>100</y>
+         <width>111</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Constant rotation</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="upper_single_command_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>460</x>
+         <y>60</y>
+         <width>181</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Single Command (5 sec/no delay)</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="lower_single_command_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>460</x>
+         <y>140</y>
+         <width>191</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Single Command (5 sec/no delay)</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="upper_check_motor_btn">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>30</y>
+         <width>75</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Check Motor</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="upper_reverse_motor_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>60</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Reverse</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="lower_check_motor_btn">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>110</y>
+         <width>75</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Check Motor</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="lower_reverse_motor_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>140</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Reverse</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_2"/>

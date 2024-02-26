@@ -41,6 +41,27 @@ class MyApplication(QMainWindow):
         self.upper_current_comport = None
         self.lower_current_comport = None
 
+        self.upper_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
+        self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
+        self.motors_settings_dict = {
+            '1': '00001000',
+            '2': '00001001',
+            '3': '00001010',
+            '4': '00001011',
+            '5': '00001100',
+            '6': '00001101',
+            '_1': '00010000',
+            '_2': '00010001',
+            '_3': '00010010',
+            '_4': '00010011',
+            '_5': '00010100',
+            '_6': '00010101'
+        }
+        self.upper_motor_pwm_scale.valueChanged.connect(self.update_upper_pwm_label)
+        self.lower_motor_pwm_scale.valueChanged.connect(self.update_lower_pwm_label)
+        self.upper_check_motor_btn.clicked.connect(self.check_upper_motor)
+        self.lower_check_motor_btn.clicked.connect(self.check_lower_motor)
+
         self.upper_comport_comboBox.activated.connect(self.update_upper_combo_box)
         self.lower_comport_comboBox.activated.connect(self.update_lower_combo_box)
         self.rescan_comport_btn.clicked.connect(self.rescan_comport)
@@ -159,6 +180,34 @@ class MyApplication(QMainWindow):
 
         self.upper_current_comport_name = None
         self.lower_current_comport_name = None
+
+    def update_upper_pwm_label(self, value):
+        self.upper_motor_pwm_label.setText(str(value))
+
+    def update_lower_pwm_label(self, value):
+        self.lower_motor_pwm_label.setText(str(value))
+
+    def check_upper_motor(self):
+        motor_number = self.upper_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
+        pwm = self.upper_motor_pwm_scale.value()
+        reverse_flag = self.upper_reverse_motor_checkBox.isChecked()
+        constant_rotation_flag = self.upper_constant_rotation_checkBox.isChecked()
+        single_command_flag = self.upper_single_command_checkBox.isChecked()
+        if reverse_flag:
+            motor_byte = self.motors_settings_dict[f'_{motor_number}']
+        else:
+            motor_byte = self.motors_settings_dict[f'{motor_number}']
+
+    def check_lower_motor(self):
+        motor_number = self.lower_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
+        pwm = self.lower_motor_pwm_scale.value()
+        reverse_flag = self.lower_reverse_motor_checkBox.isChecked()
+        constant_rotation_flag = self.lower_constant_rotation_checkBox.isChecked()
+        single_command_flag = self.lower_single_command_checkBox.isChecked()
+        if reverse_flag:
+            motor_byte = self.motors_settings_dict[f'_{motor_number}']
+        else:
+            motor_byte = self.motors_settings_dict[f'{motor_number}']
 
 
 if __name__ == "__main__":
