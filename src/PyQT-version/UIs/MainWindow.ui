@@ -116,9 +116,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>600</y>
+        <y>580</y>
         <width>651</width>
-        <height>181</height>
+        <height>201</height>
        </rect>
       </property>
       <property name="title">
@@ -342,6 +342,32 @@
        </property>
        <property name="text">
         <string>Reverse</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="upper_apply_motor_stgs_btn">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>70</y>
+         <width>81</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Apply settings</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="lower_apply_motor_stgs_btn">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>150</y>
+         <width>81</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Apply settings</string>
        </property>
       </widget>
      </widget>

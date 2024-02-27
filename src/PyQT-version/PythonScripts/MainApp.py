@@ -61,6 +61,8 @@ class MyApplication(QMainWindow):
         self.lower_motor_pwm_scale.valueChanged.connect(self.update_lower_pwm_label)
         self.upper_check_motor_btn.clicked.connect(self.check_upper_motor)
         self.lower_check_motor_btn.clicked.connect(self.check_lower_motor)
+        self.upper_apply_motor_stgs_btn.clicked.connect(self.upper_apply_motor_settings)
+        self.lower_apply_motor_stgs_btn.clicked.connect(self.lower_apply_motor_settings)
 
         self.upper_comport_comboBox.activated.connect(self.update_upper_combo_box)
         self.lower_comport_comboBox.activated.connect(self.update_lower_combo_box)
@@ -198,6 +200,16 @@ class MyApplication(QMainWindow):
         else:
             motor_byte = self.motors_settings_dict[f'{motor_number}']
 
+        if single_command_flag and constant_rotation_flag:
+            QMessageBox.warning(self, 'Warning', 'Choose only one rotation mode')
+        elif single_command_flag and not constant_rotation_flag:
+            print('Single command')
+            self.model.send_command('Upper', '00011110', motor_byte, pwm, 50, 0)
+        elif constant_rotation_flag and not single_command_flag:
+            print('Constant rotation')
+        else:
+            QMessageBox.warning(self, 'Warning', 'Rotation mode not selected')
+
     def check_lower_motor(self):
         motor_number = self.lower_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
         pwm = self.lower_motor_pwm_scale.value()
@@ -208,6 +220,36 @@ class MyApplication(QMainWindow):
             motor_byte = self.motors_settings_dict[f'_{motor_number}']
         else:
             motor_byte = self.motors_settings_dict[f'{motor_number}']
+
+        if single_command_flag and constant_rotation_flag:
+            QMessageBox.warning(self, 'Warning', 'Choose only one rotation mode')
+        elif single_command_flag and not constant_rotation_flag:
+            print('Single command')
+            self.model.send_command('Lower', '00011110', motor_byte, pwm, 50, 0)
+        elif constant_rotation_flag and not single_command_flag:
+            print('Constant rotation')
+        else:
+            QMessageBox.warning(self, 'Warning', 'Rotation mode not selected')
+
+    def upper_apply_motor_settings(self):
+        motor_number = self.upper_motors_comboBox.currentIndex() + 1
+        reverse_flag = self.upper_reverse_motor_checkBox.isChecked()
+        warning_message = f'''Nothing to change: reverse flag - {reverse_flag}
+Upper motor #{motor_number} has default settings'''
+        if reverse_flag:
+            self.manual_control.upper_change_motor_settings(motor_number)
+        else:
+            QMessageBox.warning(self, 'Warning', warning_message)
+
+    def lower_apply_motor_settings(self):
+        motor_number = self.lower_motors_comboBox.currentIndex() + 1
+        reverse_flag = self.lower_reverse_motor_checkBox.isChecked()
+        warning_message = f'''Nothing to change: reverse flag - {reverse_flag}
+Lower motor #{motor_number} has default settings'''
+        if reverse_flag:
+            self.manual_control.lower_change_motor_settings(motor_number)
+        else:
+            QMessageBox.warning(self, 'Warning', warning_message)
 
 
 if __name__ == "__main__":
