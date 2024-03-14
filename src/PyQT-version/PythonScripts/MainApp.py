@@ -74,6 +74,7 @@ class MyApplication(QMainWindow):
         self.actionElbow_and_Shoulder.triggered.connect(self.elbow_and_shoulder)
         self.actionMain_Window.triggered.connect(self.main_window)
         self.actionMain_Window.setEnabled(False)  # Disable Main Window action when App starts
+        self.motor_settings_groupBox.setEnabled(False)  # Disable Motor Setting box
 
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
@@ -142,6 +143,7 @@ class MyApplication(QMainWindow):
             if self.upper_current_comport.is_open:
                 self.model.set_upper_comport(self.upper_current_comport)
                 self.upper_collector.set_comport(self.upper_current_comport)
+                self.update_upper_status_label(True)
             else:
                 print('Upper comport is not open')
 
@@ -153,6 +155,7 @@ class MyApplication(QMainWindow):
             if self.lower_current_comport.is_open:
                 self.model.set_lower_comport(self.lower_current_comport)
                 self.lower_collector.set_comport(self.lower_current_comport)
+                self.update_lower_status_label(True)
             else:
                 print('Lower comport is not open')
 
@@ -172,6 +175,9 @@ class MyApplication(QMainWindow):
         self.upper_comport_comboBox.addItems(self.available_ports)
         self.lower_comport_comboBox.addItems(self.available_ports)
 
+        self.update_upper_status_label(False)
+        self.update_lower_status_label(False)
+
     # TODO: Looks like this method simular to rescan_comport. Maybe should remove this one...?
     def reset_comport(self):
         self.upper_comport_comboBox.clear()
@@ -182,6 +188,19 @@ class MyApplication(QMainWindow):
 
         self.upper_current_comport_name = None
         self.lower_current_comport_name = None
+
+    # TODO: Need to add observer pattern
+    def update_upper_status_label(self, connected):
+        if connected:
+            self.upper_comport_status_label.setStyleSheet("border: 3px solid #00AB5D; background-color: #00AB5D")
+        else:
+            self.upper_comport_status_label.setStyleSheet("border: 3px solid red; background-color: red")
+
+    def update_lower_status_label(self, connected):
+        if connected:
+            self.lower_comport_status_label.setStyleSheet("border: 3px solid #00AB5D; background-color: #00AB5D")
+        else:
+            self.lower_comport_status_label.setStyleSheet("border: 3px solid red; background-color: red")
 
     def update_upper_pwm_label(self, value):
         self.upper_motor_pwm_label.setText(str(value))
