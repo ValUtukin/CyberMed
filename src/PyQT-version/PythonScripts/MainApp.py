@@ -74,7 +74,7 @@ class MyApplication(QMainWindow):
         self.actionElbow_and_Shoulder.triggered.connect(self.elbow_and_shoulder)
         self.actionMain_Window.triggered.connect(self.main_window)
         self.actionMain_Window.setEnabled(False)  # Disable Main Window action when App starts
-        self.motor_settings_groupBox.setEnabled(False)  # Disable Motor Setting box
+        # self.motor_settings_groupBox.setEnabled(False)  # Disable Motor Setting box
 
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
@@ -223,7 +223,8 @@ class MyApplication(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'Choose only one rotation mode')
         elif single_command_flag and not constant_rotation_flag:
             print('Single command')
-            self.model.send_command('Upper', '00011110', motor_byte, pwm, 50, 0)
+            self.model.send_command('Upper', '00011110', motor_byte, pwm, 5, 0)
+            self.model.power_command('Upper', '00000001', '00000001')
         elif constant_rotation_flag and not single_command_flag:
             print('Constant rotation')
         else:
@@ -244,7 +245,8 @@ class MyApplication(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'Choose only one rotation mode')
         elif single_command_flag and not constant_rotation_flag:
             print('Single command')
-            self.model.send_command('Lower', '00011110', motor_byte, pwm, 50, 0)
+            self.model.send_command('Lower', '00011110', motor_byte, pwm, 5, 0)
+            self.model.power_command('Lower', '00000001', '00000001')
         elif constant_rotation_flag and not single_command_flag:
             print('Constant rotation')
         else:
