@@ -223,7 +223,7 @@ class MyApplication(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'Choose only one rotation mode')
         elif single_command_flag and not constant_rotation_flag:
             print('Single command')
-            self.model.send_command('Upper', '00011110', motor_byte, pwm, 5, 0)
+            self.model.send_command('Upper', '00011110', motor_byte, pwm, 0.5, 0)
             self.model.power_command('Upper', '00000001', '00000001')
         elif constant_rotation_flag and not single_command_flag:
             print('Constant rotation')
@@ -245,7 +245,7 @@ class MyApplication(QMainWindow):
             QMessageBox.warning(self, 'Warning', 'Choose only one rotation mode')
         elif single_command_flag and not constant_rotation_flag:
             print('Single command')
-            self.model.send_command('Lower', '00011110', motor_byte, pwm, 5, 0)
+            self.model.send_command('Lower', '00011110', motor_byte, pwm, 0.5, 0)
             self.model.power_command('Lower', '00000001', '00000001')
         elif constant_rotation_flag and not single_command_flag:
             print('Constant rotation')
