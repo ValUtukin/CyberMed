@@ -86,6 +86,12 @@ class Model:
         else:
             print(f'Model/send_command_bytes - unknown part: {part}')
 
+    def release_upper_comport_after_thread(self):
+        com.open_comport(self.upper_comport)
+
+    def release_lower_comport_after_thread(self):
+        com.open_comport(self.lower_comport)
+
 
 if __name__ == '__main__':
     upper_com = com.ini('COM2')

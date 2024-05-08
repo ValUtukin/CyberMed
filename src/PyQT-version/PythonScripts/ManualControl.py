@@ -1,8 +1,6 @@
 import sys
 import ManualControlUi
-from DataCollector import DataCollector
 from Model import *
-import comport as com
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
@@ -39,20 +37,11 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        # self.upper_comport = com.ini('COM2')
-        # self.lower_comport = com.ini('COM7')
-        self.upper_comport = None
-        self.lower_comport = None
         self.model = None
-
-        self.upper_opposite_pwm = 50
-        self.lower_opposite_pwm = 50
 
         self.upper_adc_waiting_flag = False
         self.lower_adc_waiting_flag = False
-        # TODO: Need to reconnect DataCollectors from here to Model. Here must be no comport logic. Only Model has.
-        # self.upper_data_collector = DataCollector(1, 50, self.upper_comport)
-        # self.lower_data_collector = DataCollector(1, 50, self.lower_comport)
+
         self.upper_data_collector = None
         self.lower_data_collector = None
         self.upper_current_plots_num = 0
@@ -60,11 +49,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
 
         self.default_move_script_text = "Move script is now empty"
         self.move_script_file_path = None
+        self.place_default_text()
 
         self.add_graph1()  # Add initial dummy graph 1
         self.add_graph2()  # Add initial dummy graph 2
-
-        self.place_default_text()
 
         self.upper_send_power_btn.clicked.connect(self.upper_send_power)
         self.lower_send_power_btn.clicked.connect(self.lower_send_power)
@@ -198,14 +186,6 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def lower_get_motor_settings(self):
         return self.lower_default_motors_settings
 
-    def set_upper_comport(self, port):
-        self.upper_comport = port
-        print(f'ManualControl/set_upper_comport - upper comport update: {port}')
-
-    def set_lower_comport(self, port):
-        self.lower_comport = port
-        print(f'ManualControl/set_lower_comport - lower comport update: {port}')
-
     def set_model(self, model: Model):
         self.model = model
 
@@ -223,14 +203,14 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_data_collector.moveToThread(self.upper_data_collector_thread)
         self.upper_data_collector_thread.started.connect(self.upper_data_collector.start_collecting)
         self.upper_data_collector.segment_received.connect(self.update_plot)
-        self.upper_data_collector.finished.connect(self.upper_data_collector_thread.quit)
+        self.upper_data_collector.finished.connect(self.finish_upper_collector_thread)
 
     def __connect_lower_collector(self):
         self.lower_data_collector_thread = QtCore.QThread()
         self.lower_data_collector.moveToThread(self.lower_data_collector_thread)
         self.lower_data_collector_thread.started.connect(self.lower_data_collector.start_collecting)
         self.lower_data_collector.segment_received.connect(self.update_plot)
-        self.lower_data_collector.finished.connect(self.lower_data_collector_thread.quit)
+        self.lower_data_collector.finished.connect(self.finish_lower_collector_thread)
 
     def update_plot(self):
         print(f'ManualControl/update_plot')
@@ -255,11 +235,11 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
 
     def finish_upper_collector_thread(self):
         self.upper_data_collector_thread.quit()
-        com.open_comport(self.lower_comport)
+        self.model.release_upper_comport_after_thread()
 
     def finish_lower_collector_thread(self):
         self.lower_data_collector_thread.quit()
-        com.open_comport(self.lower_comport)
+        self.model.release_lower_comport_after_thread()
 
     def add_graph1(self):
         x1 = [1, 2, 3, 4, 5, 6, 7, 8]
