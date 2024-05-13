@@ -168,7 +168,13 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             '_6': '00010101'
         }
 
-    def upper_change_motor_settings(self, motor_number):
+    def upper_change_motor_rotation(self, motor_number):
+        motor_key_str = str(motor_number)
+        temp = self.upper_default_motors_settings.get(motor_key_str)
+        self.upper_default_motors_settings[motor_key_str] = self.upper_default_motors_settings[f'_{motor_key_str}']
+        self.upper_default_motors_settings[f'_{motor_key_str}'] = temp
+
+    def lower_change_motor_rotation(self, motor_number):
         motor_key_str = str(motor_number)
         temp = self.upper_default_motors_settings.get(motor_key_str)
         self.upper_default_motors_settings[motor_key_str] = self.upper_default_motors_settings[f'_{motor_key_str}']
