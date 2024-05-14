@@ -139,6 +139,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
                                      self.lower_motor5_stop_btn]
         self.update_counter = 0
 
+        #  Use only separate of MainApp.py
         self.upper_default_motors_settings = {
             '1': '00001000',
             '2': '00001001',
@@ -153,6 +154,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             '_5': '00010100',
             '_6': '00010101'
         }
+        #  Use only separate of MainApp.py
         self.lower_default_motors_settings = {
             '1': '00001000',
             '2': '00001001',
@@ -168,29 +170,47 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             '_6': '00010101'
         }
 
-    def upper_change_motor_rotation(self, motor_number):
-        motor_key_str = str(motor_number)
-        temp = self.upper_default_motors_settings.get(motor_key_str)
-        self.upper_default_motors_settings[motor_key_str] = self.upper_default_motors_settings[f'_{motor_key_str}']
-        self.upper_default_motors_settings[f'_{motor_key_str}'] = temp
+        #  Dictionaries for keeping motor settings
+        self.upper_rotation_dict = dict()
+        self.lower_rotation_dict = dict()
+        self.upper_finger_dict = dict()
+        self.lower_finger_dict = dict()
 
-    def lower_change_motor_rotation(self, motor_number):
-        motor_key_str = str(motor_number)
-        temp = self.upper_default_motors_settings.get(motor_key_str)
-        self.upper_default_motors_settings[motor_key_str] = self.upper_default_motors_settings[f'_{motor_key_str}']
-        self.upper_default_motors_settings[f'_{motor_key_str}'] = temp
+    def upper_set_rotation(self, rotation_dict):
+        print("ManualControl/upper_set_rotation - get a rotation dict:")
+        for key, value in rotation_dict.items():
+            self.upper_rotation_dict[key] = value
+        print(self.upper_rotation_dict)
 
-    def upper_get_motor_settings(self):
-        return self.upper_default_motors_settings
+    def lower_set_rotation(self, rotation_dict):
+        print("ManualControl/lower_set_rotation - get a rotation dict:")
+        for key, value in rotation_dict.items():
+            self.lower_rotation_dict[key] = value
+        print(self.lower_rotation_dict)
 
-    def lower_change_motor_settings(self, motor_number):
-        motor_key_str = str(motor_number)
-        temp = self.lower_default_motors_settings.get(motor_key_str)
-        self.lower_default_motors_settings[motor_key_str] = self.lower_default_motors_settings[f'_{motor_key_str}']
-        self.lower_default_motors_settings[f'_{motor_key_str}'] = temp
+    def upper_set_finger(self, finger_dict):
+        print("ManualControl/upper_set_finger - get a finger dict:")
+        for key, value in finger_dict.items():
+            self.upper_finger_dict[key] = value
+        print(self.upper_finger_dict)
 
-    def lower_get_motor_settings(self):
-        return self.lower_default_motors_settings
+    def lower_set_finger(self, finger_dict):
+        print("ManualControl/lower_set_finger - get a finger dict:")
+        for key, value in finger_dict.items():
+            self.lower_finger_dict[key] = value
+        print(self.lower_finger_dict)
+
+    def upper_get_rotation(self):
+        return self.upper_rotation_dict
+
+    def lower_get_rotation(self):
+        return self.lower_rotation_dict
+
+    def upper_get_finger(self):
+        return self.upper_finger_dict
+
+    def lower_get_finger(self):
+        return self.lower_finger_dict
 
     def set_model(self, model: Model):
         self.model = model
@@ -394,7 +414,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             print('ManualControl.py/upper_collect_adc - adc_number is zero')
 
     def upper_motor1_rotate_left(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('1')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('1')
+        motor_number_byte = self.upper_finger_dict.get('1')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:  # Without args
             pwm = self.upper_motor1_pwm_scale.value()
             time = float(self.upper_motor1_time_input.toPlainText())
@@ -413,7 +436,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
 
     def upper_motor1_rotate_right(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('_1')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('_1')
+        motor_number_byte = self.upper_finger_dict.get('1')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor1_pwm_scale.value()
             time = float(self.upper_motor1_time_input.toPlainText())
@@ -441,7 +467,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_motor1_scale_label.setText(str(value))
 
     def upper_motor2_rotate_left(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('2')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('2')
+        motor_number_byte = self.upper_finger_dict.get('2')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor2_pwm_scale.value()
             time = float(self.upper_motor2_time_input.toPlainText())
@@ -460,7 +489,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
 
     def upper_motor2_rotate_right(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('_2')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('_2')
+        motor_number_byte = self.upper_finger_dict.get('2')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor2_pwm_scale.value()
             time = float(self.upper_motor2_time_input.toPlainText())
@@ -488,7 +520,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_motor2_scale_label.setText(str(value))
 
     def upper_motor3_rotate_left(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('3')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('3')
+        motor_number_byte = self.upper_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor3_pwm_scale.value()
             time = float(self.upper_motor3_time_input.toPlainText())
@@ -507,7 +542,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
 
     def upper_motor3_rotate_right(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('_3')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('_3')
+        motor_number_byte = self.upper_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor3_pwm_scale.value()
             time = float(self.upper_motor3_time_input.toPlainText())
@@ -535,7 +573,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_motor3_scale_label.setText(str(value))
 
     def upper_motor4_rotate_left(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('4')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('4')
+        motor_number_byte = self.upper_finger_dict.get('4')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor4_pwm_scale.value()
             time = float(self.upper_motor4_time_input.toPlainText())
@@ -554,7 +595,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
 
     def upper_motor4_rotate_right(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('_4')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('_4')
+        motor_number_byte = self.upper_finger_dict.get('4')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor4_pwm_scale.value()
             time = float(self.upper_motor4_time_input.toPlainText())
@@ -582,7 +626,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.upper_motor4_scale_label.setText(str(value))
 
     def upper_motor5_rotate_left(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('5')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('5')
+        motor_number_byte = self.upper_finger_dict.get('5')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor5_pwm_scale.value()
             time = float(self.upper_motor5_time_input.toPlainText())
@@ -601,7 +648,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Upper', byte_data)
 
     def upper_motor5_rotate_right(self, args=None):
-        motor_byte = self.upper_default_motors_settings.get('_5')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('_5')
+        motor_number_byte = self.upper_finger_dict.get('5')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.upper_motor5_pwm_scale.value()
             time = float(self.upper_motor5_time_input.toPlainText())
@@ -708,7 +758,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.lower_adc_waiting_flag = True
 
     def lower_motor1_rotate_left(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('1')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('1')
+        motor_number_byte = self.lower_finger_dict.get('1')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor1_pwm_scale.value()
             time = float(self.lower_motor1_time_input.toPlainText())
@@ -727,7 +780,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
 
     def lower_motor1_rotate_right(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('_1')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('_1')
+        motor_number_byte = self.lower_finger_dict.get('1')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor1_pwm_scale.value()
             time = float(self.lower_motor1_time_input.toPlainText())
@@ -755,7 +811,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_motor1_scale_label.setText(str(value))
 
     def lower_motor2_rotate_left(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('2')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('2')
+        motor_number_byte = self.lower_finger_dict.get('2')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor2_pwm_scale.value()
             time = float(self.lower_motor2_time_input.toPlainText())
@@ -774,7 +833,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
 
     def lower_motor2_rotate_right(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('_2')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('_2')
+        motor_number_byte = self.lower_finger_dict.get('2')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor2_pwm_scale.value()
             time = float(self.lower_motor2_time_input.toPlainText())
@@ -802,7 +864,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_motor2_scale_label.setText(str(value))
 
     def lower_motor3_rotate_left(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('3')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('3')
+        motor_number_byte = self.lower_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor3_pwm_scale.value()
             time = float(self.lower_motor3_time_input.toPlainText())
@@ -821,7 +886,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
 
     def lower_motor3_rotate_right(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('_3')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('_3')
+        motor_number_byte = self.lower_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor3_pwm_scale.value()
             time = float(self.lower_motor3_time_input.toPlainText())
@@ -849,7 +917,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_motor3_scale_label.setText(str(value))
 
     def lower_motor4_rotate_left(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('4')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('4')
+        motor_number_byte = self.lower_finger_dict.get('4')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor4_pwm_scale.value()
             time = float(self.lower_motor4_time_input.toPlainText())
@@ -868,7 +939,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
 
     def lower_motor4_rotate_right(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('_4')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('_4')
+        motor_number_byte = self.lower_finger_dict.get('4')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor4_pwm_scale.value()
             time = float(self.lower_motor4_time_input.toPlainText())
@@ -896,7 +970,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_motor4_scale_label.setText(str(value))
 
     def lower_motor5_rotate_left(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('5')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('5')
+        motor_number_byte = self.lower_finger_dict.get('5')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor5_pwm_scale.value()
             time = float(self.lower_motor5_time_input.toPlainText())
@@ -915,7 +992,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             self.append_text('Lower', byte_data)
 
     def lower_motor5_rotate_right(self, args=None):
-        motor_byte = self.lower_default_motors_settings.get('_5')
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('_5')
+        motor_number_byte = self.lower_finger_dict.get('5')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         if not args:
             pwm = self.lower_motor5_pwm_scale.value()
             time = float(self.lower_motor5_time_input.toPlainText())

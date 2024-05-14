@@ -106,8 +106,8 @@ class MyApplication(QMainWindow):
         self.lower_motor_pwm_scale.valueChanged.connect(self.update_lower_pwm_label)
 
         #  Rotation-settings connections
-        self.upper_check_motor_btn.clicked.connect(self.check_upper_motor)
-        self.lower_check_motor_btn.clicked.connect(self.check_lower_motor)
+        self.upper_check_motor_btn.clicked.connect(self.upper_check_motor_rotation)
+        self.lower_check_motor_btn.clicked.connect(self.lower_check_motor_rotation)
 
         self.upper_apply_rotation_btn.clicked.connect(self.upper_apply_motor_rotation)
         self.lower_apply_rotation_btn.clicked.connect(self.lower_apply_motor_rotation)
@@ -136,12 +136,6 @@ class MyApplication(QMainWindow):
         self.lower_override_rotation_file_btn.clicked.connect(self.lower_override_rotation_file)
         self.upper_override_finger_file_btn.clicked.connect(self.upper_override_finger_file)
         self.lower_override_finger_file_btn.clicked.connect(self.lower_override_finger_file)
-
-        #  Discard-File connections
-        self.upper_discard_all_rotation_btn.clicked.connect(self.upper_discard_all_rotation)
-        self.lower_discard_all_rotation_btn.clicked.connect(self.lower_discard_all_rotation)
-        self.upper_discard_all_finger_btn.clicked.connect(self.upper_discard_all_finger)
-        self.lower_discard_all_finger_btn.clicked.connect(self.lower_discard_all_finger)
 
         #  Load-File connections
         self.upper_load_rotation_btn.clicked.connect(self.upper_load_rotation)
@@ -293,7 +287,7 @@ class MyApplication(QMainWindow):
     def update_lower_pwm_label(self, value):
         self.lower_motor_pwm_label.setText(str(value))
 
-    def check_upper_motor(self):
+    def upper_check_motor_rotation(self):
         motor_number = self.upper_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
         pwm = self.upper_motor_pwm_scale.value()
         time = float(self.upper_time_input.toPlainText())
@@ -308,26 +302,26 @@ class MyApplication(QMainWindow):
         motor_byte = motor_byte_base + motor_byte_mode + self.upper_motors_finger_dict[f'{motor_number}']
 
         print(f'We about to check Upper Motor#{motor_number}, motor_byte: {motor_byte}')
-        # self.model.send_command('Upper', '00011110', motor_byte, pwm, time, 0)
-        # self.model.power_command('Upper', '00000001', '00000001')
+        self.model.send_command('Upper', '00011110', motor_byte, pwm, time, 0)
+        self.model.power_command('Upper', '00000001', '00000001')
 
-    def check_lower_motor(self):
+    def lower_check_motor_rotation(self):
         motor_number = self.lower_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
         pwm = self.lower_motor_pwm_scale.value()
         time = float(self.lower_time_input.toPlainText())
         reverse_flag = self.lower_reverse_motor_checkBox.isChecked()
 
         if reverse_flag:
-            motor_byte_mode = self.motors_settings_dict[f'_{motor_number}']
+            motor_byte_mode = self.lower_motors_rotation_dict[f'_{motor_number}']
         else:
-            motor_byte_mode = self.motors_settings_dict[f'{motor_number}']
+            motor_byte_mode = self.lower_motors_rotation_dict[f'{motor_number}']
 
         motor_byte_base = '000'
         motor_byte = motor_byte_base + motor_byte_mode + self.upper_motors_finger_dict[f'{motor_number}']
 
         print(f'We about to check Lower Motor#{motor_number}, motor_byte: {motor_byte}')
-        # self.model.send_command('Lower', '00011110', motor_byte, pwm, time, 0)
-        # self.model.power_command('Lower', '00000001', '00000001')
+        self.model.send_command('Lower', '00011110', motor_byte, pwm, time, 0)
+        self.model.power_command('Lower', '00000001', '00000001')
 
     def upper_apply_motor_rotation(self):
         motor_number = self.upper_motors_comboBox.currentIndex() + 1
@@ -335,7 +329,12 @@ class MyApplication(QMainWindow):
         warning_message = f'''Nothing to change: reverse flag - {reverse_flag}
 Upper motor #{motor_number} has default settings'''
         if reverse_flag:
-            self.manual_control.upper_change_motor_rotation(motor_number)
+            # self.manual_control.upper_change_motor_rotation(motor_number)
+            motor_key_str = str(motor_number)
+            temp = self.upper_motors_rotation_dict.get(motor_key_str)
+            self.upper_motors_rotation_dict[motor_key_str] = self.upper_motors_rotation_dict[f'_{motor_key_str}']
+            self.upper_motors_rotation_dict[f'_{motor_key_str}'] = temp
+            print(self.upper_motors_rotation_dict)
         else:
             QMessageBox.warning(self, 'Warning', warning_message)
 
@@ -345,21 +344,34 @@ Upper motor #{motor_number} has default settings'''
         warning_message = f'''Nothing to change: reverse flag - {reverse_flag}
 Lower motor #{motor_number} has default settings'''
         if reverse_flag:
-            self.manual_control.lower_change_motor_rotation(motor_number)
+            # self.manual_control.lower_change_motor_rotation(motor_number)
+            motor_key_str = str(motor_number)
+            temp = self.lower_motors_rotation_dict.get(motor_key_str)
+            self.lower_motors_rotation_dict[motor_key_str] = self.lower_motors_rotation_dict[f'_{motor_key_str}']
+            self.lower_motors_rotation_dict[f'_{motor_key_str}'] = temp
+            print(self.lower_motors_rotation_dict)
         else:
             QMessageBox.warning(self, 'Warning', warning_message)
 
     def upper_discard_all_rotation_settings(self):
-        pass
+        self.upper_motors_rotation_dict = self.upper_motors_rotation_dict_default
+        print("Roll back upper rotation dict to its default")
+        print(self.upper_motors_rotation_dict)
 
     def lower_discard_all_rotation_settings(self):
-        pass
+        self.lower_motors_rotation_dict = self.lower_motors_rotation_dict_default
+        print("Roll back lower rotation dict to its default")
+        print(self.lower_motors_rotation_dict)
 
     def upper_discard_all_finger_settings(self):
-        pass
+        self.upper_motors_finger_dict = self.upper_motors_finger_dict_default
+        print("Roll back upper finger dict to its default")
+        print(self.upper_motors_finger_dict)
 
     def lower_discard_all_finger_settings(self):
-        pass
+        self.lower_motors_finger_dict = self.lower_motors_finger_dict_default
+        print("Roll back lower finger dict to its default")
+        print(self.lower_motors_finger_dict)
 
     def upper_check_motor_finger(self):
         motor_number = self.upper_motors_finger_comboBox.currentIndex() + 1
@@ -367,11 +379,11 @@ Lower motor #{motor_number} has default settings'''
 
         print(f"Motor #{motor_number}, byte number: {motor_number_byte}")
         motor_byte_base = '000'
-        motor_byte = motor_byte_base + self.upper_motors_finger_dict[f'{motor_number}'] + motor_number_byte
+        motor_byte = motor_byte_base + self.upper_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
-        print(f'We about to check Lower Motor#{motor_number}, motor_byte: {motor_byte}')
-        # self.model.send_command('Upper', '00011110', motor_byte, 50, 0.5, 0)
-        # self.model.power_command('Upper', '00000001', '00000001')
+        print(f'We about to check Upper Motor #{motor_number}, motor_byte: {motor_byte}')
+        self.model.send_command('Upper', '00011110', motor_byte, 70, 1.0, 0)
+        self.model.power_command('Upper', '00000001', '00000001')
 
     def lower_check_motor_finger(self):
         motor_number = self.lower_motors_finger_comboBox.currentIndex() + 1
@@ -379,23 +391,41 @@ Lower motor #{motor_number} has default settings'''
 
         print(f"Motor #{motor_number}, byte number: {motor_number_byte}")
         motor_byte_base = '000'
-        motor_byte = motor_byte_base + self.upper_motors_finger_dict[f'{motor_number}'] + motor_number_byte
+        motor_byte = motor_byte_base + self.lower_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
-        print(f'We about to check Lower Motor#{motor_number}, motor_byte: {motor_byte}')
-        # self.model.send_command('Lower', '00011110', motor_byte, 50, 0.5, 0)
-        # self.model.power_command('Lower', '00000001', '00000001')
+        print(f'We about to check Lower Motor #{motor_number}, motor_byte: {motor_byte}')
+        self.model.send_command('Lower', '00011110', motor_byte, 70, 1.0, 0)
+        self.model.power_command('Lower', '00000001', '00000001')
 
     def upper_apply_motor_finger(self):
-        motor_number = self.upper_motors_finger_comboBox.currentIndex() + 1
+        motor_number = str(self.upper_motors_finger_comboBox.currentIndex() + 1)
         motor_byte_number = self.upper_motor_number_input.toPlainText()
-
         print(f'Motor #{motor_number}, finger num: {motor_byte_number}')
+
+        for key, value in self.upper_motors_finger_dict.items():
+            if value == motor_byte_number:
+                if key == motor_number:
+                    print(f'Nothing to change: Motor #{motor_number} is already {motor_byte_number}')
+                else:
+                    temp = self.upper_motors_finger_dict[motor_number]
+                    self.upper_motors_finger_dict[motor_number] = motor_byte_number
+                    self.upper_motors_finger_dict[key] = temp
+        print(self.upper_motors_finger_dict)
 
     def lower_apply_motor_finger(self):
-        motor_number = self.lower_motors_finger_comboBox.currentIndex() + 1
+        motor_number = str(self.lower_motors_finger_comboBox.currentIndex() + 1)
         motor_byte_number = self.lower_motor_number_input.toPlainText()
-
         print(f'Motor #{motor_number}, finger num: {motor_byte_number}')
+
+        for key, value in self.lower_motors_finger_dict.items():
+            if value == motor_byte_number:
+                if key == motor_number:
+                    print(f'Nothing to change: Motor #{motor_number} is already {motor_byte_number}')
+                else:
+                    temp = self.lower_motors_finger_dict[motor_number]
+                    self.lower_motors_finger_dict[motor_number] = motor_byte_number
+                    self.lower_motors_finger_dict[key] = temp
+        print(self.lower_motors_finger_dict)
 
     def upper_open_rotation_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File (Upper rotation)", "/", "Text Files (*.txt)")
@@ -446,22 +476,10 @@ Lower motor #{motor_number} has default settings'''
                 target_str = f'M{item[0]}: {item[1]}'
                 f.write(target_str + '\n')
 
-    def upper_discard_all_rotation(self):
-        pass
-
-    def lower_discard_all_rotation(self):
-        pass
-
-    def upper_discard_all_finger(self):
-        pass
-
-    def lower_discard_all_finger(self):
-        pass
-
     def upper_load_rotation(self):
-        if self.upper_settings_file_path is not None:
-            upper_settings_dict = dict()
-            with open(self.upper_settings_file_path, 'r') as f:
+        if self.upper_rotation_file_path is not None:
+            upper_rotation_dict = dict()
+            with open(self.upper_rotation_file_path, 'r') as f:
                 lines = f.readlines()
                 for line in lines:
                     motor_number_position = line.find("M") + 1
@@ -471,35 +489,64 @@ Lower motor #{motor_number} has default settings'''
                         motor_number_str = line[motor_number_position:motor_number_position + 2]
                     else:
                         motor_number_str = line[motor_number_position]
-                    upper_settings_dict[motor_number_str] = motor_rotation_str
-            print(upper_settings_dict)
+                    upper_rotation_dict[motor_number_str] = motor_rotation_str
+            self.manual_control.upper_set_rotation(upper_rotation_dict)
+            self.upper_motors_rotation_dict = upper_rotation_dict
         else:
-            print(f"File path is None")
+            QMessageBox.warning(self, 'Warning', "Upper rotation file path is empty")
 
     def lower_load_rotation(self):
-        if self.lower_settings_file_path is not None:
-            lower_settings_dict = dict()
-            with open(self.lower_settings_file_path, 'r') as f:
+        if self.lower_rotation_file_path is not None:
+            lower_rotation_dict = dict()
+            with open(self.lower_rotation_file_path, 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    motor_number_position = line.find("M") + 1
+                    motor_rotation_position = line.find(":") + 2
+                    motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
+                    if line[motor_number_position] == '_':
+                        motor_number_str = line[motor_number_position:motor_number_position + 2]
+                    else:
+                        motor_number_str = line[motor_number_position]
+                    lower_rotation_dict[motor_number_str] = motor_rotation_str
+            self.manual_control.lower_set_rotation(lower_rotation_dict)
+            self.lower_motors_rotation_dict = lower_rotation_dict
+        else:
+            QMessageBox.warning(self, 'Warning', "Lower rotation file path is empty")
+
+    def upper_load_finger(self):
+        if self.upper_finger_file_path is not None:
+            upper_finger_dict = dict()
+            with open(self.upper_finger_file_path, 'r') as f:
                 lines = f.readlines()
                 print(f'Number of lines: {len(lines)}')
                 for line in lines:
                     motor_number_position = line.find("M") + 1
-                    motor_rotation_position = line.find(":") + 2
-                    motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
-                    if line[motor_number_position] == '_':
-                        motor_number_str = line[motor_number_position:motor_number_position + 2]
-                    else:
-                        motor_number_str = line[motor_number_position]
-                    lower_settings_dict[motor_number_str] = motor_rotation_str
-            print(lower_settings_dict)
+                    motor_finger_position = line.find(":") + 2
+                    motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
+                    motor_number_str = line[motor_number_position]
+                    upper_finger_dict[motor_number_str] = motor_finger_str
+            self.manual_control.upper_set_finger(upper_finger_dict)
+            self.upper_motors_finger_dict = upper_finger_dict
         else:
-            print(f"File path is None")
-
-    def upper_load_finger(self):
-        pass
+            QMessageBox.warning(self, 'Warning', "Upper finger file path is empty")
 
     def lower_load_finger(self):
-        pass
+        if self.lower_finger_file_path is not None:
+            lower_finger_dict = dict()
+            with open(self.lower_finger_file_path, 'r') as f:
+                lines = f.readlines()
+                print(f'Number of lines: {len(lines)}')
+                for line in lines:
+                    motor_number_position = line.find("M") + 1
+                    motor_finger_position = line.find(":") + 2
+                    motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
+                    motor_number_str = line[motor_number_position]
+                    lower_finger_dict[motor_number_str] = motor_finger_str
+            self.manual_control.lower_set_finger(lower_finger_dict)
+            self.lower_motors_finger_dict = lower_finger_dict
+        else:
+            QMessageBox.warning(self, 'Warning', "Lower finger file path is empty")
 
 
 if __name__ == "__main__":
