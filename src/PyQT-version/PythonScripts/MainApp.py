@@ -157,6 +157,7 @@ class MyApplication(QMainWindow):
         self.actionMain_Window.setEnabled(False)  # Disable Main Window action when App starts
         # self.motor_settings_groupBox.setEnabled(False)  # Disable Motor Setting box
 
+        self.settings_from_file_init()
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
         self.elbow_and_shoulder = ElbowAndShoulder()
@@ -477,24 +478,25 @@ Lower motor #{motor_number} has default settings'''
                 f.write(target_str + '\n')
 
     def upper_load_rotation(self):
-        if self.upper_rotation_file_path is not None:
-            upper_rotation_dict = dict()
-            with open(self.upper_rotation_file_path, 'r') as f:
-                lines = f.readlines()
-                for line in lines:
-                    motor_number_position = line.find("M") + 1
-                    motor_rotation_position = line.find(":") + 2
-                    motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
-                    if line[motor_number_position] == '_':
-                        motor_number_str = line[motor_number_position:motor_number_position + 2]
-                    else:
-                        motor_number_str = line[motor_number_position]
-                    upper_rotation_dict[motor_number_str] = motor_rotation_str
-            self.manual_control.upper_set_rotation(upper_rotation_dict)
-            self.upper_motors_rotation_dict = upper_rotation_dict
-        else:
+        if self.upper_rotation_file_path is None:
             QMessageBox.warning(self, 'Warning', "Upper rotation file path is empty")
+            return None
+        upper_rotation_dict = dict()
+        with open(self.upper_rotation_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_rotation_position = line.find(":") + 2
+                motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
+                if line[motor_number_position] == '_':
+                    motor_number_str = line[motor_number_position:motor_number_position + 2]
+                else:
+                    motor_number_str = line[motor_number_position]
+                upper_rotation_dict[motor_number_str] = motor_rotation_str
+        self.manual_control.upper_set_rotation(upper_rotation_dict)
+        self.upper_motors_rotation_dict = upper_rotation_dict
 
+    #TODO Same with is not
     def lower_load_rotation(self):
         if self.lower_rotation_file_path is not None:
             lower_rotation_dict = dict()
@@ -547,6 +549,12 @@ Lower motor #{motor_number} has default settings'''
             self.lower_motors_finger_dict = lower_finger_dict
         else:
             QMessageBox.warning(self, 'Warning', "Lower finger file path is empty")
+
+    def settings_from_file_init(self):
+        text = "Some text"
+        self.settings_from_file_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.settings_from_file_label.setWordWrap(True)
+        self.settings_from_file_label.setText(text)
 
 
 if __name__ == "__main__":
