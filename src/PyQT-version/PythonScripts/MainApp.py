@@ -163,8 +163,12 @@ class MyApplication(QMainWindow):
         self.elbow_and_shoulder = ElbowAndShoulder()
         self.upper_collector = DataCollector(1)
         self.lower_collector = DataCollector(1)
+        self.upper_collector_both = DataCollector(1)
+        self.lower_collector_both = DataCollector(1)
         self.manual_control.set_upper_data_collector(self.upper_collector)
         self.manual_control.set_lower_data_collector(self.lower_collector)
+        self.manual_control.set_upper_collector_both(self.upper_collector_both)
+        self.manual_control.set_lower_collector_both(self.lower_collector_both)
 
         # Give copy of Model instance to other classes, so they can interact with comports through it
         model_copy = self.model
@@ -224,6 +228,7 @@ class MyApplication(QMainWindow):
             if self.upper_current_comport.is_open:
                 self.model.set_upper_comport(self.upper_current_comport)
                 self.upper_collector.set_comport(self.upper_current_comport)
+                self.upper_collector_both.set_comport(self.upper_current_comport)
                 self.update_upper_status_label(True)
             else:
                 print('Upper comport is not open')
@@ -236,6 +241,7 @@ class MyApplication(QMainWindow):
             if self.lower_current_comport.is_open:
                 self.model.set_lower_comport(self.lower_current_comport)
                 self.lower_collector.set_comport(self.lower_current_comport)
+                self.lower_collector_both.set_comport(self.lower_current_comport)
                 self.update_lower_status_label(True)
             else:
                 print('Lower comport is not open')
@@ -318,7 +324,7 @@ class MyApplication(QMainWindow):
             motor_byte_mode = self.lower_motors_rotation_dict[f'{motor_number}']
 
         motor_byte_base = '000'
-        motor_byte = motor_byte_base + motor_byte_mode + self.upper_motors_finger_dict[f'{motor_number}']
+        motor_byte = motor_byte_base + motor_byte_mode + self.lower_motors_finger_dict[f'{motor_number}']
 
         print(f'We about to check Lower Motor#{motor_number}, motor_byte: {motor_byte}')
         self.model.send_command('Lower', '00011110', motor_byte, pwm, time, 0)
@@ -429,25 +435,33 @@ Lower motor #{motor_number} has default settings'''
         print(self.lower_motors_finger_dict)
 
     def upper_open_rotation_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File (Upper rotation)", "/", "Text Files (*.txt)")
+        window_name = "Open File (Upper rotation)"
+        search_dir = "../../../Data/"
+        file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.upper_rotation_file_path_label.setText(file_path)
             self.upper_rotation_file_path = file_path
 
     def lower_open_rotation_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File (Lower rotation)", "/", "Text Files (*.txt)")
+        window_name = "Open File (Lower rotation)"
+        search_dir = "../../../Data/"
+        file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.lower_rotation_file_path_label.setText(file_path)
             self.lower_rotation_file_path = file_path
 
     def upper_open_finger_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File (Upper finger)", "/", "Text Files (*.txt)")
+        window_name = "Open File (Upper finger)"
+        search_dir = "../../../Data/"
+        file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.upper_finger_file_path_label.setText(file_path)
             self.upper_finger_file_path = file_path
 
     def lower_open_finger_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open File (Lower finger)", "/", "Text Files (*.txt)")
+        window_name = "Open File (Lower finger)"
+        search_dir = "../../../Data/"
+        file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.lower_finger_file_path_label.setText(file_path)
             self.lower_finger_file_path = file_path
@@ -496,59 +510,58 @@ Lower motor #{motor_number} has default settings'''
         self.manual_control.upper_set_rotation(upper_rotation_dict)
         self.upper_motors_rotation_dict = upper_rotation_dict
 
-    #TODO Same with is not
     def lower_load_rotation(self):
-        if self.lower_rotation_file_path is not None:
-            lower_rotation_dict = dict()
-            with open(self.lower_rotation_file_path, 'r') as f:
-                lines = f.readlines()
-                for line in lines:
-                    motor_number_position = line.find("M") + 1
-                    motor_rotation_position = line.find(":") + 2
-                    motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
-                    if line[motor_number_position] == '_':
-                        motor_number_str = line[motor_number_position:motor_number_position + 2]
-                    else:
-                        motor_number_str = line[motor_number_position]
-                    lower_rotation_dict[motor_number_str] = motor_rotation_str
-            self.manual_control.lower_set_rotation(lower_rotation_dict)
-            self.lower_motors_rotation_dict = lower_rotation_dict
-        else:
+        if self.lower_rotation_file_path is None:
             QMessageBox.warning(self, 'Warning', "Lower rotation file path is empty")
+            return None
+        lower_rotation_dict = dict()
+        with open(self.lower_rotation_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_rotation_position = line.find(":") + 2
+                motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
+                if line[motor_number_position] == '_':
+                    motor_number_str = line[motor_number_position:motor_number_position + 2]
+                else:
+                    motor_number_str = line[motor_number_position]
+                lower_rotation_dict[motor_number_str] = motor_rotation_str
+        self.manual_control.lower_set_rotation(lower_rotation_dict)
+        self.lower_motors_rotation_dict = lower_rotation_dict
 
     def upper_load_finger(self):
-        if self.upper_finger_file_path is not None:
-            upper_finger_dict = dict()
-            with open(self.upper_finger_file_path, 'r') as f:
-                lines = f.readlines()
-                print(f'Number of lines: {len(lines)}')
-                for line in lines:
-                    motor_number_position = line.find("M") + 1
-                    motor_finger_position = line.find(":") + 2
-                    motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
-                    motor_number_str = line[motor_number_position]
-                    upper_finger_dict[motor_number_str] = motor_finger_str
-            self.manual_control.upper_set_finger(upper_finger_dict)
-            self.upper_motors_finger_dict = upper_finger_dict
-        else:
+        if self.upper_finger_file_path is None:
             QMessageBox.warning(self, 'Warning', "Upper finger file path is empty")
+            return None
+        upper_finger_dict = dict()
+        with open(self.upper_finger_file_path, 'r') as f:
+            lines = f.readlines()
+            print(f'Number of lines: {len(lines)}')
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_finger_position = line.find(":") + 2
+                motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
+                motor_number_str = line[motor_number_position]
+                upper_finger_dict[motor_number_str] = motor_finger_str
+        self.manual_control.upper_set_finger(upper_finger_dict)
+        self.upper_motors_finger_dict = upper_finger_dict
 
     def lower_load_finger(self):
-        if self.lower_finger_file_path is not None:
-            lower_finger_dict = dict()
-            with open(self.lower_finger_file_path, 'r') as f:
-                lines = f.readlines()
-                print(f'Number of lines: {len(lines)}')
-                for line in lines:
-                    motor_number_position = line.find("M") + 1
-                    motor_finger_position = line.find(":") + 2
-                    motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
-                    motor_number_str = line[motor_number_position]
-                    lower_finger_dict[motor_number_str] = motor_finger_str
-            self.manual_control.lower_set_finger(lower_finger_dict)
-            self.lower_motors_finger_dict = lower_finger_dict
-        else:
+        if self.lower_finger_file_path is None:
             QMessageBox.warning(self, 'Warning', "Lower finger file path is empty")
+            return None
+        lower_finger_dict = dict()
+        with open(self.lower_finger_file_path, 'r') as f:
+            lines = f.readlines()
+            print(f'Number of lines: {len(lines)}')
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_finger_position = line.find(":") + 2
+                motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
+                motor_number_str = line[motor_number_position]
+                lower_finger_dict[motor_number_str] = motor_finger_str
+        self.manual_control.lower_set_finger(lower_finger_dict)
+        self.lower_motors_finger_dict = lower_finger_dict
 
     def settings_from_file_init(self):
         text = "Some text"

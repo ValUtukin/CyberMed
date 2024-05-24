@@ -6,12 +6,14 @@ import time
 class DataCollector(QObject):
     finished = pyqtSignal()  # It doesn't work inside __init__ func. So it's placed outside (don't know why)
     segment_received = pyqtSignal()
+    both_segment_received = pyqtSignal()
 
     def __init__(self, set_num, args=None, comport=None):
         super().__init__()
         self.data_set_holder = dict()
         self.holder_state = [False] * 5
         self.initial_delay = None
+        self.initial_delay_both = None
         if not args:
             self.initial_byte_count = None
         else:
@@ -56,6 +58,12 @@ class DataCollector(QObject):
 
     def get_delay_for_collecting(self):
         return self.initial_delay
+
+    def set_delay_for_collecting_both(self, delay):
+        self.initial_delay_both = delay
+
+    def get_delay_for_collecting_together(self):
+        return self.initial_delay_both
 
     def set_byte_count(self, byte_count):
         self.initial_byte_count = byte_count
@@ -105,6 +113,27 @@ class DataCollector(QObject):
                 self.segment_received.emit()
                 print("DataCollector/start_collecting - start sleeping...")
                 time.sleep(0.1)
+            print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
+            com.close_comport(self.comport)
+        self.finished.emit()
+
+    def start_collecting_both(self):
+        print("DataCollector/start_collecting_both - start collecting...")
+        time.sleep(self.initial_delay_both)
+        if self.holder_len:
+            for i in range(0, self.initial_byte_count, 25):
+                data = self.comport.read(25)
+                if len(data) == 0:
+                    self.add_value_to_set('0', 0)
+                else:
+                    for j in range(0, len(data)):
+                        print(f"{j + 1}) {data[j]}, type {type(data[j])}")
+                        new_data = data[j] * 3.3 / 4096
+                        set_name = str(j % len(self.data_set_holder))
+                        self.add_value_to_set(set_name, new_data)
+                self.both_segment_received.emit()
+                print("DataCollector/start_collecting_both - start sleeping...")
+                # time.sleep(0.1)
             print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
             com.close_comport(self.comport)
         self.finished.emit()
