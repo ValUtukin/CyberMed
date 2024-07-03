@@ -1,7 +1,7 @@
 import comport as com
 
 
-def time_limited_motion(comport, config, motor_byte, pwm, limited_time, delay):
+def time_limited_motion(comport, config, motor_byte, pwm=0, limited_time=0, delay=0):
     time_int = int(limited_time / 0.1)
     delay_int = int(delay / 0.1)
     print(f'Model/time_limited_motion - we send: (conf={config}, motor={motor_byte}, {pwm}, {time_int}, {delay_int})')
@@ -51,7 +51,7 @@ class Model:
     def clear_lower_command_list(self):
         self.lower_commands_list.clear()
 
-    def send_command(self, part, config, motor_byte, pwm, limited_time, delay):
+    def send_command(self, part, config, motor_byte, pwm=0, limited_time=0, delay=0):
         if part == 'Upper':
             byte_command = time_limited_motion(self.upper_comport, config, motor_byte, pwm, limited_time, delay)
             self.add_command_to_upper_list(byte_command)
@@ -86,10 +86,13 @@ class Model:
         else:
             print(f'Model/send_command_bytes - unknown part: {part}')
 
+    # Close and Open COMPORTS after collector thread finish. Like COMPORT ReFresh
     def release_upper_comport_after_thread(self):
+        com.close_comport(self.upper_comport)
         com.open_comport(self.upper_comport)
 
     def release_lower_comport_after_thread(self):
+        com.close_comport(self.lower_comport)
         com.open_comport(self.lower_comport)
 
 

@@ -1,8 +1,10 @@
 import sys
 import ManualControlUi
+import math
 from Model import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from FileWriter import FileWriter
 
 
 def switch_button_color(button, color='#19e676'):
@@ -24,13 +26,32 @@ def configure_relatives_buttons(group_buttons, pressed_button):
 
 
 def get_upper_opposite_pwm(low_pwm):
-    opposite_coefficient = 2/3
+    opposite_coefficient = 0.3
     return int(low_pwm * opposite_coefficient)
 
 
 def get_lower_opposite_pwm(up_pwm):
-    opposite_coefficient = 2/3
+    opposite_coefficient = 0.3
     return int(up_pwm * opposite_coefficient)
+
+
+def opposite_pwm_from_adc(adc_data):
+    last_value = adc_data['0'][-1]
+    print(last_value)
+
+    x0 = 0.08  # Min current (I) in idle mode
+    x1 = 7.3  # Max current (I) in idle mode  (0.58) # Roman: 0.23
+    y0 = 100  # Max PWM in idle mode
+    y1 = 20  # Min PWM in idle mode
+
+    x = last_value / (0.15 * 3)  # x for opposite pwm law y = f(x) # Roman: 93
+    y = (((y1 - y0) * (x - x0)) / (x1 - x0)) + y0
+    print(f"Opposite pwm based on ADC: {int(y)}")
+    if y <= 100:
+        return int(y * 0.3)
+    else:
+        print(f"Opposite pwm greater than 100: {y}. Return 100")
+        return 30
 
 
 class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
@@ -38,6 +59,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.model = None
+        self.file_writer = None
 
         self.upper_adc_waiting_flag = False
         self.lower_adc_waiting_flag = False
@@ -142,7 +164,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_motor5_pwm_scale.valueChanged.connect(self.update_lower_label_5)
         self.lower_motor5_buttons = [self.lower_motor5_left_btn, self.lower_motor5_right_btn,
                                      self.lower_motor5_stop_btn]
-        self.update_counter = 0
+
+        self.test_btn.clicked.connect(self.test_func)
 
         #  Use only separate of MainApp.py
         self.upper_default_motors_settings = {
@@ -180,6 +203,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_rotation_dict = dict()
         self.upper_finger_dict = dict()
         self.lower_finger_dict = dict()
+
+    #  Function for testing purposes. Connected to test_btn of ManualControlUI.py
+    def test_func(self):
+        pass
 
     def upper_set_rotation(self, rotation_dict):
         print("ManualControl/upper_set_rotation - get a rotation dict:")
@@ -220,14 +247,17 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
     def set_model(self, model: Model):
         self.model = model
 
+    def set_file_writer(self, writer: FileWriter):
+        self.file_writer = writer
+
     # TODO: Need to test new ADC-thread functions for upper/lower part
     def set_upper_data_collector(self, collector):
         self.upper_data_collector = collector
-        self.__connect_upper_collector()
+        self.__connect_upper_collector_single()
 
     def set_lower_data_collector(self, collector):
         self.lower_data_collector = collector
-        self.__connect_lower_collector()
+        self.__connect_lower_collector_single()
 
     def set_upper_collector_both(self, collector):
         self.upper_data_collector_both = collector
@@ -237,40 +267,42 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_data_collector_both = collector
         self.__connect_lower_collector_both()
 
-    def __connect_upper_collector(self):
+    def __connect_upper_collector_single(self):
         self.upper_data_collector_thread = QtCore.QThread()
         self.upper_data_collector.moveToThread(self.upper_data_collector_thread)
         self.upper_data_collector_thread.started.connect(self.upper_data_collector.start_collecting)
-        self.upper_data_collector.segment_received.connect(self.update_plot)
-        self.upper_data_collector.finished.connect(self.finish_upper_collector_thread)
+        self.upper_data_collector.segment_received.connect(self.upper_update_plot_single)
+        self.upper_data_collector.finished.connect(self.finish_upper_single_thread)
 
-    def __connect_lower_collector(self):
+    def __connect_lower_collector_single(self):
         self.lower_data_collector_thread = QtCore.QThread()
         self.lower_data_collector.moveToThread(self.lower_data_collector_thread)
         self.lower_data_collector_thread.started.connect(self.lower_data_collector.start_collecting)
-        self.lower_data_collector.segment_received.connect(self.update_plot)
-        self.lower_data_collector.finished.connect(self.finish_lower_collector_thread)
+        self.lower_data_collector.segment_received.connect(self.lower_update_plot_single)
+        self.lower_data_collector.finished.connect(self.finish_lower_single_thread)
 
     def __connect_upper_collector_both(self):
         self.upper_data_collect_both_thread = QtCore.QThread()
         self.upper_data_collector_both.moveToThread(self.upper_data_collect_both_thread)
-        self.upper_data_collect_both_thread.started.connect(self.upper_data_collector_both.start_collecting_both)
-        self.upper_data_collector_both.both_segment_received.connect(self.update_plot_upper)
-        self.upper_data_collector_both.finished.connect(self.finish_upper_both_thread)
+        self.upper_data_collect_both_thread.started.connect(self.upper_data_collector_both.upper_thread_test)
+        self.upper_data_collector_both.upper_segment_received_both.connect(self.upper_update_plot_both)
+        self.upper_data_collector_both.upper_both_finished.connect(self.finish_upper_both_thread)
 
     def __connect_lower_collector_both(self):
         self.lower_data_collect_both_thread = QtCore.QThread()
         self.lower_data_collector_both.moveToThread(self.lower_data_collect_both_thread)
-        self.lower_data_collect_both_thread.started.connect(self.lower_data_collector_both.start_collecting_both)
-        self.lower_data_collector_both.both_segment_received.connect(self.update_plot_lower)
-        self.lower_data_collector_both.finished.connect(self.finish_lower_both_thread)
+        self.lower_data_collect_both_thread.started.connect(self.lower_data_collector_both.lower_thread_test)
+        self.lower_data_collector_both.lower_segment_received_both.connect(self.lower_update_plot_both)
+        self.lower_data_collector_both.lower_both_finished.connect(self.finish_lower_both_thread)
 
-    def finish_upper_collector_thread(self):
+    def finish_upper_single_thread(self):
         self.upper_data_collector_thread.quit()
         self.model.release_upper_comport_after_thread()
         self.upper_adc_waiting_flag = False
 
-    def finish_lower_collector_thread(self):
+    def finish_lower_single_thread(self):
+        sets, _ = self.lower_data_collector.get_data_sets()
+        self.file_writer.write_data(sets)
         self.lower_data_collector_thread.quit()
         self.model.release_lower_comport_after_thread()
         self.lower_adc_waiting_flag = False
@@ -287,35 +319,23 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_adc_waiting_flag = False
         print("ManualControl/finish_lower_both_thread - finish thread")
 
-    def update_plot(self):
-        print(f'ManualControl/update_plot')
-        sets, dict_len = self.lower_data_collector.get_data_sets()
+    def upper_update_plot_single(self):
+        print(f'ManualControl/upper_update_plot_single')
+        sets, dict_len = self.upper_data_collector.get_data_sets()
+
+        opposite_pwm = opposite_pwm_from_adc(sets)
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('_3')
+        motor_number_byte = self.lower_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
+        self.model.send_command('Lower', '00001110', motor_byte, opposite_pwm)
+        self.model.power_command('Lower', config='00000001', power_byte='00000001')
+
         data_sets = list()
         x_sets = list()
         plot_names = list()
         for key in sets.keys():
-            plot_names.append(int(key))
-            data_sets.append(sets[key])
-            x_sets.append([i for i in range(0, len(sets[key]))])
-        for i in range(len(plot_names)):
-            plot_item = self.graphics_layout_widget.getItem(plot_names[i], 0)
-            plot_item.plot(x_sets[i], data_sets[i], pen='r')
-            plot_item.showGrid(x=True, y=True, alpha=1.0)
-
-    def set_plot(self, indexes):
-        self.graphics_layout_widget.clear()
-        for i in range(len(indexes)):
-            print(f'{i + 1}) {indexes[i]}')
-            self.graphics_layout_widget.addPlot(row=i, col=0, title=f"Motor #{indexes[i] + 1}")
-
-    def update_plot_upper(self):
-        print("ManualControl/update_plot_upper - updating upper")
-        sets, dict_len = self.upper_data_collector_both.get_data_sets()
-        data_sets = list()
-        x_sets = list()
-        plot_names = list()
-        for key in sets.keys():
-            plot_names.append(int(key))
+            plot_names.append(int(key[-1]) - 1)
             data_sets.append(sets[key])
             x_sets.append([i for i in range(0, len(sets[key]))])
         for i in range(len(plot_names)):
@@ -323,14 +343,76 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             plot_item.plot(x_sets[i], data_sets[i], pen='r')
             plot_item.showGrid(x=True, y=True, alpha=1.0)
 
-    def update_plot_lower(self):
-        print("ManualControl/update_plot_lower - updating lower")
-        sets, dict_len = self.lower_data_collector_both.get_data_sets()
+    def lower_update_plot_single(self):
+        print(f'ManualControl/update_plot')
+        sets, dict_len = self.lower_data_collector.get_data_sets()
+
+        opposite_pwm = opposite_pwm_from_adc(sets)
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('_3')
+        motor_number_byte = self.upper_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
+        self.model.send_command('Upper', '00000110', motor_byte, opposite_pwm)
+        self.model.power_command('Upper', config='00000001', power_byte='00000001')
+
         data_sets = list()
         x_sets = list()
         plot_names = list()
         for key in sets.keys():
-            plot_names.append(int(key))
+            plot_names.append(int(key[-1]) - 1)
+            data_sets.append(sets[key])
+            x_sets.append([i for i in range(0, len(sets[key]))])
+        for i in range(len(plot_names)):
+            plot_item = self.graphics_layout_widget.getItem(0, 0)
+            plot_item.plot(x_sets[i], data_sets[i], pen='r')
+            plot_item.showGrid(x=True, y=True, alpha=1.0)
+
+    def set_plot(self, indexes):
+        self.graphics_layout_widget.clear()
+        for i in range(len(indexes)):
+            self.graphics_layout_widget.addPlot(row=i, col=0, title=f"Motor #{indexes[i] + 1}")
+
+    def upper_update_plot_both(self):
+        print("ManualControl/update_plot_upper - updating upper")
+        sets, dict_len = self.upper_data_collector_both.get_data_sets()
+
+        opposite_pwm = opposite_pwm_from_adc(sets)
+        motor_byte_base = '000'
+        motor_rotation_byte = self.lower_rotation_dict.get('_3')
+        motor_number_byte = self.lower_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
+        self.model.send_command('Lower', '00001110', motor_byte, opposite_pwm)
+        self.model.power_command('Lower', config='00000001', power_byte='00000001')
+
+        data_sets = list()
+        x_sets = list()
+        plot_names = list()
+        for key in sets.keys():
+            plot_names.append(int(key[-1]) - 1)
+            data_sets.append(sets[key])
+            x_sets.append([i for i in range(0, len(sets[key]))])
+        for i in range(len(plot_names)):
+            plot_item = self.graphics_layout_widget.getItem(0, 0)
+            plot_item.plot(x_sets[i], data_sets[i], pen='r')
+            plot_item.showGrid(x=True, y=True, alpha=1.0)
+
+    def lower_update_plot_both(self):
+        print("ManualControl/update_plot_lower - updating lower")
+        sets, dict_len = self.lower_data_collector_both.get_data_sets()
+
+        opposite_pwm = opposite_pwm_from_adc(sets)
+        motor_byte_base = '000'
+        motor_rotation_byte = self.upper_rotation_dict.get('_3')
+        motor_number_byte = self.upper_finger_dict.get('3')
+        motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
+        self.model.send_command('Upper', '00001110', motor_byte, opposite_pwm)
+        self.model.power_command('Upper', config='00000001', power_byte='00000001')
+
+        data_sets = list()
+        x_sets = list()
+        plot_names = list()
+        for key in sets.keys():
+            plot_names.append(int(key[-1]) - 1)
             data_sets.append(sets[key])
             x_sets.append([i for i in range(0, len(sets[key]))])
         for i in range(len(plot_names)):
@@ -437,7 +519,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.model.power_command('Upper', config='00000001', power_byte='00000001')
         self.model.power_command('Lower', config='00000001', power_byte='00000001')
 
-        #  For now use only with ONE similar ADC. No more than ONE, from both sides
+    #  For now use only with ONE similar ADC. No more than ONE, from both sides
     def both_adc_together(self, upper_adc_state, lower_adc_state):
         print("ManualControl/both_adc_together - start both_adc_together")
         adc_number = 0
@@ -459,7 +541,6 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             upper_time, upper_delay = self.get_upper_time_delay(match_index)
             lower_time, lower_delay = self.get_lower_time_delay(match_index)
             if upper_time == lower_time and upper_delay == lower_delay:
-                print("Delay and Time are the same")
                 byte_count = int(upper_time * 50)
 
                 self.upper_data_collector_both.set_byte_count(byte_count)
@@ -470,7 +551,26 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
                 self.lower_data_collector_both.set_delay_for_collecting_both(lower_delay)
                 self.lower_adc_waiting_flag = True
             else:
-                print(f'Bad time or delay: U_t: {upper_time}, U_d: {upper_delay}, L_t: {lower_time}, L_d: {lower_delay}')
+                print(f'Bad time or delay: U_t:{upper_time}, U_d:{upper_delay}, L_t:{lower_time}, L_d:{lower_delay}')
+
+    def get_upper_pwm(self, motor_index):
+        if motor_index == 1:
+            pwm_1 = self.upper_motor1_pwm_scale.value()
+            return pwm_1
+        elif motor_index == 2:
+            pwm_2 = self.upper_motor2_pwm_scale.value()
+            return pwm_2
+        elif motor_index == 3:
+            pwm_3 = self.upper_motor3_pwm_scale.value()
+            return pwm_3
+        elif motor_index == 4:
+            pwm_4 = self.upper_motor4_pwm_scale.value()
+            return pwm_4
+        elif motor_index == 5:
+            pwm_5 = self.upper_motor5_pwm_scale.value()
+            return pwm_5
+        else:
+            print(f'ManualControl/get_upper_pwm - incorrect motor_index: {motor_index}')
 
     def get_upper_time_delay(self, motor_num):
         time = 0.0
@@ -521,7 +621,6 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             print("ManualControl/upper_collect_adc - go to both_adc_together")
             self.both_adc_together(upper_adc_state, lower_adc_state)
             return None
-        print("ManualControl/upper_collect_adc - after both_adc_together")
 
         adc_number = 0
         adc_decimal = 0
@@ -535,7 +634,6 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         if adc_number != 0:
             self.model.upper_send_adc(adc_decimal)
             self.upper_data_collector.set_holder_state(upper_adc_state)
-            print(self.upper_data_collector.get_data_sets())
             self.set_plot(motor_indexes)
             max_time = 0.0
             min_delay = 10.0  # Just magic number. Because 10 obviously greater than any possible delay
@@ -545,7 +643,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
                     max_time = time_to_work
                 if delay_before_work < min_delay:
                     min_delay = delay_before_work
-            byte_count = int(max_time * 50)
+            byte_count = int(max_time * 100)
             self.upper_data_collector.set_byte_count(byte_count)
             self.upper_data_collector.set_delay_for_collecting(min_delay)
             self.upper_adc_waiting_flag = True
@@ -827,6 +925,25 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.model.power_command('Lower', config='00000001', power_byte='00000001')
         self.model.power_command('Upper', config='00000001', power_byte='00000001')
 
+    def get_lower_pwm(self, motor_index):
+        if motor_index == 0:
+            pwm_1 = self.lower_motor1_pwm_scale.value()
+            return pwm_1
+        elif motor_index == 1:
+            pwm_2 = self.lower_motor2_pwm_scale.value()
+            return pwm_2
+        elif motor_index == 2:
+            pwm_3 = self.lower_motor3_pwm_scale.value()
+            return pwm_3
+        elif motor_index == 3:
+            pwm_4 = self.lower_motor4_pwm_scale.value()
+            return pwm_4
+        elif motor_index == 4:
+            pwm_5 = self.lower_motor5_pwm_scale.value()
+            return pwm_5
+        else:
+            print(f'ManualControl/get_upper_pwm - incorrect motor_index: {motor_index}')
+
     def get_lower_time_delay(self, motor_num):
         time = 0.0
         delay = 0.0
@@ -876,7 +993,6 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
             print("ManualControl/lower_collect_adc - go to both_adc_together")
             self.both_adc_together(upper_adc_state, lower_adc_state)
             return None
-        print("ManualControl/lower_collect_adc - after both_adc_together")
 
         adc_number = 0
         adc_decimal = 0
@@ -890,17 +1006,18 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         if adc_number != 0:
             self.model.lower_send_adc(adc_decimal)
             self.lower_data_collector.set_holder_state(lower_adc_state)
-            print(self.lower_data_collector.get_data_sets())
             self.set_plot(motor_indexes)
             max_time = 0.0
             min_delay = 10.0  # Just magic number. Because 10 obviously greater than any possible delay
             for i in range(len(motor_indexes)):
                 time_to_work, delay_before_work = self.get_lower_time_delay(motor_indexes[i])
+                pwm = self.get_lower_pwm(motor_indexes[i])
                 if time_to_work > max_time:
                     max_time = time_to_work
                 if delay_before_work < min_delay:
                     min_delay = delay_before_work
-            byte_count = int(max_time * 50)
+                self.file_writer.prepare_file_name("Lower", motor_indexes[i] + 1, pwm, max_time, min_delay)
+            byte_count = int(max_time * 100)
             self.lower_data_collector.set_byte_count(byte_count)
             self.lower_data_collector.set_delay_for_collecting(min_delay)
             self.lower_adc_waiting_flag = True

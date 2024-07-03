@@ -445,6 +445,9 @@ class Ui_MainWindow(object):
         self.open_script_file_btn = QtWidgets.QPushButton(self.centralwidget)
         self.open_script_file_btn.setGeometry(QtCore.QRect(10, 750, 75, 31))
         self.open_script_file_btn.setObjectName("open_script_file_btn")
+        self.test_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.test_btn.setGeometry(QtCore.QRect(740, 750, 75, 31))
+        self.test_btn.setObjectName("test_btn")
         MainWindow.setCentralWidget(self.centralwidget)
 
         # Lower part default time/delay values
@@ -569,3 +572,5 @@ class Ui_MainWindow(object):
         self.move_script_label.setText(_translate("MainWindow", "Text"))
         self.script_file_path_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Path to file here</span></p></body></html>"))
         self.open_script_file_btn.setText(_translate("MainWindow", "Open..."))
+        self.test_btn.setText(_translate("MainWindow", "Test Button"))
+from pyqtgraph import PlotWidget

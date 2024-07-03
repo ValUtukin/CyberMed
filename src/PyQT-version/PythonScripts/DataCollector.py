@@ -6,14 +6,22 @@ import time
 class DataCollector(QObject):
     finished = pyqtSignal()  # It doesn't work inside __init__ func. So it's placed outside (don't know why)
     segment_received = pyqtSignal()
-    both_segment_received = pyqtSignal()
+    upper_segment_received_both = pyqtSignal()
+    lower_segment_received_both = pyqtSignal()
+    upper_both_finished = pyqtSignal()
+    lower_both_finished = pyqtSignal()
 
-    def __init__(self, set_num, args=None, comport=None):
+    def __init__(self, set_num, args=None):
         super().__init__()
         self.data_set_holder = dict()
         self.holder_state = [False] * 5
         self.initial_delay = None
         self.initial_delay_both = None
+
+        self.default_comport = None
+        self.upper_comport_both = None
+        self.lower_comport_both = None
+
         if not args:
             self.initial_byte_count = None
         else:
@@ -29,16 +37,24 @@ class DataCollector(QObject):
         else:
             print(f'DataCollector/__init__ - got 0 as parameter. Current holder_len is {len(self.data_set_holder)}')
             self.holder_len = 0
-        if not comport:  # Comport is None
-            self.comport = None
-        else:
-            self.comport = comport
 
-    def set_comport(self, serial_inst):
-        self.comport = serial_inst
+    def set_upper_comport_both(self, serial_inst):
+        self.upper_comport_both = serial_inst
 
-    def get_comport(self):
-        return self.comport
+    def get_upper_comport_both(self):
+        return self.upper_comport_both
+
+    def set_lower_comport_both(self, serial_inst):
+        self.lower_comport_both = serial_inst
+
+    def get_lower_comport_both(self):
+        return self.lower_comport_both
+
+    def set_default_comport(self, serial_inst):
+        self.default_comport = serial_inst
+
+    def get_default_comport(self):
+        return self.default_comport
 
     def set_holder_state(self, state_arr):
         self.delete_all_sets()
@@ -66,6 +82,7 @@ class DataCollector(QObject):
         return self.initial_delay_both
 
     def set_byte_count(self, byte_count):
+        print(f"DataCollector/set_byte_count - byte count: {byte_count}")
         self.initial_byte_count = byte_count
 
     def get_byte_count(self):
@@ -98,31 +115,36 @@ class DataCollector(QObject):
         self.data_set_holder.clear()
 
     def start_collecting(self):
+        packet_counter = 0
         time.sleep(self.initial_delay)
+        print(self.default_comport.name)
         if self.holder_len:
-            for i in range(0, self.initial_byte_count, 25):
-                data = self.comport.read(25)
+            for i in range(0, self.initial_byte_count, 20):
+                data = self.default_comport.read(20)
+                packet_counter += 1
+                print(f"Packet #{packet_counter}, len: {len(data)}")
                 if len(data) == 0:
-                    self.add_value_to_set('0', 0)
+                    print("Packet len is 0")
+                    # self.add_value_to_set('0', 0)
                 else:
-                    for j in range(0, len(data)):
-                        print(f"{j + 1}) {data[j]}, type {type(data[j])}")
-                        new_data = data[j] * 3.3 / 4096
+                    for j in range(1, len(data), 2):
+                        print(f"data[{j-1}] = {data[j-1]}, data[{j}] = {data[j]}")
+                        new_data = (data[j - 1] + data[j] * 256) * 3.3 / 4096
+                        print(f"{j + 1}) {new_data}, type {type(new_data)}")
                         set_name = str(j % len(self.data_set_holder))
                         self.add_value_to_set(set_name, new_data)
                 self.segment_received.emit()
-                print("DataCollector/start_collecting - start sleeping...")
-                time.sleep(0.1)
+                time.sleep(0.01)
             print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
-            com.close_comport(self.comport)
+            com.close_comport(self.default_comport)
         self.finished.emit()
 
-    def start_collecting_both(self):
-        print("DataCollector/start_collecting_both - start collecting...")
+    def upper_start_collecting_both(self):
+        print("DataCollector/upper_start_collecting_both - start collecting...")
         time.sleep(self.initial_delay_both)
         if self.holder_len:
-            for i in range(0, self.initial_byte_count, 25):
-                data = self.comport.read(25)
+            for i in range(0, self.initial_byte_count, 40):
+                data = self.upper_comport_both.read(40)
                 if len(data) == 0:
                     self.add_value_to_set('0', 0)
                 else:
@@ -130,13 +152,80 @@ class DataCollector(QObject):
                         print(f"{j + 1}) {data[j]}, type {type(data[j])}")
                         new_data = data[j] * 3.3 / 4096
                         set_name = str(j % len(self.data_set_holder))
+                        self.add_value_to_set(set_name, new_data)  # self.add_value_to_set(set_name, new_data)
+                self.upper_segment_received_both.emit()
+                time.sleep(0.01)
+            print(f'DataCollector/collect_both - Just finished receiving data. Num of bytes {self.initial_byte_count}')
+            com.close_comport(self.upper_comport_both)
+        self.upper_both_finished.emit()
+
+    def lower_start_collecting_both(self):
+        print("DataCollector/start_collecting_both - start collecting...")
+        time.sleep(self.initial_delay_both)
+        if self.holder_len:
+            for i in range(0, self.initial_byte_count, 40):
+                data = self.lower_comport_both.read(40)
+                if len(data) == 0:
+                    self.add_value_to_set('0', 0)
+                else:
+                    for j in range(0, len(data)):
+                        print(f"{j + 1}) {data[j]}, type {type(data[j])}")
+                        new_data = data[j] * 3.3 / 4096
+                        set_name = str(j % len(self.data_set_holder))
+                        self.add_value_to_set(set_name, new_data)  # self.add_value_to_set(set_name, new_data)
+                self.lower_segment_received_both.emit()
+                time.sleep(0.01)
+            print(f'DataCollector/collect_both - Just finished receiving data. Num of bytes {self.initial_byte_count}')
+            com.close_comport(self.lower_comport_both)
+        self.lower_both_finished.emit()
+
+    def upper_thread_test(self):
+        packet_counter = 0
+        time.sleep(self.initial_delay_both)
+        if self.holder_len:
+            for i in range(0, self.initial_byte_count, 20):
+                data = self.upper_comport_both.read(20)
+                packet_counter += 1
+                print(f"Packet #{packet_counter}, len: {len(data)}")
+                if len(data) == 0:
+                    print("Packet len is 0")
+                    # self.add_value_to_set('0', 0)
+                else:
+                    for j in range(1, len(data), 2):
+                        print(f"data[{j - 1}] = {data[j - 1]}, data[{j}] = {data[j]}")
+                        new_data = (data[j - 1] + data[j] * 256) * 3.3 / 4096
+                        print(f"{j + 1}) {new_data}, type {type(new_data)}")
+                        set_name = str(j % len(self.data_set_holder))
                         self.add_value_to_set(set_name, new_data)
-                self.both_segment_received.emit()
-                print("DataCollector/start_collecting_both - start sleeping...")
-                # time.sleep(0.1)
+                self.upper_segment_received_both.emit()
+                time.sleep(0.01)
             print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
-            com.close_comport(self.comport)
-        self.finished.emit()
+            # com.close_comport(self.upper_comport_both)
+        self.upper_both_finished.emit()
+
+    def lower_thread_test(self):
+        packet_counter = 0
+        time.sleep(self.initial_delay_both)
+        if self.holder_len:
+            for i in range(0, self.initial_byte_count, 20):
+                data = self.lower_comport_both.read(20)
+                packet_counter += 1
+                print(f"Packet #{packet_counter}, len: {len(data)}")
+                if len(data) == 0:
+                    print("Packet len is 0")
+                    # self.add_value_to_set('0', 0)
+                else:
+                    for j in range(1, len(data), 2):
+                        print(f"data[{j - 1}] = {data[j - 1]}, data[{j}] = {data[j]}")
+                        new_data = (data[j - 1] + data[j] * 256) * 3.3 / 4096
+                        print(f"{j + 1}) {new_data}, type {type(new_data)}")
+                        set_name = str(j % len(self.data_set_holder))
+                        self.add_value_to_set(set_name, new_data)
+                self.lower_segment_received_both.emit()
+                time.sleep(0.01)
+            print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
+            # com.close_comport(self.lower_comport_both)
+        self.lower_both_finished.emit()
 
 
 if __name__ == '__main__':

@@ -1,13 +1,14 @@
 import sys
 import comport as com
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 from PyQt5.uic import loadUi
 from ManualControl import ManualControl
 from PreSavedMoves import PreSavedMoves
 from ElbowAndShoulder import ElbowAndShoulder
 from DataCollector import DataCollector
+from FileWriter import FileWriter
 from Model import *
 
 
@@ -41,10 +42,11 @@ class MyApplication(QMainWindow):
         self.upper_current_comport = None
         self.lower_current_comport = None
 
-        self.upper_rotation_file_path = None
-        self.lower_rotation_file_path = None
-        self.upper_finger_file_path = None
-        self.lower_finger_file_path = None
+        # Default settings file paths. Use for autoload function (motor_settings_autoload). !Modify to your directory!
+        self.upper_rotation_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\upper_rotation.txt"
+        self.lower_rotation_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\lower_rotation.txt"
+        self.upper_finger_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\upper_finger.txt"
+        self.lower_finger_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\lower_finger.txt"
 
         self.upper_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
@@ -157,7 +159,6 @@ class MyApplication(QMainWindow):
         self.actionMain_Window.setEnabled(False)  # Disable Main Window action when App starts
         # self.motor_settings_groupBox.setEnabled(False)  # Disable Motor Setting box
 
-        self.settings_from_file_init()
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
         self.elbow_and_shoulder = ElbowAndShoulder()
@@ -169,6 +170,8 @@ class MyApplication(QMainWindow):
         self.manual_control.set_lower_data_collector(self.lower_collector)
         self.manual_control.set_upper_collector_both(self.upper_collector_both)
         self.manual_control.set_lower_collector_both(self.lower_collector_both)
+        self.file_writer = FileWriter()
+        self.manual_control.set_file_writer(self.file_writer)
 
         # Give copy of Model instance to other classes, so they can interact with comports through it
         model_copy = self.model
@@ -178,6 +181,73 @@ class MyApplication(QMainWindow):
         self.stackedWidget.addWidget(self.manual_control)
         self.stackedWidget.addWidget(self.pre_saved_moves)
         self.stackedWidget.addWidget(self.elbow_and_shoulder)
+
+        # Load motor settings from default directory
+        self.motor_settings_autoload()
+        # Show the obtained settings
+        self.settings_from_file_init()
+
+    def motor_settings_autoload(self):
+        print("MainApp/motor_settings_autoload - load settings")
+        upper_rotation_dict = dict()
+        lower_rotation_dict = dict()
+        upper_finger_dict = dict()
+        lower_finger_dict = dict()
+
+        # Load upper rotation file
+        with open(self.upper_rotation_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_rotation_position = line.find(":") + 2
+                motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
+                if line[motor_number_position] == '_':
+                    motor_number_str = line[motor_number_position:motor_number_position + 2]
+                else:
+                    motor_number_str = line[motor_number_position]
+                upper_rotation_dict[motor_number_str] = motor_rotation_str
+
+        # Load lower rotation file
+        with open(self.lower_rotation_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_rotation_position = line.find(":") + 2
+                motor_rotation_str = line[motor_rotation_position:motor_rotation_position + 2]
+                if line[motor_number_position] == '_':
+                    motor_number_str = line[motor_number_position:motor_number_position + 2]
+                else:
+                    motor_number_str = line[motor_number_position]
+                lower_rotation_dict[motor_number_str] = motor_rotation_str
+
+        # Load upper finger file
+        with open(self.upper_finger_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_finger_position = line.find(":") + 2
+                motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
+                motor_number_str = line[motor_number_position]
+                upper_finger_dict[motor_number_str] = motor_finger_str
+
+        # Load upper finger file
+        with open(self.lower_finger_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_finger_position = line.find(":") + 2
+                motor_finger_str = line[motor_finger_position:motor_finger_position + 3]
+                motor_number_str = line[motor_number_position]
+                lower_finger_dict[motor_number_str] = motor_finger_str
+
+        self.manual_control.upper_set_rotation(upper_rotation_dict)
+        self.upper_motors_rotation_dict = upper_rotation_dict
+        self.manual_control.lower_set_rotation(lower_rotation_dict)
+        self.lower_motors_rotation_dict = lower_rotation_dict
+        self.manual_control.upper_set_finger(upper_finger_dict)
+        self.upper_motors_finger_dict = upper_finger_dict
+        self.manual_control.lower_set_finger(lower_finger_dict)
+        self.lower_motors_finger_dict = lower_finger_dict
 
     def manual_control(self):
         self.stackedWidget.setCurrentWidget(self.manual_control)
@@ -227,8 +297,8 @@ class MyApplication(QMainWindow):
             self.upper_current_comport = com.ini(self.upper_current_comport_name)
             if self.upper_current_comport.is_open:
                 self.model.set_upper_comport(self.upper_current_comport)
-                self.upper_collector.set_comport(self.upper_current_comport)
-                self.upper_collector_both.set_comport(self.upper_current_comport)
+                self.upper_collector.set_default_comport(self.upper_current_comport)
+                self.upper_collector_both.set_upper_comport_both(self.upper_current_comport)
                 self.update_upper_status_label(True)
             else:
                 print('Upper comport is not open')
@@ -240,8 +310,8 @@ class MyApplication(QMainWindow):
             self.lower_current_comport = com.ini(self.lower_current_comport_name)
             if self.lower_current_comport.is_open:
                 self.model.set_lower_comport(self.lower_current_comport)
-                self.lower_collector.set_comport(self.lower_current_comport)
-                self.lower_collector_both.set_comport(self.lower_current_comport)
+                self.lower_collector.set_default_comport(self.lower_current_comport)
+                self.lower_collector_both.set_lower_comport_both(self.lower_current_comport)
                 self.update_lower_status_label(True)
             else:
                 print('Lower comport is not open')
@@ -563,11 +633,21 @@ Lower motor #{motor_number} has default settings'''
         self.manual_control.lower_set_finger(lower_finger_dict)
         self.lower_motors_finger_dict = lower_finger_dict
 
+    # TODO: Complete show-settings functionality
     def settings_from_file_init(self):
+        text_to_show = ""
+        text_to_show += "Upper motor-to-finger settings:\n"
+        for key, value in self.upper_motors_finger_dict.items():
+            text_to_show += f"{key}) {value}\n"
+
+        text_to_show += "\nLower motor-to-finger settings:\n"
+        for key, value in self.lower_motors_finger_dict.items():
+            text_to_show += f"{key}) {value}\n"
+
         text = "Some text"
         self.settings_from_file_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.settings_from_file_label.setWordWrap(True)
-        self.settings_from_file_label.setText(text)
+        self.settings_from_file_label.setText(text_to_show)
 
 
 if __name__ == "__main__":

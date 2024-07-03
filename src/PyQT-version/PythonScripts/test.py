@@ -44,5 +44,6 @@ def sandbox1():
 
 
 if __name__ == '__main__':
-    sandbox1()
+    # sandbox1()
+    print(1 & 1)
 

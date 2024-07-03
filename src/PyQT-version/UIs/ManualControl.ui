@@ -1683,6 +1683,19 @@ background-color: white; text-align: justify; text-justify: inter-word;</string>
      <string>Open...</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="test_btn">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>750</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Test Button</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <customwidgets>

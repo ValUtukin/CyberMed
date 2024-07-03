@@ -98,12 +98,14 @@ def send_bytearray(serial_inst, data):
 
 
 def open_comport(serial_inst):
+    print(f"comport.py/open_comport - opening port {serial_inst.name}")
     serial_inst.open()
     serial_inst.reset_input_buffer()
     serial_inst.reset_output_buffer()
 
 
 def close_comport(serial_inst):
+    print(f"comport.py/close_comport - closing port {serial_inst.name}")
     if serial_inst.is_open:
         serial_inst.reset_input_buffer()
         serial_inst.reset_output_buffer()
