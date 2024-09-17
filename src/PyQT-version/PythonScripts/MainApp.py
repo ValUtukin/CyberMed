@@ -52,6 +52,8 @@ class MyApplication(QMainWindow):
         self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.upper_motors_finger_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_finger_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
+        self.upper_motors_adc_test_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
+        self.lower_motors_adc_test_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.upper_motors_rotation_dict = {
             '1': '01',
             '2': '01',
@@ -127,6 +129,14 @@ class MyApplication(QMainWindow):
         self.upper_discard_all_finger_btn.clicked.connect(self.upper_discard_all_finger_settings)
         self.lower_discard_all_finger_btn.clicked.connect(self.lower_discard_all_finger_settings)
 
+        # ADC-testing connections
+        self.upper_check_adc_btn.clicked.connect(self.upper_check_adc)
+        self.lower_check_adc_btn.clicked.connect(self.lower_check_adc)
+        self.upper_motor_adc_test_pwm_scale.valueChanged.connect(self.update_upper_adc_pwm_label)
+        self.lower_motor_adc_test_pwm_scale.valueChanged.connect(self.update_lower_adc_pwm_label)
+        self.upper_adc_test_thread = QtCore.QThread()
+        self.lower_adc_test_thread = QtCore.QThread()
+
         #  Open-File connections
         self.upper_open_rotation_file_for_save_btn.clicked.connect(self.upper_open_rotation_file)
         self.lower_open_rotation_file_for_save_btn.clicked.connect(self.lower_open_rotation_file)
@@ -164,6 +174,10 @@ class MyApplication(QMainWindow):
         self.elbow_and_shoulder = ElbowAndShoulder()
         self.upper_collector = DataCollector(1)
         self.lower_collector = DataCollector(1)
+
+        self.upper_adc_collector = DataCollector(1)
+        self.lower_adc_collector = DataCollector(1)
+
         self.upper_collector_both = DataCollector(1)
         self.lower_collector_both = DataCollector(1)
         self.manual_control.set_upper_data_collector(self.upper_collector)
@@ -172,6 +186,10 @@ class MyApplication(QMainWindow):
         self.manual_control.set_lower_collector_both(self.lower_collector_both)
         self.file_writer = FileWriter()
         self.manual_control.set_file_writer(self.file_writer)
+
+        # Setup ADC-testing thread
+        self.upper_setup_adc_test_thread()
+        self.lower_setup_adc_test_thread()
 
         # Give copy of Model instance to other classes, so they can interact with comports through it
         model_copy = self.model
@@ -299,6 +317,7 @@ class MyApplication(QMainWindow):
                 self.model.set_upper_comport(self.upper_current_comport)
                 self.upper_collector.set_default_comport(self.upper_current_comport)
                 self.upper_collector_both.set_upper_comport_both(self.upper_current_comport)
+                self.upper_adc_collector.set_default_comport(self.upper_current_comport)
                 self.update_upper_status_label(True)
             else:
                 print('Upper comport is not open')
@@ -312,6 +331,7 @@ class MyApplication(QMainWindow):
                 self.model.set_lower_comport(self.lower_current_comport)
                 self.lower_collector.set_default_comport(self.lower_current_comport)
                 self.lower_collector_both.set_lower_comport_both(self.lower_current_comport)
+                self.lower_adc_collector.set_default_comport(self.lower_current_comport)
                 self.update_lower_status_label(True)
             else:
                 print('Lower comport is not open')
@@ -459,7 +479,7 @@ Lower motor #{motor_number} has default settings'''
         motor_byte = motor_byte_base + self.upper_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
         print(f'We about to check Upper Motor #{motor_number}, motor_byte: {motor_byte}')
-        self.model.send_command('Upper', '00011110', motor_byte, 70, 1.0, 0)
+        self.model.send_command('Upper', '00011110', motor_byte, 50, 1.0, 0)
         self.model.power_command('Upper', '00000001', '00000001')
 
     def lower_check_motor_finger(self):
@@ -471,7 +491,7 @@ Lower motor #{motor_number} has default settings'''
         motor_byte = motor_byte_base + self.lower_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
         print(f'We about to check Lower Motor #{motor_number}, motor_byte: {motor_byte}')
-        self.model.send_command('Lower', '00011110', motor_byte, 70, 1.0, 0)
+        self.model.send_command('Lower', '00011110', motor_byte, 50, 1.0, 0)
         self.model.power_command('Lower', '00000001', '00000001')
 
     def upper_apply_motor_finger(self):
@@ -503,6 +523,93 @@ Lower motor #{motor_number} has default settings'''
                     self.lower_motors_finger_dict[motor_number] = motor_byte_number
                     self.lower_motors_finger_dict[key] = temp
         print(self.lower_motors_finger_dict)
+
+    def upper_check_adc(self):
+        motor_number = self.upper_motors_adc_test_comboBox.currentIndex() + 1
+        pwm = self.upper_motor_adc_test_pwm_scale.value()
+        time_to_work = 1.0
+        delay_before_work = 0.0
+        motor_byte_base = '000'
+        motor_rotation_mode = self.upper_motors_rotation_dict[f'{motor_number}']
+        motor_finger_number = self.upper_motors_finger_dict[f'{motor_number}']
+        motor_byte = motor_byte_base + motor_rotation_mode + motor_finger_number
+
+        adc_decimal = 2 ** motor_number
+        self.model.upper_send_adc(adc_decimal)
+        self.model.send_command("Upper", '00011110', motor_byte, pwm, time_to_work, delay_before_work)
+
+        self.upper_adc_test_thread.start()
+        self.model.power_command('Upper', '00000001', '00000001')
+
+        self.model.clear_upper_command_list()
+
+    def lower_check_adc(self):
+        motor_number = self.lower_motors_adc_test_comboBox.currentIndex() + 1
+        pwm = self.lower_motor_adc_test_pwm_scale.value()
+
+        time_to_work = 1.0
+        delay_before_work = 0.0
+        motor_byte_base = '000'
+        motor_rotation_mode = self.lower_motors_rotation_dict[f'{motor_number}']
+        motor_finger_number = self.lower_motors_finger_dict[f'{motor_number}']  # string number 000, 001, 010 etc.
+        motor_byte = motor_byte_base + motor_rotation_mode + motor_finger_number
+
+        adc_decimal = 2 ** motor_number
+        self.model.lower_send_adc(adc_decimal)
+        self.model.send_command("Lower", '00011110', motor_byte, pwm, time_to_work, delay_before_work)
+
+        self.lower_adc_test_thread.start()
+        self.model.power_command('Lower', '00000001', '00000001')
+
+        self.model.clear_lower_command_list()
+
+    def upper_setup_adc_test_thread(self):
+        self.upper_adc_collector.moveToThread(self.upper_adc_test_thread)
+        self.upper_adc_test_thread.started.connect(self.upper_adc_collector.simple_adc_test)
+        self.upper_adc_collector.adc_check_complete.connect(self.upper_show_adc_test_data)
+        self.upper_adc_collector.finished.connect(self.finish_upper_adc_test_thread)
+
+    def lower_setup_adc_test_thread(self):
+        self.lower_adc_collector.moveToThread(self.lower_adc_test_thread)
+        self.lower_adc_test_thread.started.connect(self.lower_adc_collector.simple_adc_test)
+        self.lower_adc_collector.adc_check_complete.connect(self.lower_show_adc_test_data)
+        self.lower_adc_collector.finished.connect(self.finish_lower_adc_test_thread)
+
+    def upper_show_adc_test_data(self):
+        test_data = self.upper_adc_collector.get_test_data()
+        text_to_show = ""
+        for i in range(len(test_data)):
+            text_to_show += str(test_data[i])
+            text_to_show += " "
+        self.upper_adc_test_data_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.upper_adc_test_data_label.setWordWrap(True)
+        self.upper_adc_test_data_label.setText(text_to_show)
+
+    def lower_show_adc_test_data(self):
+        test_data = self.lower_adc_collector.get_test_data()
+        text_to_show = ""
+        for i in range(len(test_data)):
+            text_to_show += str(test_data[i])
+            text_to_show += " "
+        self.lower_adc_test_data_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.lower_adc_test_data_label.setWordWrap(True)
+        self.lower_adc_test_data_label.setText(text_to_show)
+
+    def finish_upper_adc_test_thread(self):
+        print('finishing the thread')
+        self.upper_adc_test_thread.quit()
+        self.model.release_upper_comport_after_thread()
+
+    def finish_lower_adc_test_thread(self):
+        print('finishing the thread')
+        self.lower_adc_test_thread.quit()
+        self.model.release_lower_comport_after_thread()
+
+    def update_upper_adc_pwm_label(self, value):
+        self.upper_motor_adc_test_pwm_label.setText(str(value))
+
+    def update_lower_adc_pwm_label(self, value):
+        self.lower_motor_adc_test_pwm_label.setText(str(value))
 
     def upper_open_rotation_file(self):
         window_name = "Open File (Upper rotation)"

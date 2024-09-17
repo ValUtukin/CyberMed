@@ -10,6 +10,7 @@ class DataCollector(QObject):
     lower_segment_received_both = pyqtSignal()
     upper_both_finished = pyqtSignal()
     lower_both_finished = pyqtSignal()
+    adc_check_complete = pyqtSignal()
 
     def __init__(self, set_num, args=None):
         super().__init__()
@@ -21,6 +22,8 @@ class DataCollector(QObject):
         self.default_comport = None
         self.upper_comport_both = None
         self.lower_comport_both = None
+
+        self.testing_data = []
 
         if not args:
             self.initial_byte_count = None
@@ -226,6 +229,17 @@ class DataCollector(QObject):
             print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
             # com.close_comport(self.lower_comport_both)
         self.lower_both_finished.emit()
+
+    def simple_adc_test(self):
+        for i in range(100):
+            self.testing_data.append(i + 1)
+            if len(self.testing_data) % 10 == 0:
+                self.adc_check_complete.emit()
+                time.sleep(0.5)
+        self.finished.emit()
+
+    def get_test_data(self):
+        return self.testing_data
 
 
 if __name__ == '__main__':

@@ -37,20 +37,19 @@ def get_lower_opposite_pwm(up_pwm):
 
 def opposite_pwm_from_adc(adc_data):
     last_value = adc_data['0'][-1]
-    print(last_value)
 
-    x0 = 0.08  # Min current (I) in idle mode
-    x1 = 7.3  # Max current (I) in idle mode  (0.58) # Roman: 0.23
+    x0 = 0.45  # Max current (I) in idle mode
+    x1 = 0.06  # Min current (I) in idle mode  (0.58) # Roman: 0.23
     y0 = 100  # Max PWM in idle mode
     y1 = 20  # Min PWM in idle mode
 
-    x = last_value / (0.15 * 3)  # x for opposite pwm law y = f(x) # Roman: 93
+    x = (last_value * 10) / 3  # x for opposite pwm law y = f(x) # Roman: 93 # Roman: 0.15 -> 0.1
     y = (((y1 - y0) * (x - x0)) / (x1 - x0)) + y0
     print(f"Opposite pwm based on ADC: {int(y)}")
-    if y <= 100:
+    if 0 < y < 100:
         return int(y * 0.3)
     else:
-        print(f"Opposite pwm greater than 100: {y}. Return 100")
+        print(f"Opposite pwm greater than 100: {y}. Return 30")
         return 30
 
 
