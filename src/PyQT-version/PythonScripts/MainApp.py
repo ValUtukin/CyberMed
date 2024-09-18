@@ -1,6 +1,6 @@
 import sys
 import comport as com
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 from PyQt5.uic import loadUi
@@ -29,6 +29,10 @@ class MyApplication(QMainWindow):
 
         # Load the UI from the UI file
         loadUi("../UIs/MainWindow.ui", self)
+
+        # Set Application Icon (window top-left). !Modify icon path to your directory!
+        self.icon_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Images\cyber_hand.png"
+        self.setWindowIcon(QtGui.QIcon(self.icon_file_path))
 
         text = "Welcome to CyberMed SoftWare"
         self.welcome_label.setText(f"<font color='#00AB5D', size=24>{text}</font>")
