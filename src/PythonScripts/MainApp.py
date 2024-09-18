@@ -31,7 +31,7 @@ class MyApplication(QMainWindow):
         loadUi("../UIs/MainWindow.ui", self)
 
         # Set Application Icon (window top-left). !Modify icon path to your directory!
-        self.icon_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Images\cyber_hand.png"
+        self.icon_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Images/cyber_hand.png"
         self.setWindowIcon(QtGui.QIcon(self.icon_file_path))
 
         text = "Welcome to CyberMed SoftWare"
@@ -47,10 +47,10 @@ class MyApplication(QMainWindow):
         self.lower_current_comport = None
 
         # Default settings file paths. Use for autoload function (motor_settings_autoload). !Modify to your directory!
-        self.upper_rotation_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\upper_rotation.txt"
-        self.lower_rotation_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\lower_rotation.txt"
-        self.upper_finger_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\upper_finger.txt"
-        self.lower_finger_file_path = r"C:\\PyCharmProjects\PyQt_withHub\CyberMed\Data\lower_finger.txt"
+        self.upper_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_rotation.txt"
+        self.lower_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_rotation.txt"
+        self.upper_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_finger.txt"
+        self.lower_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_finger.txt"
 
         self.upper_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
@@ -617,7 +617,7 @@ Lower motor #{motor_number} has default settings'''
 
     def upper_open_rotation_file(self):
         window_name = "Open File (Upper rotation)"
-        search_dir = "../../../Data/"
+        search_dir = "../../Data/"
         file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.upper_rotation_file_path_label.setText(file_path)
@@ -625,7 +625,7 @@ Lower motor #{motor_number} has default settings'''
 
     def lower_open_rotation_file(self):
         window_name = "Open File (Lower rotation)"
-        search_dir = "../../../Data/"
+        search_dir = "../../Data/"
         file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.lower_rotation_file_path_label.setText(file_path)
@@ -633,7 +633,7 @@ Lower motor #{motor_number} has default settings'''
 
     def upper_open_finger_file(self):
         window_name = "Open File (Upper finger)"
-        search_dir = "../../../Data/"
+        search_dir = "../../Data/"
         file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.upper_finger_file_path_label.setText(file_path)
@@ -641,7 +641,7 @@ Lower motor #{motor_number} has default settings'''
 
     def lower_open_finger_file(self):
         window_name = "Open File (Lower finger)"
-        search_dir = "../../../Data/"
+        search_dir = "../../Data/"
         file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
         if file_path:
             self.lower_finger_file_path_label.setText(file_path)

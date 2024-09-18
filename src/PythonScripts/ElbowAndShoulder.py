@@ -1,8 +1,6 @@
 import sys
 import ElbowAndShoulderUi
-from Model import *
-import comport as com
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 
 
 class ElbowAndShoulder(QtWidgets.QMainWindow, ElbowAndShoulderUi.Ui_MainWindow):

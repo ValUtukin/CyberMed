@@ -1,6 +1,5 @@
 import sys
 import ManualControlUi
-import math
 from Model import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
