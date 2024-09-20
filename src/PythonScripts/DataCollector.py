@@ -120,9 +120,10 @@ class DataCollector(QObject):
     def start_collecting(self):
         packet_counter = 0
         time.sleep(self.initial_delay)
-        print(self.default_comport.name)
+        less = self.initial_byte_count % 20
         if self.holder_len:
-            for i in range(0, self.initial_byte_count, 20):
+            # Receive full packets - 20 bytes
+            for i in range(0, self.initial_byte_count - less, 20):
                 data = self.default_comport.read(20)
                 packet_counter += 1
                 print(f"Packet #{packet_counter}, len: {len(data)}")
@@ -137,7 +138,20 @@ class DataCollector(QObject):
                         set_name = str(j % len(self.data_set_holder))
                         self.add_value_to_set(set_name, new_data)
                 self.segment_received.emit()
-                time.sleep(0.01)
+
+            # Receive left bytes < 20
+            print(f"Try to receive {less} bytes")
+            less_data = self.default_comport.read(less)
+            packet_counter += 1
+            print(f"Packet #{packet_counter}, len: {len(less_data)}")
+            for i in range(1, len(less_data), 2):
+                print(f"data[{i - 1}] = {less_data[i - 1]}, data[{i}] = {less_data[i]}")
+                new_data = (less_data[i - 1] + data[i] * 256) * 3.3 / 4096
+                print(f"{i + 1}) {new_data}, type {type(new_data)}")
+                set_name = str(i % len(self.data_set_holder))
+                self.add_value_to_set(set_name, new_data)
+            self.segment_received.emit()
+
             print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
             com.close_comport(self.default_comport)
         self.finished.emit()

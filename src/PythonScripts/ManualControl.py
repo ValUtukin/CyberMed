@@ -37,16 +37,21 @@ def get_lower_opposite_pwm(up_pwm):
 def opposite_pwm_from_adc(adc_data):
     last_value = adc_data['0'][-1]
 
-    x0 = 0.45  # Max current (I) in idle mode
+    x0 = 1.3  # Max current (I) in idle mode
     x1 = 0.06  # Min current (I) in idle mode  (0.58) # Roman: 0.23
     y0 = 100  # Max PWM in idle mode
     y1 = 20  # Min PWM in idle mode
 
-    x = (last_value * 10) / 3  # x for opposite pwm law y = f(x) # Roman: 93 # Roman: 0.15 -> 0.1
+    # x0 = 0.06
+    # x1 = 0.1
+    # y0 = 20
+    # y1 = 100
+
+    x = (last_value * 10) / 24.3902  # x for opposite pwm law y = f(x) # Roman: 93 # Roman: 0.15 -> 0.1
     y = (((y1 - y0) * (x - x0)) / (x1 - x0)) + y0
     print(f"Opposite pwm based on ADC: {int(y)}")
     if 0 < y < 100:
-        return int(y * 0.3)
+        return int(y)
     else:
         print(f"Opposite pwm greater than 100: {y}. Return 30")
         return 30
@@ -327,7 +332,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         motor_number_byte = self.lower_finger_dict.get('3')
         motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         self.model.send_command('Lower', '00001110', motor_byte, opposite_pwm)
-        self.model.power_command('Lower', config='00000001', power_byte='00000001')
+        # self.model.power_command('Lower', config='00000001', power_byte='00000001')
 
         data_sets = list()
         x_sets = list()
