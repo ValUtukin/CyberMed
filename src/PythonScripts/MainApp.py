@@ -31,7 +31,7 @@ class MyApplication(QMainWindow):
         loadUi("../UIs/MainWindow.ui", self)
 
         # Set Application Icon (window top-left). !Modify icon path to your directory!
-        self.icon_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Images/cyber_hand.png"
+        self.icon_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Images/cyber_hand.png"
         self.setWindowIcon(QtGui.QIcon(self.icon_file_path))
 
         text = "Welcome to CyberMed SoftWare"
@@ -47,10 +47,10 @@ class MyApplication(QMainWindow):
         self.lower_current_comport = None
 
         # Default settings file paths. Use for autoload function (motor_settings_autoload). !Modify to your directory!
-        self.upper_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_rotation.txt"
-        self.lower_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_rotation.txt"
-        self.upper_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_finger.txt"
-        self.lower_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_finger.txt"
+        self.upper_rotation_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/upper_rotation.txt"
+        self.lower_rotation_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/lower_rotation.txt"
+        self.upper_finger_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/upper_finger.txt"
+        self.lower_finger_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/lower_finger.txt"
 
         self.upper_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])

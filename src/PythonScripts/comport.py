@@ -1,4 +1,34 @@
+import time
 import serial
+
+
+class ComportInstance(serial.Serial):
+    def __init__(self, comport_name):
+        super().__init__()
+        print("ComportInst have created")
+        self.baudrate = 115200
+        self.bytesize = 8
+        self.parity = 'N'
+        self.stopbits = 1
+        self.timeout = 2.0
+        self.port = comport_name
+
+        self.open_comport()
+        print(self)
+
+    def open_comport(self):
+        print(f"comport.py/open_comport - opening port {self.name}")
+        if self.is_open:
+            print(f'Port - {self.name} is already open')
+        else:
+            self.open()
+            self.reset_input_buffer()
+            self.reset_output_buffer()
+
+    def __del__(self):
+        print('Destructor called')
+        self.reset_input_buffer()
+        self.reset_output_buffer()
 
 
 def ini(comport_name='COM2'):
@@ -118,3 +148,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+    inst = ComportInstance('COM1')
+    print('Waiting 5 sec...')
+    time.sleep(5.0)
+    inst.open_comport()
+    del inst
