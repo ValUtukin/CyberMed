@@ -1,5 +1,6 @@
 import sys
 import comport as com
+from comport import ComportInstance
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
@@ -9,7 +10,7 @@ from PreSavedMoves import PreSavedMoves
 from ElbowAndShoulder import ElbowAndShoulder
 from DataCollector import DataCollector
 from FileWriter import FileWriter
-from Model import *
+from CommandMaster import CommandMaster
 
 
 def get_comport_name(device_full_name):
@@ -31,13 +32,13 @@ class MyApplication(QMainWindow):
         loadUi("../UIs/MainWindow.ui", self)
 
         # Set Application Icon (window top-left). !Modify icon path to your directory!
-        self.icon_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Images/cyber_hand.png"
+        self.icon_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Images/cyber_hand.png"
         self.setWindowIcon(QtGui.QIcon(self.icon_file_path))
 
         text = "Welcome to CyberMed SoftWare"
         self.welcome_label.setText(f"<font color='#00AB5D', size=24>{text}</font>")
 
-        self.model = Model()
+        self.command_master = CommandMaster()
         self.available_ports = com.show_available_ports()
         self.upper_comport_comboBox.addItems(self.available_ports)
         self.lower_comport_comboBox.addItems(self.available_ports)
@@ -47,10 +48,10 @@ class MyApplication(QMainWindow):
         self.lower_current_comport = None
 
         # Default settings file paths. Use for autoload function (motor_settings_autoload). !Modify to your directory!
-        self.upper_rotation_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/upper_rotation.txt"
-        self.lower_rotation_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/lower_rotation.txt"
-        self.upper_finger_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/upper_finger.txt"
-        self.lower_finger_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/lower_finger.txt"
+        self.upper_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_rotation.txt"
+        self.lower_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_rotation.txt"
+        self.upper_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_finger.txt"
+        self.lower_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_finger.txt"
 
         self.upper_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
@@ -58,6 +59,10 @@ class MyApplication(QMainWindow):
         self.lower_motors_finger_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.upper_motors_adc_test_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_adc_test_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
+        self.upper_motors_adc_channel_comboBox.addItems(['Channel 1', 'Channel 2', 'Channel 3', 'Channel 4',
+                                                         'Channel 5', 'Channel 6'])
+        self.lower_motors_adc_channel_comboBox.addItems(['Channel 1', 'Channel 2', 'Channel 3', 'Channel 4',
+                                                         'Channel 5', 'Channel 6'])
         self.upper_motors_rotation_dict = {
             '1': '01',
             '2': '01',
@@ -138,6 +143,10 @@ class MyApplication(QMainWindow):
         self.lower_check_adc_btn.clicked.connect(self.lower_check_adc)
         self.upper_motor_adc_test_pwm_scale.valueChanged.connect(self.update_upper_adc_pwm_label)
         self.lower_motor_adc_test_pwm_scale.valueChanged.connect(self.update_lower_adc_pwm_label)
+        self.upper_discard_adc_data_btn.clicked.connect(self.upper_discard_adc_data)
+        self.lower_discard_adc_data_btn.clicked.connect(self.lower_discard_adc_data)
+        self.adc_label_place_default_text('Upper')
+        self.adc_label_place_default_text('Lower')
         self.upper_adc_test_thread = QtCore.QThread()
         self.lower_adc_test_thread = QtCore.QThread()
 
@@ -195,10 +204,10 @@ class MyApplication(QMainWindow):
         self.upper_setup_adc_test_thread()
         self.lower_setup_adc_test_thread()
 
-        # Give copy of Model instance to other classes, so they can interact with comports through it
-        model_copy = self.model
-        self.manual_control.set_model(model_copy)
-        self.pre_saved_moves.set_model(model_copy)
+        # Give copy of CommandMaster instance to other classes, so they can interact with comports through it
+        master_copy = self.command_master
+        self.manual_control.set_command_master(master_copy)
+        self.pre_saved_moves.set_command_master(master_copy)
 
         self.stackedWidget.addWidget(self.manual_control)
         self.stackedWidget.addWidget(self.pre_saved_moves)
@@ -316,9 +325,10 @@ class MyApplication(QMainWindow):
         if self.upper_current_comport_name is None:
             print('MainApp/connect_upper_comport - upper comport name is None')
         else:
-            self.upper_current_comport = com.ini(self.upper_current_comport_name)
+            # self.upper_current_comport = com.ini(self.upper_current_comport_name)
+            self.upper_current_comport = ComportInstance(self.upper_current_comport_name, 'Upper')
             if self.upper_current_comport.is_open:
-                self.model.set_upper_comport(self.upper_current_comport)
+                self.command_master.set_upper_comport(self.upper_current_comport)
                 self.upper_collector.set_default_comport(self.upper_current_comport)
                 self.upper_collector_both.set_upper_comport_both(self.upper_current_comport)
                 self.upper_adc_collector.set_default_comport(self.upper_current_comport)
@@ -330,9 +340,10 @@ class MyApplication(QMainWindow):
         if self.lower_current_comport_name is None:
             print('MainApp/connect_lower_comport - lower comport name is None')
         else:
-            self.lower_current_comport = com.ini(self.lower_current_comport_name)
+            # self.lower_current_comport = com.ini(self.lower_current_comport_name)
+            self.lower_current_comport = ComportInstance(self.lower_current_comport_name, 'Lower')
             if self.lower_current_comport.is_open:
-                self.model.set_lower_comport(self.lower_current_comport)
+                self.command_master.set_lower_comport(self.lower_current_comport)
                 self.lower_collector.set_default_comport(self.lower_current_comport)
                 self.lower_collector_both.set_lower_comport_both(self.lower_current_comport)
                 self.lower_adc_collector.set_default_comport(self.lower_current_comport)
@@ -342,9 +353,9 @@ class MyApplication(QMainWindow):
 
     def rescan_comport(self):
         if self.upper_current_comport:
-            com.close_comport(self.upper_current_comport)
+            self.upper_current_comport.close_comport()
         if self.lower_current_comport:
-            com.close_comport(self.lower_current_comport)
+            self.lower_current_comportclose_comport()
 
         self.upper_current_comport_name = None
         self.lower_current_comport_name = None
@@ -403,8 +414,9 @@ class MyApplication(QMainWindow):
         motor_byte = motor_byte_base + motor_byte_mode + self.upper_motors_finger_dict[f'{motor_number}']
 
         print(f'We about to check Upper Motor#{motor_number}, motor_byte: {motor_byte}')
-        self.model.send_command('Upper', '00011110', motor_byte, pwm, time, 0)
-        self.model.power_command('Upper', '00000001', '00000001')
+        self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=pwm,
+                                         work_time=time, delay=0)
+        self.command_master.power_command(part='Upper', config='00000001', power_byte='00000001')
 
     def lower_check_motor_rotation(self):
         motor_number = self.lower_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
@@ -421,8 +433,9 @@ class MyApplication(QMainWindow):
         motor_byte = motor_byte_base + motor_byte_mode + self.lower_motors_finger_dict[f'{motor_number}']
 
         print(f'We about to check Lower Motor#{motor_number}, motor_byte: {motor_byte}')
-        self.model.send_command('Lower', '00011110', motor_byte, pwm, time, 0)
-        self.model.power_command('Lower', '00000001', '00000001')
+        self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=pwm,
+                                         work_time=time, delay=0)
+        self.command_master.power_command(part='Lower', config='00000001', power_byte='00000001')
 
     def upper_apply_motor_rotation(self):
         motor_number = self.upper_motors_comboBox.currentIndex() + 1
@@ -483,8 +496,9 @@ Lower motor #{motor_number} has default settings'''
         motor_byte = motor_byte_base + self.upper_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
         print(f'We about to check Upper Motor #{motor_number}, motor_byte: {motor_byte}')
-        self.model.send_command('Upper', '00011110', motor_byte, 50, 1.0, 0)
-        self.model.power_command('Upper', '00000001', '00000001')
+        self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=50,
+                                         work_time=1.0, delay=0)
+        self.command_master.power_command(part='Upper', config='00000001', power_byte='00000001')
 
     def lower_check_motor_finger(self):
         motor_number = self.lower_motors_finger_comboBox.currentIndex() + 1
@@ -495,8 +509,9 @@ Lower motor #{motor_number} has default settings'''
         motor_byte = motor_byte_base + self.lower_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
         print(f'We about to check Lower Motor #{motor_number}, motor_byte: {motor_byte}')
-        self.model.send_command('Lower', '00011110', motor_byte, 50, 1.0, 0)
-        self.model.power_command('Lower', '00000001', '00000001')
+        self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=50,
+                                         work_time=1.0, delay=0)
+        self.model.power_command(part='Lower', config='00000001', power_byte='00000001')
 
     def upper_apply_motor_finger(self):
         motor_number = str(self.upper_motors_finger_comboBox.currentIndex() + 1)
@@ -528,25 +543,31 @@ Lower motor #{motor_number} has default settings'''
                     self.lower_motors_finger_dict[key] = temp
         print(self.lower_motors_finger_dict)
 
+    # TODO: Need to finish ADC-check block. Display label doesn't work properly
     def upper_check_adc(self):
         motor_number = self.upper_motors_adc_test_comboBox.currentIndex() + 1
+        adc_channel = self.upper_motors_adc_channel_comboBox.currentIndex()
         pwm = self.upper_motor_adc_test_pwm_scale.value()
-        time_to_work = 1.0
-        delay_before_work = 0.0
+        time_to_work = 2.0
+        delay_before_work = 0.5
         motor_byte_base = '000'
         motor_rotation_mode = self.upper_motors_rotation_dict[f'{motor_number}']
         motor_finger_number = self.upper_motors_finger_dict[f'{motor_number}']
         motor_byte = motor_byte_base + motor_rotation_mode + motor_finger_number
 
-        adc_decimal = 2 ** motor_number
-        self.model.upper_send_adc(adc_decimal)
-        self.model.send_command("Upper", '00011110', motor_byte, pwm, time_to_work, delay_before_work)
+        adc_decimal = 2 ** adc_channel
+        self.upper_adc_collector.set_test_adc_byte_count(time_to_work=time_to_work)
+        self.upper_adc_collector.set_test_adc_delay(delay_before_work=delay_before_work)
+        self.command_master.upper_send_adc(adc_decimal=adc_decimal)
+        self.command_master.send_command(part="Upper", config='00011110', motor_byte=motor_byte, pwm=pwm,
+                                         work_time=time_to_work, delay=delay_before_work)
 
         self.upper_adc_test_thread.start()
-        self.model.power_command('Upper', '00000001', '00000001')
+        self.command_master.power_command(part='Upper', config='00000001', power_byte='00000001')
 
-        self.model.clear_upper_command_list()
+        self.command_master.clear_upper_command_list()
 
+    # TODO: Finish this method according to upper_check_adc
     def lower_check_adc(self):
         motor_number = self.lower_motors_adc_test_comboBox.currentIndex() + 1
         pwm = self.lower_motor_adc_test_pwm_scale.value()
@@ -559,13 +580,14 @@ Lower motor #{motor_number} has default settings'''
         motor_byte = motor_byte_base + motor_rotation_mode + motor_finger_number
 
         adc_decimal = 2 ** motor_number
-        self.model.lower_send_adc(adc_decimal)
-        self.model.send_command("Lower", '00011110', motor_byte, pwm, time_to_work, delay_before_work)
+        self.command_master.lower_send_adc(adc_decimal=adc_decimal)
+        self.command_master.send_command(part="Lower", config='00011110', motor_byte=motor_byte, pwm=pwm,
+                                         work_time=time_to_work, delay=delay_before_work)
 
         self.lower_adc_test_thread.start()
-        self.model.power_command('Lower', '00000001', '00000001')
+        self.command_master.power_command(part='Lower', config='00000001', power_byte='00000001')
 
-        self.model.clear_lower_command_list()
+        self.command_master.clear_lower_command_list()
 
     def upper_setup_adc_test_thread(self):
         self.upper_adc_collector.moveToThread(self.upper_adc_test_thread)
@@ -582,9 +604,10 @@ Lower motor #{motor_number} has default settings'''
     def upper_show_adc_test_data(self):
         test_data = self.upper_adc_collector.get_test_data()
         text_to_show = ""
+        print(len(test_data))
         for i in range(len(test_data)):
             text_to_show += str(test_data[i])
-            text_to_show += " "
+            text_to_show += "  "
         self.upper_adc_test_data_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.upper_adc_test_data_label.setWordWrap(True)
         self.upper_adc_test_data_label.setText(text_to_show)
@@ -599,15 +622,36 @@ Lower motor #{motor_number} has default settings'''
         self.lower_adc_test_data_label.setWordWrap(True)
         self.lower_adc_test_data_label.setText(text_to_show)
 
+    def adc_label_place_default_text(self, part):
+        default_text = "No data from"
+        if part == 'Upper':
+            ending = " UPPER Collector"
+            self.upper_adc_test_data_label.setText(default_text + ending)
+        elif part == 'Lower':
+            ending = " LOWER Collector"
+            self.lower_adc_test_data_label.setText(default_text + ending)
+        else:
+            print(f'place_default_text - No such part: {part}')
+
     def finish_upper_adc_test_thread(self):
         print('finishing the thread')
         self.upper_adc_test_thread.quit()
-        self.model.release_upper_comport_after_thread()
+        self.command_master.release_upper_comport_after_thread()
 
     def finish_lower_adc_test_thread(self):
         print('finishing the thread')
         self.lower_adc_test_thread.quit()
-        self.model.release_lower_comport_after_thread()
+        self.command_master.release_lower_comport_after_thread()
+
+    def upper_discard_adc_data(self):
+        self.upper_adc_test_data_label.clear()
+        self.adc_label_place_default_text('Upper')
+        self.upper_adc_collector.clear_test_data()
+
+    def lower_discard_adc_data(self):
+        self.lower_adc_test_data_label.clear()
+        self.adc_label_place_default_text('Lower')
+        self.lower_adc_collector.clear_test_data()
 
     def update_upper_adc_pwm_label(self, value):
         self.upper_motor_adc_test_pwm_label.setText(str(value))
@@ -744,7 +788,6 @@ Lower motor #{motor_number} has default settings'''
         self.manual_control.lower_set_finger(lower_finger_dict)
         self.lower_motors_finger_dict = lower_finger_dict
 
-    # TODO: Complete show-settings functionality
     def settings_from_file_init(self):
         text_to_show = ""
         text_to_show += "Upper motor-to-finger settings:\n"
@@ -755,7 +798,6 @@ Lower motor #{motor_number} has default settings'''
         for key, value in self.lower_motors_finger_dict.items():
             text_to_show += f"{key}) {value}\n"
 
-        text = "Some text"
         self.settings_from_file_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.settings_from_file_label.setWordWrap(True)
         self.settings_from_file_label.setText(text_to_show)

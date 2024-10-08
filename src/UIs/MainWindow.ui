@@ -1164,6 +1164,52 @@ background-color: white; text-align: justify; text-justify: inter-word;</string>
         <string>Check ADC</string>
        </property>
       </widget>
+      <widget class="QComboBox" name="upper_motors_adc_channel_comboBox">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>60</y>
+         <width>91</width>
+         <height>31</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="lower_motors_adc_channel_comboBox">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>91</width>
+         <height>31</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="upper_discard_adc_data_btn">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>120</y>
+         <width>75</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Discard</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="lower_discard_adc_data_btn">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>280</y>
+         <width>75</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Discard</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_2"/>

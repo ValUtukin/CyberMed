@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\PyCharmProjects\PyQt_withHub\CyberMed\src\PyQT-version\UIs\ManualControl.ui'
+# Form implementation generated from reading ui file 'C:/PyCharmProjects/PyQt_withHub/CyberMed/src/UIs/ManualControl.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
-
+from pyqtgraph import PlotWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -414,18 +414,15 @@ class Ui_MainWindow(object):
         self.upper_send_adc.setGeometry(QtCore.QRect(640, 10, 75, 23))
         self.upper_send_adc.setObjectName("upper_send_adc")
 
-        self.graphicsView = pg.PlotWidget(self.centralwidget)
+        self.graphicsView = PlotWidget(self.centralwidget)
         self.graphics_layout_widget = pg.GraphicsLayoutWidget()
         self.plotLayout = QtWidgets.QVBoxLayout(self.graphicsView)
         self.plotLayout.addWidget(self.graphics_layout_widget)
         self.graphicsView.setGeometry(QtCore.QRect(740, 60, 591, 571))
         self.graphicsView.setObjectName("graphicsView")
 
-        self.stop_receive_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.stop_receive_btn.setGeometry(QtCore.QRect(740, 20, 75, 23))
-        self.stop_receive_btn.setObjectName("stop_receive_btn")
         self.save_graph_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.save_graph_btn.setGeometry(QtCore.QRect(830, 20, 75, 23))
+        self.save_graph_btn.setGeometry(QtCore.QRect(1150, 10, 75, 31))
         self.save_graph_btn.setObjectName("save_graph_btn")
         self.save_move_script_btn = QtWidgets.QPushButton(self.centralwidget)
         self.save_move_script_btn.setGeometry(QtCore.QRect(570, 750, 75, 31))
@@ -448,6 +445,15 @@ class Ui_MainWindow(object):
         self.test_btn = QtWidgets.QPushButton(self.centralwidget)
         self.test_btn.setGeometry(QtCore.QRect(740, 750, 75, 31))
         self.test_btn.setObjectName("test_btn")
+
+        self.graph_name_input = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.graph_name_input.setStyleSheet("font-size: 12pt")  # Change the size of font
+        self.graph_name_input.setGeometry(QtCore.QRect(820, 10, 321, 31))
+        self.graph_name_input.setObjectName("graph_name_input")
+
+        self.enter_graph_name_label = QtWidgets.QLabel(self.centralwidget)
+        self.enter_graph_name_label.setGeometry(QtCore.QRect(740, 10, 81, 31))
+        self.enter_graph_name_label.setObjectName("enter_graph_name_label")
         MainWindow.setCentralWidget(self.centralwidget)
 
         # Lower part default time/delay values
@@ -565,7 +571,6 @@ class Ui_MainWindow(object):
         self.upper_motor4_adc_box.setText(_translate("MainWindow", "ADC"))
         self.upper_motor5_adc_box.setText(_translate("MainWindow", "ADC"))
         self.upper_send_adc.setText(_translate("MainWindow", "Send ADC"))
-        self.stop_receive_btn.setText(_translate("MainWindow", "Stop Receive"))
         self.save_graph_btn.setText(_translate("MainWindow", "Save Graph"))
         self.save_move_script_btn.setText(_translate("MainWindow", "Save script"))
         self.discard_move_script_btn.setText(_translate("MainWindow", "Discard script"))
@@ -573,4 +578,4 @@ class Ui_MainWindow(object):
         self.script_file_path_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Path to file here</span></p></body></html>"))
         self.open_script_file_btn.setText(_translate("MainWindow", "Open..."))
         self.test_btn.setText(_translate("MainWindow", "Test Button"))
-from pyqtgraph import PlotWidget
+        self.enter_graph_name_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Graph Name:</span></p></body></html>"))

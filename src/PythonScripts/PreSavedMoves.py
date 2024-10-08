@@ -1,6 +1,6 @@
 import sys
 import PreSavedMovesUi
-from Model import Model
+from CommandMaster import CommandMaster
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
@@ -25,7 +25,7 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
-        self.model = None
+        self.command_master = None
         self.move_script_file_path = None
         self.default_move_script_text = "Move script is now empty"
         self.place_default_text()
@@ -38,8 +38,8 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         self.current_cursor_position = 0
         self.previous_cursor_position = 0
 
-    def set_model(self, model: Model):
-        self.model = model
+    def set_command_master(self, master: CommandMaster):
+        self.command_master = master
 
     def place_default_text(self):
         self.move_script_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
@@ -71,14 +71,14 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
             command_byte = str_to_bytearray(command_str)
             print(f'Command {command_byte}, type {type(command_byte)}, len {len(command_byte)}')
             if part_flag:
-                self.model.send_command_bytes('Upper', command_byte)
+                self.command_master.send_command_bytes('Upper', command_byte)
                 part_flag = False
             else:
-                self.model.send_command_bytes('Lower', command_byte)
+                self.command_master.send_command_bytes('Lower', command_byte)
                 part_flag = True
         part_flag = True  # Set flag back to True. Just in case
-        self.model.power_command('Upper', config='00000001', power_byte='00000001')
-        self.model.power_command('Lower', config='00000001', power_byte='00000001')
+        self.command_master.power_command('Upper', config='00000001', power_byte='00000001')
+        self.command_master.power_command('Lower', config='00000001', power_byte='00000001')
 
     def send_next_command(self):
         if self.model is None:
@@ -94,14 +94,14 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
                 text_bytes = full_text_bytes[:self.current_cursor_position]
                 upper_command_str = text_bytes[self.previous_cursor_position:self.previous_cursor_position + 17]
                 upper_command = str_to_bytearray(upper_command_str)
-                self.model.send_command_bytes('Upper', upper_command)
+                self.command_master.send_command_bytes('Upper', upper_command)
 
                 lower_command_str = text_bytes[self.previous_cursor_position + 17:self.previous_cursor_position + 34]
                 lower_command = str_to_bytearray(lower_command_str)
-                self.model.send_command_bytes('Lower', lower_command)
+                self.command_master.send_command_bytes('Lower', lower_command)
 
-                self.model.power_command('Upper', config='00000001', power_byte='00000001')
-                self.model.power_command('Lower', config='00000001', power_byte='00000001')
+                self.command_master.power_command('Upper', config='00000001', power_byte='00000001')
+                self.command_master.power_command('Lower', config='00000001', power_byte='00000001')
 
                 self.previous_cursor_position = self.current_cursor_position
 

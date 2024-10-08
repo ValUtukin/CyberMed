@@ -23,7 +23,9 @@ class DataCollector(QObject):
         self.upper_comport_both = None
         self.lower_comport_both = None
 
-        self.testing_data = []
+        self.test_adc_byte_count = None
+        self.test_adc_delay = None
+        self.testing_data = list()
 
         if not args:
             self.initial_byte_count = None
@@ -140,20 +142,20 @@ class DataCollector(QObject):
                 self.segment_received.emit()
 
             # Receive left bytes < 20
-            print(f"Try to receive {less} bytes")
-            less_data = self.default_comport.read(less)
-            packet_counter += 1
-            print(f"Packet #{packet_counter}, len: {len(less_data)}")
-            for i in range(1, len(less_data), 2):
-                print(f"data[{i - 1}] = {less_data[i - 1]}, data[{i}] = {less_data[i]}")
-                new_data = (less_data[i - 1] + data[i] * 256) * 3.3 / 4096
-                print(f"{i + 1}) {new_data}, type {type(new_data)}")
-                set_name = str(i % len(self.data_set_holder))
-                self.add_value_to_set(set_name, new_data)
-            self.segment_received.emit()
+            if less != 0:
+                print(f"Try to receive {less} bytes")
+                less_data = self.default_comport.read(less)
+                packet_counter += 1
+                print(f"Packet #{packet_counter}, len: {len(less_data)}")
+                for i in range(1, len(less_data), 2):
+                    print(f"data[{i - 1}] = {less_data[i - 1]}, data[{i}] = {less_data[i]}")
+                    new_data = (less_data[i - 1] + data[i] * 256) * 3.3 / 4096
+                    print(f"{i + 1}) {new_data}, type {type(new_data)}")
+                    set_name = str(i % len(self.data_set_holder))
+                    self.add_value_to_set(set_name, new_data)
+                self.segment_received.emit()
 
             print(f'Just finished receiving data. Num of bytes {self.initial_byte_count}')
-            com.close_comport(self.default_comport)
         self.finished.emit()
 
     def upper_start_collecting_both(self):
@@ -244,16 +246,38 @@ class DataCollector(QObject):
             # com.close_comport(self.lower_comport_both)
         self.lower_both_finished.emit()
 
+    def set_test_adc_byte_count(self, time_to_work):
+        self.test_adc_byte_count = int(time_to_work * 50)
+
+    def set_test_adc_delay(self, delay_before_work):
+        self.test_adc_delay = delay_before_work
+
     def simple_adc_test(self):
-        for i in range(100):
-            self.testing_data.append(i + 1)
-            if len(self.testing_data) % 10 == 0:
-                self.adc_check_complete.emit()
-                time.sleep(0.5)
+        time.sleep(self.test_adc_delay)
+        packet_counter = 0
+        for i in range(0, self.test_adc_byte_count, 20):
+            data = self.default_comport.read(20)
+            packet_counter += 1
+            print(f"Packet #{packet_counter}, len: {len(data)}")
+            if len(data) == 0:
+                print("Packet len is 0")
+                # self.add_value_to_set('0', 0)
+            else:
+                for j in range(1, len(data), 2):
+                    print(f"data[{j - 1}] = {data[j - 1]}, data[{j}] = {data[j]}")
+                    new_data = (data[j - 1] + data[j] * 256) * 3.3 / 4096
+                    print(f"{j + 1}) {new_data}, type {type(new_data)}")
+
+                    self.testing_data.append(round(new_data, 3))
+        time.sleep(0.5)
+        self.adc_check_complete.emit()
         self.finished.emit()
 
     def get_test_data(self):
         return self.testing_data
+
+    def clear_test_data(self):
+        self.testing_data.clear()
 
 
 if __name__ == '__main__':

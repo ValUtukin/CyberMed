@@ -1,0 +1,10 @@
+2024-10-01 13:07:35.484298: Upper: COM8: SERVICE: Start New Session
+
+2024-10-01 13:07:36.564335: Lower: COM6: SERVICE: Start New Session
+
+2024-10-01 13:07:43.154067: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-01 13:07:43.154067: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=50, time=2.0, delay=0.0
+2024-10-01 13:07:43.155069: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-01 13:08:18.649105: Upper: COM8: ADC: config=(00100000), adc_byte=(8)
+2024-10-01 13:08:18.650123: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=50, time=2.0, delay=0.0
+2024-10-01 13:08:18.650123: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
