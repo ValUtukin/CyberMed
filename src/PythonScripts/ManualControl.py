@@ -37,43 +37,41 @@ def get_lower_opposite_pwm(up_pwm):
 
 
 def get_opposite_time_delay(original_time, original_delay):
-    opposite_time = original_time * 0.8  # 80 % of original time
-    opposite_delay = original_delay * 1.5  # 150 % of original delay
+    opposite_time = original_time * 0.6  # 80 % of original time
+    opposite_delay = original_delay * 1.3  # 150 % of original delay
     return opposite_time, opposite_delay
 
 
-def opposite_pwm_from_adc(adc_data):
+def opposite_pwm_from_adc(adc_data, part=None):
+    if part is not None:
+        if part == 'Upper':
+            print("PWM for Lower")
+        elif part == 'Lower':
+            print("PWM for Upper")
+        else:
+            print(f'Unknown part: {part}')
     last_value = adc_data['0'][-1]
     print(f"last_value - {last_value}")
     file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/ADC_Data/data.txt"
     with open(file_path, 'a') as f:
         f.write(str(last_value))
         f.write('\n')
-    # x0 = 1.3  # Max current (I) in idle mode
-    # x1 = 0.06  # Min current (I) in idle mode  (0.58) # Roman: 0.23
-    # y0 = 100  # Max PWM in idle mode
-    # y1 = 20  # Min PWM in idle mode
 
-    x0 = 0.01
-    x1 = 0.2
-    y0 = 60
-    y1 = 7
+    x0 = 0.15  # Max current (I) in idle mode
+    x1 = 0.04  # Min current (I) in idle mode  (0.58)
+    y0 = 40  # Max PWM in idle mode
+    y1 = 70  # Min PWM in idle mode
 
-    x = (last_value * 10) / 24.3902  # x for opposite pwm law y = f(x) # Roman: 93 # Roman: 0.15 -> 0.1
+    # x = (last_value * 10) / 24.3902  # x for opposite pwm law y = f(x) # Roman: 93 # Roman: 0.15 -> 0.1
+    x = last_value
     print(f'X = {x}')
-    y = (((y1 - y0) * (x - x0)) / (x1 - x0)) + y0
-
-    if y <= 0:
-        print(f"Opposite pwm based on ADC == {y}. Return 10")
-        return 10
-    elif (y > 0) and (y < 90):
-        print(f"Opposite pwm based on ADC > 0 and < 100: {y}")
-        # percent_pwm = (y / 100) * main_pwm
-        # print(f"PWM % = {percent_pwm}")
-        return int(y)
+    if x > x0:
+        y = y0
+    elif x < x1:
+        y = y1
     else:
-        print(f"Opposite pwm is unreliable: {y}. Return 30")
-        return 90
+        y = (((y1 - y0) * (x - x0)) / (x1 - x0)) + y0
+    return int(y)
 
 
 class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
@@ -226,10 +224,12 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         self.lower_rotation_dict = dict()
         self.upper_finger_dict = dict()
         self.lower_finger_dict = dict()
+        self.upper_adc_channels_dict = dict()
+        self.lower_adc_channels_dict = dict()
 
     #  Function for testing purposes. Connected to test_btn of ManualControlUI.py
     def test_func(self):
-        pass
+        print(self.upper_data_collector.get_data_sets())
 
     def upper_set_rotation(self, rotation_dict):
         print("ManualControl/upper_set_rotation - get a rotation dict:")
@@ -254,6 +254,18 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         for key, value in finger_dict.items():
             self.lower_finger_dict[key] = value
         print(self.lower_finger_dict)
+
+    def upper_set_adc_channels(self, adc_dict):
+        print("ManualControl/upper_set_adc_channels - get an ADC dict:")
+        for key, value in adc_dict.items():
+            self.upper_adc_channels_dict[key] = int(value)
+        print(self.upper_adc_channels_dict)
+
+    def lower_set_adc_channels(self, adc_dict):
+        print("ManualControl/lower_set_adc_channels - get an ADC dict:")
+        for key, value in adc_dict.items():
+            self.lower_adc_channels_dict[key] = int(value)
+        print(self.lower_adc_channels_dict)
 
     def upper_get_rotation(self):
         return self.upper_rotation_dict
@@ -346,12 +358,13 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         print(f'ManualControl/upper_update_plot_single')
         sets, dict_len = self.upper_data_collector.get_data_sets()
 
-        opposite_pwm = opposite_pwm_from_adc(sets)
+        opposite_pwm = opposite_pwm_from_adc(sets, part="Upper")
         motor_byte_base = '000'
-        motor_rotation_byte = self.lower_rotation_dict.get('_3')
-        motor_number_byte = self.lower_finger_dict.get('3')
+        motor_rotation_byte = self.lower_rotation_dict.get('_2')
+        motor_number_byte = self.lower_finger_dict.get('2')
         motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
-        self.command_master.send_command('Lower', '00000110', motor_byte, opposite_pwm)
+        self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=opposite_pwm,
+                                         work_time=0, delay=0)
         # self.model.power_command('Lower', config='00000001', power_byte='00000001')
 
         data_sets = list()
@@ -370,10 +383,10 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         print(f'ManualControl/update_plot')
         sets, dict_len = self.lower_data_collector.get_data_sets()
 
-        opposite_pwm = opposite_pwm_from_adc(sets)
+        opposite_pwm = opposite_pwm_from_adc(sets, part="Lower")
         motor_byte_base = '000'
-        motor_rotation_byte = self.upper_rotation_dict.get('_3')
-        motor_number_byte = self.upper_finger_dict.get('3')
+        motor_rotation_byte = self.upper_rotation_dict.get('_2')
+        motor_number_byte = self.upper_finger_dict.get('2')
         motor_byte = motor_byte_base + motor_rotation_byte + motor_number_byte
         self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=opposite_pwm,
                                          work_time=0, delay=0)
@@ -643,7 +656,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         for i in range(len(upper_adc_state)):
             if upper_adc_state[i]:
                 adc_number += 1
-                adc_decimal += 2 ** i
+                adc_decimal += 2 ** self.upper_adc_channels_dict[f'{i + 1}']
                 motor_indexes.append(i)
 
         if adc_number != 0:
@@ -786,9 +799,12 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
                                              work_time=time, delay=delay)
             byte_data = self.command_master.get_upper_commands_list()
             self.append_text('Upper', byte_data)
+
+            op_time, op_delay = get_opposite_time_delay(time, delay)
+
             configure_relatives_buttons(self.upper_motor3_buttons, 0)
 
-            self.lower_motor3_rotate_right([pwm, time, delay])
+            self.lower_motor3_rotate_right([int(pwm * 0.9), op_time, op_delay])
             configure_relatives_buttons(self.lower_motor3_buttons, 1)
         else:
             self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=args[0],
@@ -1025,7 +1041,8 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
         for i in range(len(lower_adc_state)):
             if lower_adc_state[i]:
                 adc_number += 1
-                adc_decimal += 2 ** i
+                adc_decimal += 2 ** self.lower_adc_channels_dict[f'{i + 1}']
+                print(f"adc_decimal = {adc_decimal}")
                 motor_indexes.append(i)
 
         if adc_number != 0:
@@ -1175,7 +1192,7 @@ class ManualControl(QtWidgets.QMainWindow, ManualControlUi.Ui_MainWindow):
 
             op_time, op_delay = get_opposite_time_delay(time, delay)
             print(op_time, op_delay)
-            self.upper_motor3_rotate_right([pwm, op_time, op_delay])
+            self.upper_motor3_rotate_right([int(pwm * 0.9), op_time, op_delay])
             configure_relatives_buttons(self.upper_motor3_buttons, 1)
         else:
             self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=args[0],

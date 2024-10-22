@@ -38,6 +38,40 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
         self.current_cursor_position = 0
         self.previous_cursor_position = 0
 
+        # Tense Fingers connections block
+        self.tense_finger_pwm_scale.valueChanged.connect(self.update_tense_finger_pwm_label)
+        self.tense_finger_comboBox.addItems(['Thumb', 'Index', 'Middle', 'Ring', 'Pinky'])
+        self.tense_finger_btn.clicked.connect(self.tense_finger_command)
+        self.release_finger_btn.clicked.connect(self.release_finger_command)
+        self.upper_rotation_dict = dict()
+        self.lower_rotation_dict = dict()
+        self.upper_finger_dict = dict()
+        self.lower_finger_dict = dict()
+
+    def upper_set_rotation(self, rotation_dict):
+        print("PreSavedMoves/upper_set_rotation - get a rotation dict:")
+        for key, value in rotation_dict.items():
+            self.upper_rotation_dict[key] = value
+        print(self.upper_rotation_dict)
+
+    def lower_set_rotation(self, rotation_dict):
+        print("PreSavedMoves/lower_set_rotation - get a rotation dict:")
+        for key, value in rotation_dict.items():
+            self.lower_rotation_dict[key] = value
+        print(self.lower_rotation_dict)
+
+    def upper_set_finger(self, finger_dict):
+        print("PreSavedMoves/upper_set_finger - get a finger dict:")
+        for key, value in finger_dict.items():
+            self.upper_finger_dict[key] = value
+        print(self.upper_finger_dict)
+
+    def lower_set_finger(self, finger_dict):
+        print("PreSavedMoves/lower_set_finger - get a finger dict:")
+        for key, value in finger_dict.items():
+            self.lower_finger_dict[key] = value
+        print(self.lower_finger_dict)
+
     def set_command_master(self, master: CommandMaster):
         self.command_master = master
 
@@ -104,6 +138,139 @@ class PreSavedMoves(QtWidgets.QMainWindow, PreSavedMovesUi.Ui_MainWindow):
                 self.command_master.power_command('Lower', config='00000001', power_byte='00000001')
 
                 self.previous_cursor_position = self.current_cursor_position
+
+    def tense_finger_command(self):
+        current_finger_index = self.tense_finger_comboBox.currentIndex()
+        motor_byte_base = '000'
+        upper_motor_byte = ''
+        lower_motor_byte = ''
+        if current_finger_index == 0:
+            print('Tense - Thumb')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('1')
+            upper_motor_number_byte = self.upper_finger_dict.get('1')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('1')
+            lower_motor_number_byte = self.lower_finger_dict.get('1')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 1:
+            print('Tense - Index')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('2')
+            upper_motor_number_byte = self.upper_finger_dict.get('2')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('2')
+            lower_motor_number_byte = self.lower_finger_dict.get('2')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 2:
+            print('Tense - Middle')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('3')
+            upper_motor_number_byte = self.upper_finger_dict.get('3')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('3')
+            lower_motor_number_byte = self.lower_finger_dict.get('3')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 3:
+            print('Tense - Ring')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('4')
+            upper_motor_number_byte = self.upper_finger_dict.get('4')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('4')
+            lower_motor_number_byte = self.lower_finger_dict.get('4')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 4:
+            print('Tense - Pinky')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('5')
+            upper_motor_number_byte = self.upper_finger_dict.get('5')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('5')
+            lower_motor_number_byte = self.lower_finger_dict.get('5')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        else:
+            print(f'Unknown finger index: {current_finger_index}')
+
+        pwm = self.tense_finger_pwm_scale.value()
+        time = float(self.tense_finger_time_input.toPlainText())
+        if upper_motor_byte != '' and lower_motor_byte != '':
+            self.command_master.send_command(part='Upper', config='00001110', motor_byte=upper_motor_byte, pwm=pwm,
+                                             work_time=time)
+            self.command_master.send_command(part='Lower', config='00001110', motor_byte=lower_motor_byte, pwm=pwm,
+                                             work_time=time)
+            self.command_master.power_command('Upper', config='00000001', power_byte='00000001')
+            self.command_master.power_command('Lower', config='00000001', power_byte='00000001')
+        else:
+            print('PreSavedMoves/tense_finger_command - motor bytes are empty')
+
+    def release_finger_command(self):
+        current_finger_index = self.tense_finger_comboBox.currentIndex()
+        motor_byte_base = '000'
+        upper_motor_byte = ''
+        lower_motor_byte = ''
+        if current_finger_index == 0:
+            print('Release - Thumb')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('_1')
+            upper_motor_number_byte = self.upper_finger_dict.get('1')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('_1')
+            lower_motor_number_byte = self.lower_finger_dict.get('1')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 1:
+            print('Release - Index')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('_2')
+            upper_motor_number_byte = self.upper_finger_dict.get('2')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('_2')
+            lower_motor_number_byte = self.lower_finger_dict.get('2')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 2:
+            print('Release - Middle')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('_3')
+            upper_motor_number_byte = self.upper_finger_dict.get('3')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('_3')
+            lower_motor_number_byte = self.lower_finger_dict.get('3')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 3:
+            print('Release - Ring')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('_4')
+            upper_motor_number_byte = self.upper_finger_dict.get('4')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('_4')
+            lower_motor_number_byte = self.lower_finger_dict.get('4')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        elif current_finger_index == 4:
+            print('Release - Pinky')
+            upper_motor_rotation_byte = self.upper_rotation_dict.get('_5')
+            upper_motor_number_byte = self.upper_finger_dict.get('5')
+            upper_motor_byte = motor_byte_base + upper_motor_rotation_byte + upper_motor_number_byte
+
+            lower_motor_rotation_byte = self.lower_rotation_dict.get('_5')
+            lower_motor_number_byte = self.lower_finger_dict.get('5')
+            lower_motor_byte = motor_byte_base + lower_motor_rotation_byte + lower_motor_number_byte
+        else:
+            print(f'Unknown finger index: {current_finger_index}')
+
+        pwm = 50
+        time = 0.2
+        if upper_motor_byte != '' and lower_motor_byte != '':
+            self.command_master.send_command(part='Upper', config='00001110', motor_byte=upper_motor_byte, pwm=pwm,
+                                             work_time=time)
+            self.command_master.send_command(part='Lower', config='00001110', motor_byte=lower_motor_byte, pwm=pwm,
+                                             work_time=time)
+            self.command_master.power_command('Upper', config='00000001', power_byte='00000001')
+            self.command_master.power_command('Lower', config='00000001', power_byte='00000001')
+        else:
+            print('PreSavedMoves/tense_finger_command - motor bytes are empty')
+
+    def update_tense_finger_pwm_label(self, value):
+        self.tense_finger_pwm_label.setText(str(value))
 
 
 def main():

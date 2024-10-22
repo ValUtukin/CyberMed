@@ -462,7 +462,7 @@ class Ui_MainWindow(object):
         self.lower_motor2_delay_input.setPlainText('1.0')
         self.lower_motor3_delay_input.setPlainText('1.0')
         self.lower_motor5_delay_input.setPlainText('1.0')
-        self.lower_motor3_time_input.setPlainText('0.5')
+        self.lower_motor3_time_input.setPlainText('1.0')
         self.lower_motor2_time_input.setPlainText('0.5')
         self.lower_motor1_time_input.setPlainText('0.5')
         self.lower_motor1_delay_input.setPlainText('1.0')

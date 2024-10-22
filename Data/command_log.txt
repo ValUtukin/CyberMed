@@ -1,10 +1,243 @@
-2024-10-01 13:07:35.484298: Upper: COM8: SERVICE: Start New Session
+2024-10-22 10:24:09.080567: Upper: COM8: SERVICE: Start New Session
 
-2024-10-01 13:07:36.564335: Lower: COM6: SERVICE: Start New Session
+2024-10-22 10:24:10.159910: Lower: COM6: SERVICE: Start New Session
 
-2024-10-01 13:07:43.154067: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
-2024-10-01 13:07:43.154067: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=50, time=2.0, delay=0.0
-2024-10-01 13:07:43.155069: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
-2024-10-01 13:08:18.649105: Upper: COM8: ADC: config=(00100000), adc_byte=(8)
-2024-10-01 13:08:18.650123: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=50, time=2.0, delay=0.0
-2024-10-01 13:08:18.650123: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:24:22.846109: Lower: COM6: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:24:23.773359: Lower: COM6: MOVE: config=(00011110), motor=(00001010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:24:23.774356: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:24:24.902069: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:24:24.902069: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:24:26.104562: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:26.303870: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:26.504027: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=42, time=0.0, delay=0.0
+2024-10-22 10:24:26.703767: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:26.904164: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:44.669200: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:24:45.494265: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:24:45.495018: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:24:47.205388: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:24:47.206406: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:24:48.210157: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:24:48.222151: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:24:48.408351: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:48.608994: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:48.808925: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:55.949296: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:24:56.797409: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:24:56.798427: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:24:57.789920: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:24:57.789920: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:24:58.793748: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:58.805778: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:24:58.815773: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:24:58.992342: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:24:59.193168: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:25:54.861515: Lower: COM6: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:25:56.222315: Lower: COM6: MOVE: config=(00011110), motor=(00001010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:25:56.222315: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:26:02.325412: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:26:02.326430: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:26:03.329383: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:03.342412: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:03.352406: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:03.362400: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:03.527788: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:26:13.334228: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:26:14.126350: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:26:14.127105: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:26:15.773906: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:26:15.773906: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:26:16.779274: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:26:16.869875: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:16.872954: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:16.875819: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:16.877820: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:29.589537: Lower: COM6: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:26:30.382459: Lower: COM6: MOVE: config=(00011110), motor=(00001010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:26:30.383217: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:26:31.549927: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:26:31.549927: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:26:32.553610: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:26:32.572446: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:32.584436: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:32.594434: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:26:32.603458: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:27:07.062303: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:27:08.046373: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:27:08.046373: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:27:09.606135: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:27:09.606135: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:27:10.610641: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:10.624301: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:10.635545: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:10.645537: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:10.651052: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:20.486410: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:27:21.582395: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:27:21.582395: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:27:22.333434: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:27:22.334452: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:27:23.338285: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=50, time=0.0, delay=0.0
+2024-10-22 10:27:23.354949: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:23.366941: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:23.370937: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:27:23.374934: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:42:59.809835: Upper: COM8: SERVICE: Start New Session
+
+2024-10-22 10:43:00.681816: Lower: COM6: SERVICE: Start New Session
+
+2024-10-22 10:43:10.383850: Lower: COM6: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:43:11.487328: Lower: COM6: MOVE: config=(00011110), motor=(00001010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:43:11.488329: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:43:12.623290: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:43:12.624134: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:43:13.825520: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:14.025838: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:14.226033: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:14.425673: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:14.625291: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:36.463726: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:43:37.879733: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=1.5, delay=1.0
+2024-10-22 10:43:37.879733: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.8, delay=1.3
+2024-10-22 10:43:39.231594: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:43:39.231594: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:43:40.234987: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:43:40.246980: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:43:40.434079: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:40.634048: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:40.832611: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:41.034423: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:41.233930: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:41.433886: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:43:53.774936: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:43:54.719728: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.5, delay=1.0
+2024-10-22 10:43:54.720299: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.2, delay=1.3
+2024-10-22 10:43:55.614961: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:43:55.615980: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:43:56.618819: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:43:56.630839: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:43:56.641169: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:14.063736: Lower: COM6: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:44:15.047792: Lower: COM6: MOVE: config=(00011110), motor=(00001010), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:44:15.048558: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=63, time=0.5, delay=1.3
+2024-10-22 10:44:16.063301: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:44:16.063301: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:44:17.066867: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:17.079075: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:17.089070: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:17.099208: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:17.266763: Upper: COM8: MOVE: config=(00011110), motor=(00001010), pwm=53, time=0.0, delay=0.0
+2024-10-22 10:44:31.647758: Upper: COM8: ADC: config=(00100000), adc_byte=(4)
+2024-10-22 10:44:32.423808: Upper: COM8: MOVE: config=(00011110), motor=(00010010), pwm=70, time=1.5, delay=1.0
+2024-10-22 10:44:32.423808: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=63, time=0.8, delay=1.3
+2024-10-22 10:44:33.438883: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:44:33.439841: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:44:34.444726: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:44:34.456726: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:34.467054: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:34.473126: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:44:34.642168: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=43, time=0.0, delay=0.0
+2024-10-22 10:44:34.841977: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:44:35.042317: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:44:35.055310: Lower: COM6: MOVE: config=(00011110), motor=(00010010), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:46:18.290419: Upper: COM8: SERVICE: Start New Session
+
+2024-10-22 10:46:19.138238: Lower: COM6: SERVICE: Start New Session
+
+2024-10-22 10:47:17.007335: Lower: COM6: ADC: config=(00100000), adc_byte=(5)
+2024-10-22 10:47:29.408045: Upper: COM8: ADC: config=(00100000), adc_byte=(28)
+2024-10-22 10:48:37.400075: Upper: COM8: ADC: config=(00100000), adc_byte=(20)
+2024-10-22 10:58:31.931365: Upper: COM8: SERVICE: Start New Session
+
+2024-10-22 10:58:32.731379: Lower: COM6: SERVICE: Start New Session
+
+2024-10-22 10:58:43.008112: Lower: COM6: ADC: config=(00100000), adc_byte=(1)
+2024-10-22 10:58:43.953143: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:58:43.953143: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=21, time=1.0, delay=1.0
+2024-10-22 10:58:45.248891: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:58:45.248891: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:58:46.451141: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:58:46.650403: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:58:46.850644: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:58:47.050603: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:58:47.250539: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:59:05.552971: Upper: COM8: ADC: config=(00100000), adc_byte=(2)
+2024-10-22 10:59:06.600307: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:59:06.601309: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=21, time=1.0, delay=1.0
+2024-10-22 10:59:12.608829: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:59:12.609458: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:59:13.612290: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:59:13.627452: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:59:13.639409: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:59:13.649597: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:59:13.655555: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:59:31.592997: Lower: COM6: ADC: config=(00100000), adc_byte=(1)
+2024-10-22 10:59:32.352250: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:59:32.353269: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=21, time=1.0, delay=1.0
+2024-10-22 10:59:33.344028: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:59:33.345032: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:59:34.348090: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:59:34.359652: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=70, time=0.0, delay=0.0
+2024-10-22 10:59:34.544714: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=51, time=0.0, delay=0.0
+2024-10-22 10:59:34.746510: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=58, time=0.0, delay=0.0
+2024-10-22 10:59:34.946850: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=53, time=0.0, delay=0.0
+2024-10-22 10:59:44.529003: Upper: COM8: ADC: config=(00100000), adc_byte=(2)
+2024-10-22 10:59:45.456264: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=70, time=1.0, delay=1.0
+2024-10-22 10:59:45.457283: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=21, time=1.0, delay=1.0
+2024-10-22 10:59:46.256488: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:59:46.256488: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:59:47.260173: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:59:47.279991: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:59:47.291012: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:59:47.301205: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:59:47.310541: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 10:59:59.632206: Upper: COM8: MOVE: config=(00001110), motor=(00010000), pwm=50, time=0.2, delay=0.0
+2024-10-22 10:59:59.633224: Lower: COM6: MOVE: config=(00001110), motor=(00001001), pwm=50, time=0.2, delay=0.0
+2024-10-22 10:59:59.633224: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 10:59:59.634208: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:01:11.321324: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:01:11.321324: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:01:16.977329: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=60, time=0.5, delay=0.0
+2024-10-22 11:01:16.977329: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:01:35.545750: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=60, time=0.5, delay=0.0
+2024-10-22 11:01:35.545750: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:02:06.713635: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:02:06.713635: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:02:08.472698: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:02:08.473700: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:02:30.913387: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:02:30.913387: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:02:35.033656: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:02:35.033656: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:02:52.289113: Lower: COM6: ADC: config=(00100000), adc_byte=(1)
+2024-10-22 11:02:53.265105: Lower: COM6: MOVE: config=(00011110), motor=(00010001), pwm=70, time=1.0, delay=1.0
+2024-10-22 11:02:53.266135: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=21, time=1.0, delay=1.0
+2024-10-22 11:02:55.321316: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:02:55.321316: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:02:56.324656: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=47, time=0.0, delay=0.0
+2024-10-22 11:02:56.342482: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=70, time=0.0, delay=0.0
+2024-10-22 11:02:56.348555: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=70, time=0.0, delay=0.0
+2024-10-22 11:02:56.354527: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=70, time=0.0, delay=0.0
+2024-10-22 11:02:56.360633: Upper: COM8: MOVE: config=(00011110), motor=(00010000), pwm=70, time=0.0, delay=0.0
+2024-10-22 11:03:25.312389: Upper: COM8: ADC: config=(00100000), adc_byte=(2)
+2024-10-22 11:03:26.233351: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=70, time=1.0, delay=1.0
+2024-10-22 11:03:26.234125: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=21, time=1.0, delay=1.0
+2024-10-22 11:03:27.704491: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:03:27.705509: Lower: COM6: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:03:28.708792: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 11:03:28.728296: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 11:03:28.739325: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 11:03:28.745443: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 11:03:28.751418: Lower: COM6: MOVE: config=(00011110), motor=(00001001), pwm=40, time=0.0, delay=0.0
+2024-10-22 11:03:55.313548: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:03:55.313548: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:03:56.425631: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:03:56.425631: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:03:57.505768: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:03:57.505768: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:03:58.977792: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:03:58.977792: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:04:02.322214: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:04:02.322214: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)
+2024-10-22 11:04:03.185815: Upper: COM8: MOVE: config=(00011110), motor=(00001000), pwm=60, time=0.2, delay=0.0
+2024-10-22 11:04:03.185815: Upper: COM8: POWER: config=(00000001), power_byte=(00000001)

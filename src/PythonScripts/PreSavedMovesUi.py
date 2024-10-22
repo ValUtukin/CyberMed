@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\PyCharmProjects\PyQt_withHub\CyberMed\src\PyQT-version\UIs\PreSavedMoves.ui'
+# Form implementation generated from reading ui file 'C:/PyCharmProjects/PyQt_withHub/CyberMed/src/UIs/PreSavedMoves.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -22,8 +22,7 @@ class Ui_MainWindow(object):
         self.current_script_label.setObjectName("current_script_label")
         self.script_file_path_label = QtWidgets.QLabel(self.centralwidget)
         self.script_file_path_label.setGeometry(QtCore.QRect(170, 10, 561, 31))
-        self.script_file_path_label.setStyleSheet(" background-color: white; border-bottom-style: solid; "
-                                                  "border-bottom-width: 1px;")
+        self.script_file_path_label.setStyleSheet(" background-color: white; border-bottom-style: solid; border-bottom-width: 1px;")
         self.script_file_path_label.setObjectName("script_file_path_label")
         self.open_script_file_btn = QtWidgets.QPushButton(self.centralwidget)
         self.open_script_file_btn.setGeometry(QtCore.QRect(740, 10, 75, 31))
@@ -34,7 +33,7 @@ class Ui_MainWindow(object):
         self.move_script_label = QtWidgets.QLabel(self.centralwidget)
         self.move_script_label.setGeometry(QtCore.QRect(10, 50, 721, 91))
         self.move_script_label.setStyleSheet("border-style: solid;border-color: rgb(0, 0, 0);border-width: 1px;\n"
-                                             "background-color: white; text-align: justify; text-justify: inter-word;")
+"background-color: white; text-align: justify; text-justify: inter-word;")
         self.move_script_label.setObjectName("move_script_label")
         self.send_full_sequence_btn = QtWidgets.QPushButton(self.centralwidget)
         self.send_full_sequence_btn.setGeometry(QtCore.QRect(510, 150, 101, 31))
@@ -42,6 +41,37 @@ class Ui_MainWindow(object):
         self.send_next_command_btn = QtWidgets.QPushButton(self.centralwidget)
         self.send_next_command_btn.setGeometry(QtCore.QRect(620, 150, 111, 31))
         self.send_next_command_btn.setObjectName("send_next_command_btn")
+        self.tense_finger_comboBox = QtWidgets.QComboBox(self.centralwidget)
+        self.tense_finger_comboBox.setGeometry(QtCore.QRect(100, 210, 81, 31))
+        self.tense_finger_comboBox.setObjectName("tense_finger_comboBox")
+        self.tense_finger_label = QtWidgets.QLabel(self.centralwidget)
+        self.tense_finger_label.setGeometry(QtCore.QRect(10, 210, 81, 31))
+        self.tense_finger_label.setObjectName("tense_finger_label")
+        self.tense_finger_pwm_scale = QtWidgets.QSlider(self.centralwidget)
+        self.tense_finger_pwm_scale.setGeometry(QtCore.QRect(190, 210, 160, 31))
+        self.tense_finger_pwm_scale.setMaximum(100)
+        self.tense_finger_pwm_scale.setOrientation(QtCore.Qt.Horizontal)
+        self.tense_finger_pwm_scale.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.tense_finger_pwm_scale.setTickInterval(10)
+        self.tense_finger_pwm_scale.setObjectName("tense_finger_pwm_scale")
+        self.tense_finger_pwm_label = QtWidgets.QLabel(self.centralwidget)
+        self.tense_finger_pwm_label.setGeometry(QtCore.QRect(340, 190, 21, 21))
+        self.tense_finger_pwm_label.setObjectName("tense_finger_pwm_label")
+        self.tense_finger_time_input = QtWidgets.QTextEdit(self.centralwidget)
+        self.tense_finger_time_input.setGeometry(QtCore.QRect(400, 210, 61, 31))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.tense_finger_time_input.setFont(font)
+        self.tense_finger_time_input.setObjectName("tense_finger_time_input")
+        self.tense_finger_time_label = QtWidgets.QLabel(self.centralwidget)
+        self.tense_finger_time_label.setGeometry(QtCore.QRect(360, 210, 47, 31))
+        self.tense_finger_time_label.setObjectName("tense_finger_time_label")
+        self.tense_finger_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.tense_finger_btn.setGeometry(QtCore.QRect(470, 210, 75, 31))
+        self.tense_finger_btn.setObjectName("tense_finger_btn")
+        self.release_finger_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.release_finger_btn.setGeometry(QtCore.QRect(550, 210, 81, 31))
+        self.release_finger_btn.setObjectName("release_finger_btn")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1346, 21))
@@ -64,3 +94,8 @@ class Ui_MainWindow(object):
         self.move_script_label.setText(_translate("MainWindow", "Text"))
         self.send_full_sequence_btn.setText(_translate("MainWindow", "Send Full Sequence"))
         self.send_next_command_btn.setText(_translate("MainWindow", "Send Next Command"))
+        self.tense_finger_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Tense finger:</span></p></body></html>"))
+        self.tense_finger_pwm_label.setText(_translate("MainWindow", "0"))
+        self.tense_finger_time_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Time:</span></p></body></html>"))
+        self.tense_finger_btn.setText(_translate("MainWindow", "Tense Finger"))
+        self.release_finger_btn.setText(_translate("MainWindow", "Release Finger"))

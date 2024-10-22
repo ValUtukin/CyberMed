@@ -52,6 +52,8 @@ class MyApplication(QMainWindow):
         self.lower_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_rotation.txt"
         self.upper_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_finger.txt"
         self.lower_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_finger.txt"
+        self.upper_adc_channels_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_adc_channels.txt"
+        self.lower_adc_channels_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_adc_channels.txt"
 
         self.upper_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
@@ -59,10 +61,10 @@ class MyApplication(QMainWindow):
         self.lower_motors_finger_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.upper_motors_adc_test_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_adc_test_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
-        self.upper_motors_adc_channel_comboBox.addItems(['Channel 1', 'Channel 2', 'Channel 3', 'Channel 4',
-                                                         'Channel 5', 'Channel 6'])
-        self.lower_motors_adc_channel_comboBox.addItems(['Channel 1', 'Channel 2', 'Channel 3', 'Channel 4',
-                                                         'Channel 5', 'Channel 6'])
+        self.upper_motors_adc_channel_comboBox.addItems(['Channel 0', 'Channel 1', 'Channel 2', 'Channel 3',
+                                                         'Channel 4', 'Channel 5'])
+        self.lower_motors_adc_channel_comboBox.addItems(['Channel 0', 'Channel 1', 'Channel 2', 'Channel 3',
+                                                         'Channel 4', 'Channel 5'])
         self.upper_motors_rotation_dict = {
             '1': '01',
             '2': '01',
@@ -115,6 +117,26 @@ class MyApplication(QMainWindow):
         }
         self.lower_motors_finger_dict_default = self.lower_motors_finger_dict.copy()
 
+        self.upper_adc_channels_dict = {
+            '1': '0',
+            '2': '1',
+            '3': '2',
+            '4': '3',
+            '5': '4',
+            '6': '5'
+        }
+        self.upper_adc_channels_dict_default = self.upper_adc_channels_dict.copy()
+
+        self.lower_adc_channels_dict = {
+            '1': '0',
+            '2': '1',
+            '3': '2',
+            '4': '3',
+            '5': '4',
+            '6': '5'
+        }
+        self.lower_adc_channels_dict_default = self.lower_adc_channels_dict.copy()
+
         self.upper_motor_pwm_scale.valueChanged.connect(self.update_upper_pwm_label)
         self.lower_motor_pwm_scale.valueChanged.connect(self.update_lower_pwm_label)
 
@@ -143,6 +165,8 @@ class MyApplication(QMainWindow):
         self.lower_check_adc_btn.clicked.connect(self.lower_check_adc)
         self.upper_motor_adc_test_pwm_scale.valueChanged.connect(self.update_upper_adc_pwm_label)
         self.lower_motor_adc_test_pwm_scale.valueChanged.connect(self.update_lower_adc_pwm_label)
+        self.upper_apply_adc_data_btn.clicked.connect(self.upper_apply_adc_data)
+        self.lower_apply_adc_data_btn.clicked.connect(self.lower_apply_adc_data)
         self.upper_discard_adc_data_btn.clicked.connect(self.upper_discard_adc_data)
         self.lower_discard_adc_data_btn.clicked.connect(self.lower_discard_adc_data)
         self.adc_label_place_default_text('Upper')
@@ -155,18 +179,24 @@ class MyApplication(QMainWindow):
         self.lower_open_rotation_file_for_save_btn.clicked.connect(self.lower_open_rotation_file)
         self.upper_open_finger_file_for_save_btn.clicked.connect(self.upper_open_finger_file)
         self.lower_open_finger_file_for_save_btn.clicked.connect(self.lower_open_finger_file)
+        self.upper_open_adc_file_for_save_btn.clicked.connect(self.upper_open_adc_file)
+        self.lower_open_adc_file_for_save_btn.clicked.connect(self.lower_open_adc_file)
 
         #  Override-File connections
         self.upper_override_rotation_file_btn.clicked.connect(self.upper_override_rotation_file)
         self.lower_override_rotation_file_btn.clicked.connect(self.lower_override_rotation_file)
         self.upper_override_finger_file_btn.clicked.connect(self.upper_override_finger_file)
         self.lower_override_finger_file_btn.clicked.connect(self.lower_override_finger_file)
+        self.upper_override_adc_file_btn.clicked.connect(self.upper_override_adc_file)
+        self.lower_override_adc_file_btn.clicked.connect(self.lower_override_adc_file)
 
         #  Load-File connections
         self.upper_load_rotation_btn.clicked.connect(self.upper_load_rotation)
         self.lower_load_rotation_btn.clicked.connect(self.lower_load_rotation)
         self.upper_load_finger_btn.clicked.connect(self.upper_load_finger)
         self.lower_load_finger_btn.clicked.connect(self.lower_load_finger)
+        self.upper_load_adc_btn.clicked.connect(self.upper_load_adc)
+        self.lower_load_adc_btn.clicked.connect(self.lower_load_adc)
 
         #  COMPORT connections
         self.upper_comport_comboBox.activated.connect(self.upper_update_comport_combo_box)
@@ -224,6 +254,8 @@ class MyApplication(QMainWindow):
         lower_rotation_dict = dict()
         upper_finger_dict = dict()
         lower_finger_dict = dict()
+        upper_adc_channels_dict = dict()
+        lower_adc_channels_dict = dict()
 
         # Load upper rotation file
         with open(self.upper_rotation_file_path, 'r') as f:
@@ -271,14 +303,47 @@ class MyApplication(QMainWindow):
                 motor_number_str = line[motor_number_position]
                 lower_finger_dict[motor_number_str] = motor_finger_str
 
+        # Load upper ADC channels file
+        with open(self.upper_adc_channels_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_adc_position = line.find(":") + 2
+                motor_adc_str = line[motor_adc_position:motor_adc_position + 3]
+                motor_number_str = line[motor_number_position]
+                upper_adc_channels_dict[motor_number_str] = motor_adc_str
+
+        # Load lower ADC channels file
+        with open(self.lower_adc_channels_file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_adc_position = line.find(":") + 2
+                motor_adc_str = line[motor_adc_position:motor_adc_position + 3]
+                motor_number_str = line[motor_number_position]
+                lower_adc_channels_dict[motor_number_str] = motor_adc_str
+
         self.manual_control.upper_set_rotation(upper_rotation_dict)
+        self.pre_saved_moves.upper_set_rotation(upper_rotation_dict)
         self.upper_motors_rotation_dict = upper_rotation_dict
+
         self.manual_control.lower_set_rotation(lower_rotation_dict)
+        self.pre_saved_moves.lower_set_rotation(lower_rotation_dict)
         self.lower_motors_rotation_dict = lower_rotation_dict
+
         self.manual_control.upper_set_finger(upper_finger_dict)
+        self.pre_saved_moves.upper_set_finger(upper_finger_dict)
         self.upper_motors_finger_dict = upper_finger_dict
+
         self.manual_control.lower_set_finger(lower_finger_dict)
+        self.pre_saved_moves.lower_set_finger(lower_finger_dict)
         self.lower_motors_finger_dict = lower_finger_dict
+
+        self.upper_adc_channels_dict = upper_adc_channels_dict
+        self.manual_control.upper_set_adc_channels(upper_adc_channels_dict)
+
+        self.lower_adc_channels_dict = lower_adc_channels_dict
+        self.manual_control.lower_set_adc_channels(lower_adc_channels_dict)
 
     def manual_control(self):
         self.stackedWidget.setCurrentWidget(self.manual_control)
@@ -443,7 +508,6 @@ class MyApplication(QMainWindow):
         warning_message = f'''Nothing to change: reverse flag - {reverse_flag}
 Upper motor #{motor_number} has default settings'''
         if reverse_flag:
-            # self.manual_control.upper_change_motor_rotation(motor_number)
             motor_key_str = str(motor_number)
             temp = self.upper_motors_rotation_dict.get(motor_key_str)
             self.upper_motors_rotation_dict[motor_key_str] = self.upper_motors_rotation_dict[f'_{motor_key_str}']
@@ -458,7 +522,6 @@ Upper motor #{motor_number} has default settings'''
         warning_message = f'''Nothing to change: reverse flag - {reverse_flag}
 Lower motor #{motor_number} has default settings'''
         if reverse_flag:
-            # self.manual_control.lower_change_motor_rotation(motor_number)
             motor_key_str = str(motor_number)
             temp = self.lower_motors_rotation_dict.get(motor_key_str)
             self.lower_motors_rotation_dict[motor_key_str] = self.lower_motors_rotation_dict[f'_{motor_key_str}']
@@ -570,8 +633,8 @@ Lower motor #{motor_number} has default settings'''
     # TODO: Finish this method according to upper_check_adc
     def lower_check_adc(self):
         motor_number = self.lower_motors_adc_test_comboBox.currentIndex() + 1
+        adc_channel = self.lower_motors_adc_channel_comboBox.currentIndex()
         pwm = self.lower_motor_adc_test_pwm_scale.value()
-
         time_to_work = 1.0
         delay_before_work = 0.0
         motor_byte_base = '000'
@@ -579,7 +642,9 @@ Lower motor #{motor_number} has default settings'''
         motor_finger_number = self.lower_motors_finger_dict[f'{motor_number}']  # string number 000, 001, 010 etc.
         motor_byte = motor_byte_base + motor_rotation_mode + motor_finger_number
 
-        adc_decimal = 2 ** motor_number
+        adc_decimal = 2 ** adc_channel
+        self.lower_adc_collector.set_test_adc_byte_count(time_to_work=time_to_work)
+        self.lower_adc_collector.set_test_adc_delay(delay_before_work=delay_before_work)
         self.command_master.lower_send_adc(adc_decimal=adc_decimal)
         self.command_master.send_command(part="Lower", config='00011110', motor_byte=motor_byte, pwm=pwm,
                                          work_time=time_to_work, delay=delay_before_work)
@@ -604,10 +669,9 @@ Lower motor #{motor_number} has default settings'''
     def upper_show_adc_test_data(self):
         test_data = self.upper_adc_collector.get_test_data()
         text_to_show = ""
-        print(len(test_data))
         for i in range(len(test_data)):
             text_to_show += str(test_data[i])
-            text_to_show += "  "
+            text_to_show += " "
         self.upper_adc_test_data_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.upper_adc_test_data_label.setWordWrap(True)
         self.upper_adc_test_data_label.setText(text_to_show)
@@ -643,6 +707,36 @@ Lower motor #{motor_number} has default settings'''
         self.lower_adc_test_thread.quit()
         self.command_master.release_lower_comport_after_thread()
 
+    def upper_apply_adc_data(self):
+        motor_number = str(self.upper_motors_adc_test_comboBox.currentIndex() + 1)
+        adc_channel = str(self.upper_motors_adc_channel_comboBox.currentIndex())
+        print(f'Upper ADC -> Motor #{motor_number}, adc channel: {adc_channel}')
+
+        for key, value in self.upper_adc_channels_dict.items():
+            if value == adc_channel:
+                if key == motor_number:
+                    print(f'Nothing to change: Motor #{motor_number} is already {adc_channel}')
+                else:
+                    temp = self.upper_adc_channels_dict[motor_number]
+                    self.upper_adc_channels_dict[motor_number] = adc_channel
+                    self.upper_adc_channels_dict[key] = temp
+        print(self.upper_adc_channels_dict)
+
+    def lower_apply_adc_data(self):
+        motor_number = str(self.lower_motors_adc_test_comboBox.currentIndex() + 1)
+        adc_channel = str(self.lower_motors_adc_channel_comboBox.currentIndex())
+        print(f'Lower ADC -> Motor #{motor_number}, adc channel: {adc_channel}')
+
+        for key, value in self.lower_adc_channels_dict.items():
+            if value == adc_channel:
+                if key == motor_number:
+                    print(f'Nothing to change: Motor #{motor_number} is already {adc_channel}')
+                else:
+                    temp = self.lower_adc_channels_dict[motor_number]
+                    self.lower_adc_channels_dict[motor_number] = adc_channel
+                    self.lower_adc_channels_dict[key] = temp
+        print(self.lower_adc_channels_dict)
+
     def upper_discard_adc_data(self):
         self.upper_adc_test_data_label.clear()
         self.adc_label_place_default_text('Upper')
@@ -659,6 +753,7 @@ Lower motor #{motor_number} has default settings'''
     def update_lower_adc_pwm_label(self, value):
         self.lower_motor_adc_test_pwm_label.setText(str(value))
 
+    # Methods to OPEN settings file. Prepare it for further work
     def upper_open_rotation_file(self):
         window_name = "Open File (Upper rotation)"
         search_dir = "../../Data/"
@@ -691,7 +786,23 @@ Lower motor #{motor_number} has default settings'''
             self.lower_finger_file_path_label.setText(file_path)
             self.lower_finger_file_path = file_path
 
-    # Write all settings to the selected file path
+    def upper_open_adc_file(self):
+        window_name = "Open File (Upper ADC)"
+        search_dir = "../../Data/"
+        file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
+        if file_path:
+            self.upper_adc_channels_file_path_label.setText(file_path)
+            self.upper_adc_channels_file_path = file_path
+
+    def lower_open_adc_file(self):
+        window_name = "Open File (Lower ADC)"
+        search_dir = "../../Data/"
+        file_path, _ = QFileDialog.getOpenFileName(self, window_name, search_dir, "Text Files (*.txt)")
+        if file_path:
+            self.lower_adc_channels_file_path_label.setText(file_path)
+            self.lower_adc_channels_file_path = file_path
+
+    # Methods to WRITE settings to the selected file path
     def upper_override_rotation_file(self):
         with open(self.upper_rotation_file_path, 'w') as f:
             for item in self.upper_motors_rotation_dict.items():
@@ -716,6 +827,19 @@ Lower motor #{motor_number} has default settings'''
                 target_str = f'M{item[0]}: {item[1]}'
                 f.write(target_str + '\n')
 
+    def upper_override_adc_file(self):
+        with open(self.upper_adc_channels_file_path, 'w') as f:
+            for item in self.upper_adc_channels_dict.items():
+                target_str = f'M{item[0]}: {item[1]}'
+                f.write(target_str + '\n')
+
+    def lower_override_adc_file(self):
+        with open(self.lower_adc_channels_file_path, 'w') as f:
+            for item in self.lower_adc_channels_dict.items():
+                target_str = f'M{item[0]}: {item[1]}'
+                f.write(target_str + '\n')
+
+    # Methods to LOAD settings from files
     def upper_load_rotation(self):
         if self.upper_rotation_file_path is None:
             QMessageBox.warning(self, 'Warning', "Upper rotation file path is empty")
@@ -787,6 +911,40 @@ Lower motor #{motor_number} has default settings'''
                 lower_finger_dict[motor_number_str] = motor_finger_str
         self.manual_control.lower_set_finger(lower_finger_dict)
         self.lower_motors_finger_dict = lower_finger_dict
+
+    def upper_load_adc(self):
+        if self.upper_adc_channels_file_path is None:
+            QMessageBox.warning(self, 'Warning', "Upper ADC file path is empty")
+            return None
+        upper_adc_dict = dict()
+        with open(self.upper_adc_channels_file_path, 'r') as f:
+            lines = f.readlines()
+            print(f'Number of lines: {len(lines)}')
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_adc_position = line.find(":") + 2
+                motor_adc_str = line[motor_adc_position:motor_adc_position + 3]
+                motor_number_str = line[motor_number_position]
+                upper_adc_dict[motor_number_str] = motor_adc_str
+        self.manual_control.upper_set_finger(upper_adc_dict)
+        self.upper_adc_channels_dict = upper_adc_dict
+
+    def lower_load_adc(self):
+        if self.lower_adc_channels_file_path is None:
+            QMessageBox.warning(self, 'Warning', "Lower ADC file path is empty")
+            return None
+        lower_adc_dict = dict()
+        with open(self.lower_adc_channels_file_path, 'r') as f:
+            lines = f.readlines()
+            print(f'Number of lines: {len(lines)}')
+            for line in lines:
+                motor_number_position = line.find("M") + 1
+                motor_adc_position = line.find(":") + 2
+                motor_adc_str = line[motor_adc_position:motor_adc_position + 3]
+                motor_number_str = line[motor_number_position]
+                lower_adc_dict[motor_number_str] = motor_adc_str
+        self.manual_control.lower_set_finger(lower_adc_dict)
+        self.lower_adc_channels_dict = lower_adc_dict
 
     def settings_from_file_init(self):
         text_to_show = ""
