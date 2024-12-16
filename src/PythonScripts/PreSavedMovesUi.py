@@ -81,6 +81,11 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
+        # Default values for tense command. PWM = 15, tense time = 0.5 sec
+        self.default_pwm_value = 15
+        self.tense_finger_pwm_scale.setValue(self.default_pwm_value)
+        self.tense_finger_time_input.setText('0.5')
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -95,7 +100,10 @@ class Ui_MainWindow(object):
         self.send_full_sequence_btn.setText(_translate("MainWindow", "Send Full Sequence"))
         self.send_next_command_btn.setText(_translate("MainWindow", "Send Next Command"))
         self.tense_finger_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Tense finger:</span></p></body></html>"))
-        self.tense_finger_pwm_label.setText(_translate("MainWindow", "0"))
+
+        # Set corresponding pwm scale label
+        self.tense_finger_pwm_label.setText(_translate("MainWindow", f"{self.default_pwm_value}"))
+
         self.tense_finger_time_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Time:</span></p></body></html>"))
         self.tense_finger_btn.setText(_translate("MainWindow", "Tense Finger"))
         self.release_finger_btn.setText(_translate("MainWindow", "Release Finger"))

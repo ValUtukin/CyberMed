@@ -1706,6 +1706,32 @@ background-color: white; text-align: justify; text-justify: inter-word;</string>
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Graph Name:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="disable_graph_btn">
+    <property name="geometry">
+     <rect>
+      <x>1240</x>
+      <y>10</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Disable Graph</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stop_collector_thread_btn">
+    <property name="geometry">
+     <rect>
+      <x>1240</x>
+      <y>640</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop Collecting</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <customwidgets>

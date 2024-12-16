@@ -1,5 +1,6 @@
 import sys
 import comport as com
+from logging import getLogger, basicConfig, DEBUG
 from comport import ComportInstance
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -38,6 +39,13 @@ class MyApplication(QMainWindow):
         text = "Welcome to CyberMed SoftWare"
         self.welcome_label.setText(f"<font color='#00AB5D', size=24>{text}</font>")
 
+        # Setup Logger
+        self.main_logger = getLogger()
+        self.logging_format = "[%(levelname)s] - [%(asctime)s] - [%(name)s] - %(message)s"
+        self.log_file_path = r"C://PyCharmProjects/CyberMed log/MainApp.log"
+        basicConfig(filename=self.log_file_path, filemode='w', level=DEBUG, format=self.logging_format)
+        self.main_logger.info("START NEW SESSION")
+
         self.command_master = CommandMaster()
         self.available_ports = com.show_available_ports()
         self.upper_comport_comboBox.addItems(self.available_ports)
@@ -46,6 +54,12 @@ class MyApplication(QMainWindow):
         self.lower_current_comport_name = None
         self.upper_current_comport = None
         self.lower_current_comport = None
+
+        # File path for custom command logging
+        self.command_log_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/command_log.txt"
+        # Clearing command log file every time MainApp is started
+        with open(self.command_log_file_path, 'w') as f:
+            f.write("")
 
         # Default settings file paths. Use for autoload function (motor_settings_autoload). !Modify to your directory!
         self.upper_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_rotation.txt"
@@ -215,24 +229,26 @@ class MyApplication(QMainWindow):
         self.manual_control = ManualControl()
         self.pre_saved_moves = PreSavedMoves()
         self.elbow_and_shoulder = ElbowAndShoulder()
-        self.upper_collector = DataCollector(1)
-        self.lower_collector = DataCollector(1)
+        self.file_writer = FileWriter()
 
-        self.upper_adc_collector = DataCollector(1)
-        self.lower_adc_collector = DataCollector(1)
+        # Collectors to test ADC
+        self.upper_adc_collector = DataCollector(set_num=1, name="MainApp Upper-test")
+        self.lower_adc_collector = DataCollector(set_num=1, name="MainApp Lower-test")
+        # Setup ADC-testing thread
+        self.upper_setup_adc_test_thread()
+        self.lower_setup_adc_test_thread()
 
-        self.upper_collector_both = DataCollector(1)
-        self.lower_collector_both = DataCollector(1)
+        # Collectors for actual work
+        self.upper_collector = DataCollector(set_num=1, name="Upper-single")
+        self.lower_collector = DataCollector(set_num=1, name="Lower-single")
+        self.upper_collector_both = DataCollector(set_num=1, name="Upper-both")
+        self.lower_collector_both = DataCollector(set_num=1, name="Lower-both")
+
         self.manual_control.set_upper_data_collector(self.upper_collector)
         self.manual_control.set_lower_data_collector(self.lower_collector)
         self.manual_control.set_upper_collector_both(self.upper_collector_both)
         self.manual_control.set_lower_collector_both(self.lower_collector_both)
-        self.file_writer = FileWriter()
         self.manual_control.set_file_writer(self.file_writer)
-
-        # Setup ADC-testing thread
-        self.upper_setup_adc_test_thread()
-        self.lower_setup_adc_test_thread()
 
         # Give copy of CommandMaster instance to other classes, so they can interact with comports through it
         master_copy = self.command_master
@@ -371,7 +387,7 @@ class MyApplication(QMainWindow):
         self.lower_comport_comboBox.setCurrentIndex(lower_combo_box_current_index)
         self.lower_comport_comboBox.model().item(current_index).setFlags(QtCore.Qt.NoItemFlags)
         print(f"update_upper: Upper - {self.upper_current_comport_name}, Lower - {self.lower_current_comport_name}")
-        self.connect_upper_comport()
+        self.__connect_upper_comport()
 
     def lower_update_comport_combo_box(self):
         current_index = self.lower_comport_comboBox.currentIndex()
@@ -383,15 +399,14 @@ class MyApplication(QMainWindow):
         self.upper_comport_comboBox.setCurrentIndex(upper_combo_box_current_index)
         self.upper_comport_comboBox.model().item(current_index).setFlags(QtCore.Qt.NoItemFlags)
         print(f"update_lower: Upper - {self.upper_current_comport_name}, Lower - {self.lower_current_comport_name}")
-        self.connect_lower_comport()
+        self.__connect_lower_comport()
 
-    # TODO: Need to test comport setting process for upper_collector and lower_collector
-    def connect_upper_comport(self):
+    def __connect_upper_comport(self):
         if self.upper_current_comport_name is None:
-            print('MainApp/connect_upper_comport - upper comport name is None')
+            self.main_logger.warning("Cannot connect: upper comport name is None")
         else:
-            # self.upper_current_comport = com.ini(self.upper_current_comport_name)
             self.upper_current_comport = ComportInstance(self.upper_current_comport_name, 'Upper')
+            self.upper_current_comport.set_command_log_file_path(self.command_log_file_path)
             if self.upper_current_comport.is_open:
                 self.command_master.set_upper_comport(self.upper_current_comport)
                 self.upper_collector.set_default_comport(self.upper_current_comport)
@@ -401,12 +416,12 @@ class MyApplication(QMainWindow):
             else:
                 print('Upper comport is not open')
 
-    def connect_lower_comport(self):
+    def __connect_lower_comport(self):
         if self.lower_current_comport_name is None:
-            print('MainApp/connect_lower_comport - lower comport name is None')
+            self.main_logger.warning("Cannot connect: lower comport name is None")
         else:
-            # self.lower_current_comport = com.ini(self.lower_current_comport_name)
             self.lower_current_comport = ComportInstance(self.lower_current_comport_name, 'Lower')
+            self.lower_current_comport.set_command_log_file_path(self.command_log_file_path)
             if self.lower_current_comport.is_open:
                 self.command_master.set_lower_comport(self.lower_current_comport)
                 self.lower_collector.set_default_comport(self.lower_current_comport)
@@ -420,7 +435,7 @@ class MyApplication(QMainWindow):
         if self.upper_current_comport:
             self.upper_current_comport.close_comport()
         if self.lower_current_comport:
-            self.lower_current_comportclose_comport()
+            self.lower_current_comport.close_comport()
 
         self.upper_current_comport_name = None
         self.lower_current_comport_name = None
@@ -434,6 +449,7 @@ class MyApplication(QMainWindow):
 
         self.update_upper_status_label(False)
         self.update_lower_status_label(False)
+        self.main_logger.info("Rescan comports. Both ports are None now")
 
     # TODO: Looks like this method simular to rescan_comport. Maybe should remove this one...?
     def reset_comport(self):
@@ -467,7 +483,7 @@ class MyApplication(QMainWindow):
     def upper_check_motor_rotation(self):
         motor_number = self.upper_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
         pwm = self.upper_motor_pwm_scale.value()
-        time = float(self.upper_time_input.toPlainText())
+        time_to_work = self.upper_time_input.toPlainText()
         reverse_flag = self.upper_reverse_motor_checkBox.isChecked()
 
         if reverse_flag:
@@ -478,15 +494,15 @@ class MyApplication(QMainWindow):
         motor_byte_base = '000'
         motor_byte = motor_byte_base + motor_byte_mode + self.upper_motors_finger_dict[f'{motor_number}']
 
-        print(f'We about to check Upper Motor#{motor_number}, motor_byte: {motor_byte}')
+        self.main_logger.debug(f'We about to check Upper Motor#{motor_number} rotation, motor_byte: {motor_byte}')
         self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=pwm,
-                                         work_time=time, delay=0)
+                                         work_time=time_to_work, delay='0.0', write_to_script_file=False)
         self.command_master.power_command(part='Upper', config='00000001', power_byte='00000001')
 
     def lower_check_motor_rotation(self):
         motor_number = self.lower_motors_comboBox.currentIndex() + 1  # Indexes start from 0. Motors start from 1
         pwm = self.lower_motor_pwm_scale.value()
-        time = float(self.lower_time_input.toPlainText())
+        time_to_work = self.lower_time_input.toPlainText()
         reverse_flag = self.lower_reverse_motor_checkBox.isChecked()
 
         if reverse_flag:
@@ -497,9 +513,9 @@ class MyApplication(QMainWindow):
         motor_byte_base = '000'
         motor_byte = motor_byte_base + motor_byte_mode + self.lower_motors_finger_dict[f'{motor_number}']
 
-        print(f'We about to check Lower Motor#{motor_number}, motor_byte: {motor_byte}')
+        self.main_logger.debug(f'We about to check Lower Motor#{motor_number} rotation, motor_byte: {motor_byte}')
         self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=pwm,
-                                         work_time=time, delay=0)
+                                         work_time=time_to_work, delay='0.0', write_to_script_file=False)
         self.command_master.power_command(part='Lower', config='00000001', power_byte='00000001')
 
     def upper_apply_motor_rotation(self):
@@ -532,48 +548,42 @@ Lower motor #{motor_number} has default settings'''
 
     def upper_discard_all_rotation_settings(self):
         self.upper_motors_rotation_dict = self.upper_motors_rotation_dict_default
-        print("Roll back upper rotation dict to its default")
-        print(self.upper_motors_rotation_dict)
+        self.main_logger.debug("Roll back upper rotation dict to its default")
 
     def lower_discard_all_rotation_settings(self):
         self.lower_motors_rotation_dict = self.lower_motors_rotation_dict_default
-        print("Roll back lower rotation dict to its default")
-        print(self.lower_motors_rotation_dict)
+        self.main_logger.debug("Roll back lower rotation dict to its default")
 
     def upper_discard_all_finger_settings(self):
         self.upper_motors_finger_dict = self.upper_motors_finger_dict_default
-        print("Roll back upper finger dict to its default")
-        print(self.upper_motors_finger_dict)
+        self.main_logger.debug("Roll back upper finger dict to its default")
 
     def lower_discard_all_finger_settings(self):
         self.lower_motors_finger_dict = self.lower_motors_finger_dict_default
-        print("Roll back lower finger dict to its default")
-        print(self.lower_motors_finger_dict)
+        self.main_logger.debug("Roll back lower finger dict to its default")
 
     def upper_check_motor_finger(self):
         motor_number = self.upper_motors_finger_comboBox.currentIndex() + 1
         motor_number_byte = self.upper_motor_number_input.toPlainText()
 
-        print(f"Motor #{motor_number}, byte number: {motor_number_byte}")
         motor_byte_base = '000'
         motor_byte = motor_byte_base + self.upper_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
-        print(f'We about to check Upper Motor #{motor_number}, motor_byte: {motor_byte}')
-        self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=50,
-                                         work_time=1.0, delay=0)
+        self.main_logger.debug(f"We about to check Upper Motor-to-Finger #{motor_number}, motor_byte: {motor_byte}")
+        self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=15,
+                                         work_time='1.0', delay='0.0', write_to_script_file=False)
         self.command_master.power_command(part='Upper', config='00000001', power_byte='00000001')
 
     def lower_check_motor_finger(self):
         motor_number = self.lower_motors_finger_comboBox.currentIndex() + 1
         motor_number_byte = self.lower_motor_number_input.toPlainText()
 
-        print(f"Motor #{motor_number}, byte number: {motor_number_byte}")
         motor_byte_base = '000'
         motor_byte = motor_byte_base + self.lower_motors_rotation_dict[f'{motor_number}'] + motor_number_byte
 
-        print(f'We about to check Lower Motor #{motor_number}, motor_byte: {motor_byte}')
-        self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=50,
-                                         work_time=1.0, delay=0)
+        self.main_logger.debug(f"We about to check Lower Motor-to-Finger #{motor_number}, motor_byte: {motor_byte}")
+        self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=15,
+                                         work_time='1.0', delay='0.0', write_to_script_file=False)
         self.model.power_command(part='Lower', config='00000001', power_byte='00000001')
 
     def upper_apply_motor_finger(self):
@@ -623,7 +633,7 @@ Lower motor #{motor_number} has default settings'''
         self.upper_adc_collector.set_test_adc_delay(delay_before_work=delay_before_work)
         self.command_master.upper_send_adc(adc_decimal=adc_decimal)
         self.command_master.send_command(part="Upper", config='00011110', motor_byte=motor_byte, pwm=pwm,
-                                         work_time=time_to_work, delay=delay_before_work)
+                                         work_time=time_to_work, delay=delay_before_work, write_to_script_file=False)
 
         self.upper_adc_test_thread.start()
         self.command_master.power_command(part='Upper', config='00000001', power_byte='00000001')
@@ -647,7 +657,7 @@ Lower motor #{motor_number} has default settings'''
         self.lower_adc_collector.set_test_adc_delay(delay_before_work=delay_before_work)
         self.command_master.lower_send_adc(adc_decimal=adc_decimal)
         self.command_master.send_command(part="Lower", config='00011110', motor_byte=motor_byte, pwm=pwm,
-                                         work_time=time_to_work, delay=delay_before_work)
+                                         work_time=time_to_work, delay=delay_before_work, write_to_script_file=False)
 
         self.lower_adc_test_thread.start()
         self.command_master.power_command(part='Lower', config='00000001', power_byte='00000001')
@@ -959,6 +969,14 @@ Lower motor #{motor_number} has default settings'''
         self.settings_from_file_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.settings_from_file_label.setWordWrap(True)
         self.settings_from_file_label.setText(text_to_show)
+
+    def closeEvent(self, event):
+        self.main_logger.info("Application is closed")
+        if self.upper_current_comport_name:
+            self.upper_current_comport.write_command_log({'service_msg': "Stop Session"}, 'SERVICE')
+        if self.lower_current_comport_name:
+            self.lower_current_comport.write_command_log({'service_msg': "Stop Session"}, 'SERVICE')
+        event.accept()
 
 
 if __name__ == "__main__":

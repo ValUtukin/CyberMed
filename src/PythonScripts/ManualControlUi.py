@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 from pyqtgraph import PlotWidget
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -433,7 +434,7 @@ class Ui_MainWindow(object):
         self.move_script_label = QtWidgets.QLabel(self.centralwidget)
         self.move_script_label.setGeometry(QtCore.QRect(10, 650, 721, 91))
         self.move_script_label.setStyleSheet("border-style: solid;border-color: rgb(0, 0, 0);border-width: 1px;\n"
-                                            "background-color: white; text-align: justify; text-justify: inter-word;")
+"background-color: white; text-align: justify; text-justify: inter-word;")
         self.move_script_label.setObjectName("move_script_label")
         self.script_file_path_label = QtWidgets.QLabel(self.centralwidget)
         self.script_file_path_label.setGeometry(QtCore.QRect(90, 750, 471, 31))
@@ -445,15 +446,18 @@ class Ui_MainWindow(object):
         self.test_btn = QtWidgets.QPushButton(self.centralwidget)
         self.test_btn.setGeometry(QtCore.QRect(740, 750, 75, 31))
         self.test_btn.setObjectName("test_btn")
-
         self.graph_name_input = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.graph_name_input.setStyleSheet("font-size: 12pt")  # Change the size of font
         self.graph_name_input.setGeometry(QtCore.QRect(820, 10, 321, 31))
         self.graph_name_input.setObjectName("graph_name_input")
-
         self.enter_graph_name_label = QtWidgets.QLabel(self.centralwidget)
         self.enter_graph_name_label.setGeometry(QtCore.QRect(740, 10, 81, 31))
         self.enter_graph_name_label.setObjectName("enter_graph_name_label")
+        self.disable_graph_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.disable_graph_btn.setGeometry(QtCore.QRect(1240, 10, 81, 31))
+        self.disable_graph_btn.setObjectName("disable_graph_btn")
+        self.stop_collector_thread_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.stop_collector_thread_btn.setGeometry(QtCore.QRect(1240, 640, 91, 31))
+        self.stop_collector_thread_btn.setObjectName("stop_collector_thread_btn")
         MainWindow.setCentralWidget(self.centralwidget)
 
         # Lower part default time/delay values
@@ -579,3 +583,5 @@ class Ui_MainWindow(object):
         self.open_script_file_btn.setText(_translate("MainWindow", "Open..."))
         self.test_btn.setText(_translate("MainWindow", "Test Button"))
         self.enter_graph_name_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:10pt;\">Graph Name:</span></p></body></html>"))
+        self.disable_graph_btn.setText(_translate("MainWindow", "Disable Graph"))
+        self.stop_collector_thread_btn.setText(_translate("MainWindow", "Stop Collecting"))

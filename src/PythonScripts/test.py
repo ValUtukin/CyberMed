@@ -1,6 +1,7 @@
 import time
 import timeit
 import datetime
+from decimal import Decimal
 
 
 def sandbox():
@@ -17,14 +18,33 @@ def sandbox():
     print(*last_values)
     print(*ys)
 
-def sandbox1():
-    array1 = [True, True, True]
-    array2 = [True, False, True]
 
-    if array1 == array2:
-        print("Arrays are equal")
-    else:
-        print("Not equal")
+def enumerate_test():
+    for i, value in enumerate(range(0, 100, 2)):
+        print(f"{i}: {value}")
+
+
+def sandbox1():
+    my_dict = {
+        '0': [0, 0, 0],
+        '1': [1, 1, 1],
+        '2': [2, 2, 2]
+    }
+
+    for j in range(20):
+        set_name = str(j % len(my_dict))
+        print(set_name)
+
+
+def zip_test():
+    a = [1, 4, 3, 4]
+    b = [1, 5, 3]
+    for i, pair in enumerate(zip(a, b)):
+        print(f"{i}: {pair}")
+
+
+def hex_convert(hex_str):
+    print(int(hex_str, 16))
 
 
 def time_test():
@@ -38,8 +58,12 @@ def time_test():
     print(f'str - {dt2_str}, type - {type(dt2_str)}')
 
 
+def test():
+    target = 3
+    for i in range(10):
+        if i % target == 0:
+            print(i)
+
+
 if __name__ == '__main__':
-    # sandbox()
-    delay = 0
-    char_delay = bytes(chr(delay), 'ascii')
-    print(char_delay)
+    test()
