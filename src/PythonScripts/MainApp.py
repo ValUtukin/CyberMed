@@ -571,7 +571,7 @@ Lower motor #{motor_number} has default settings'''
 
         self.main_logger.debug(f"We about to check Upper Motor-to-Finger #{motor_number}, motor_byte: {motor_byte}")
         self.command_master.send_command(part='Upper', config='00011110', motor_byte=motor_byte, pwm=15,
-                                         work_time='1.0', delay='0.0', write_to_script_file=False)
+                                         work_time='0.5', delay='0.0', write_to_script_file=False)
         self.command_master.power_command(part='Upper', config='00000001', power_byte='00000001')
 
     def lower_check_motor_finger(self):
@@ -583,8 +583,8 @@ Lower motor #{motor_number} has default settings'''
 
         self.main_logger.debug(f"We about to check Lower Motor-to-Finger #{motor_number}, motor_byte: {motor_byte}")
         self.command_master.send_command(part='Lower', config='00011110', motor_byte=motor_byte, pwm=15,
-                                         work_time='1.0', delay='0.0', write_to_script_file=False)
-        self.model.power_command(part='Lower', config='00000001', power_byte='00000001')
+                                         work_time='0.5', delay='0.0', write_to_script_file=False)
+        self.command_master.power_command(part='Lower', config='00000001', power_byte='00000001') # model -> command_master
 
     def upper_apply_motor_finger(self):
         motor_number = str(self.upper_motors_finger_comboBox.currentIndex() + 1)
@@ -818,24 +818,28 @@ Lower motor #{motor_number} has default settings'''
             for item in self.upper_motors_rotation_dict.items():
                 target_str = f'M{item[0]}: {item[1]}'
                 f.write(target_str + '\n')
+        print("Upper Rotation File has been updated!")
 
     def lower_override_rotation_file(self):
         with open(self.lower_rotation_file_path, 'w') as f:
             for item in self.lower_motors_rotation_dict.items():
                 target_str = f'M{item[0]}: {item[1]}'
                 f.write(target_str + '\n')
+        print("Lower Rotation File has been updated!")
 
     def upper_override_finger_file(self):
         with open(self.upper_finger_file_path, 'w') as f:
             for item in self.upper_motors_finger_dict.items():
                 target_str = f'M{item[0]}: {item[1]}'
                 f.write(target_str + '\n')
+        print("Upper Finger File has been updated!")
 
     def lower_override_finger_file(self):
         with open(self.lower_finger_file_path, 'w') as f:
             for item in self.lower_motors_finger_dict.items():
                 target_str = f'M{item[0]}: {item[1]}'
                 f.write(target_str + '\n')
+        print("Lower Finger File has been updated!")
 
     def upper_override_adc_file(self):
         with open(self.upper_adc_channels_file_path, 'w') as f:
@@ -867,6 +871,7 @@ Lower motor #{motor_number} has default settings'''
                     motor_number_str = line[motor_number_position]
                 upper_rotation_dict[motor_number_str] = motor_rotation_str
         self.manual_control.upper_set_rotation(upper_rotation_dict)
+        self.pre_saved_moves.upper_set_rotation(upper_rotation_dict)
         self.upper_motors_rotation_dict = upper_rotation_dict
 
     def lower_load_rotation(self):
@@ -886,6 +891,7 @@ Lower motor #{motor_number} has default settings'''
                     motor_number_str = line[motor_number_position]
                 lower_rotation_dict[motor_number_str] = motor_rotation_str
         self.manual_control.lower_set_rotation(lower_rotation_dict)
+        self.pre_saved_moves.lower_set_rotation(lower_rotation_dict)
         self.lower_motors_rotation_dict = lower_rotation_dict
 
     def upper_load_finger(self):
@@ -903,6 +909,7 @@ Lower motor #{motor_number} has default settings'''
                 motor_number_str = line[motor_number_position]
                 upper_finger_dict[motor_number_str] = motor_finger_str
         self.manual_control.upper_set_finger(upper_finger_dict)
+        self.pre_saved_moves.upper_set_finger(upper_finger_dict)
         self.upper_motors_finger_dict = upper_finger_dict
 
     def lower_load_finger(self):
@@ -920,6 +927,7 @@ Lower motor #{motor_number} has default settings'''
                 motor_number_str = line[motor_number_position]
                 lower_finger_dict[motor_number_str] = motor_finger_str
         self.manual_control.lower_set_finger(lower_finger_dict)
+        self.pre_saved_moves.lower_set_finger(lower_finger_dict)
         self.lower_motors_finger_dict = lower_finger_dict
 
     def upper_load_adc(self):
