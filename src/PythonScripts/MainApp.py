@@ -42,7 +42,7 @@ class MyApplication(QMainWindow):
         # Setup Logger
         self.main_logger = getLogger()
         self.logging_format = "[%(levelname)s] - [%(asctime)s] - [%(name)s] - %(message)s"
-        self.log_file_path = r"C://PyCharmProjects/CyberMed log/MainApp.log"
+        self.log_file_path = r"D://PythonProjects/log/MainApp.log"
         basicConfig(filename=self.log_file_path, filemode='w', level=DEBUG, format=self.logging_format)
         self.main_logger.info("START NEW SESSION")
 
@@ -56,18 +56,18 @@ class MyApplication(QMainWindow):
         self.lower_current_comport = None
 
         # File path for custom command logging
-        self.command_log_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/command_log.txt"
+        self.command_log_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/command_log.txt"
         # Clearing command log file every time MainApp is started
         with open(self.command_log_file_path, 'w') as f:
             f.write("")
 
         # Default settings file paths. Use for autoload function (motor_settings_autoload). !Modify to your directory!
-        self.upper_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_rotation.txt"
-        self.lower_rotation_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_rotation.txt"
-        self.upper_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_finger.txt"
-        self.lower_finger_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_finger.txt"
-        self.upper_adc_channels_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/upper_adc_channels.txt"
-        self.lower_adc_channels_file_path = r"C:/PyCharmProjects/PyQt_withHub/CyberMed/Data/lower_adc_channels.txt"
+        self.upper_rotation_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/upper_rotation.txt"
+        self.lower_rotation_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/lower_rotation.txt"
+        self.upper_finger_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/upper_finger.txt"
+        self.lower_finger_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/lower_finger.txt"
+        self.upper_adc_channels_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/upper_adc_channels.txt"
+        self.lower_adc_channels_file_path = r"D:/PythonProjects/CyberMed/CyberMed/Data/lower_adc_channels.txt"
 
         self.upper_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
         self.lower_motors_comboBox.addItems(['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5', 'Motor 6'])
@@ -405,31 +405,39 @@ class MyApplication(QMainWindow):
         if self.upper_current_comport_name is None:
             self.main_logger.warning("Cannot connect: upper comport name is None")
         else:
-            self.upper_current_comport = ComportInstance(self.upper_current_comport_name, 'Upper')
-            self.upper_current_comport.set_command_log_file_path(self.command_log_file_path)
-            if self.upper_current_comport.is_open:
-                self.command_master.set_upper_comport(self.upper_current_comport)
-                self.upper_collector.set_default_comport(self.upper_current_comport)
-                self.upper_collector_both.set_upper_comport_both(self.upper_current_comport)
-                self.upper_adc_collector.set_default_comport(self.upper_current_comport)
-                self.update_upper_status_label(True)
-            else:
-                print('Upper comport is not open')
+            try:
+                self.upper_current_comport = ComportInstance(self.upper_current_comport_name, 'Upper')
+                self.upper_current_comport.set_command_log_file_path(self.command_log_file_path)
+                if self.upper_current_comport.is_open:
+                    self.command_master.set_upper_comport(self.upper_current_comport)
+                    self.upper_collector.set_default_comport(self.upper_current_comport)
+                    self.upper_collector_both.set_upper_comport_both(self.upper_current_comport)
+                    self.upper_adc_collector.set_default_comport(self.upper_current_comport)
+                    self.update_upper_status_label(True)
+                else:
+                    print('Upper comport is not open')
+            except Exception as e:
+                self.main_logger.warning(e)
+                self.upper_current_comport_name = None
 
     def __connect_lower_comport(self):
         if self.lower_current_comport_name is None:
             self.main_logger.warning("Cannot connect: lower comport name is None")
         else:
-            self.lower_current_comport = ComportInstance(self.lower_current_comport_name, 'Lower')
-            self.lower_current_comport.set_command_log_file_path(self.command_log_file_path)
-            if self.lower_current_comport.is_open:
-                self.command_master.set_lower_comport(self.lower_current_comport)
-                self.lower_collector.set_default_comport(self.lower_current_comport)
-                self.lower_collector_both.set_lower_comport_both(self.lower_current_comport)
-                self.lower_adc_collector.set_default_comport(self.lower_current_comport)
-                self.update_lower_status_label(True)
-            else:
-                print('Lower comport is not open')
+            try:
+                self.lower_current_comport = ComportInstance(self.lower_current_comport_name, 'Lower')
+                self.lower_current_comport.set_command_log_file_path(self.command_log_file_path)
+                if self.lower_current_comport.is_open:
+                    self.command_master.set_lower_comport(self.lower_current_comport)
+                    self.lower_collector.set_default_comport(self.lower_current_comport)
+                    self.lower_collector_both.set_lower_comport_both(self.lower_current_comport)
+                    self.lower_adc_collector.set_default_comport(self.lower_current_comport)
+                    self.update_lower_status_label(True)
+                else:
+                    print('Lower comport is not open')
+            except Exception as e:
+                self.main_logger.warning(e)
+                self.lower_current_comport_name = None
 
     def rescan_comport(self):
         if self.upper_current_comport:
